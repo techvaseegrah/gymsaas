@@ -71,32 +71,35 @@ const RFIDPunchModal = ({ isOpen, onClose, onSubmit, loading }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md mx-4">
-                <div className="flex justify-between items-center border-b pb-3 mb-4">
-                    <h3 className="text-xl font-semibold text-gray-700 flex items-center">
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50 backdrop-blur-sm">
+            <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4 border border-gray-700">
+                <div className="flex justify-between items-center border-b border-gray-700 pb-3 mb-4">
+                    <h3 className="text-xl font-semibold text-white flex items-center">
                         <FaIdCard className="mr-3 text-yellow-500" />
                         Enter Your RFID
                     </h3>
-                    <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                    <button 
+                        onClick={onClose} 
+                        className="text-gray-400 hover:text-white transition-colors duration-200"
+                    >
                         <FaTimes size={20} />
                     </button>
                 </div>
                 
                 <form onSubmit={handleSubmit}>
-                    <p className="text-gray-600 mb-4">Please enter your RFID code below to check your attendance status.</p>
+                    <p className="text-gray-300 mb-4">Please enter your RFID code below to check your attendance status.</p>
                     <input
                         type="text"
                         value={rfid}
                         onChange={(e) => setRfid(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        className="w-full px-4 py-3 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition-all duration-200"
                         placeholder="RFID Code"
                         autoFocus
                     />
                     
                     {locationError && (
-                        <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                            <p className="text-red-600 text-sm">{locationError}</p>
+                        <div className="mt-3 p-3 bg-red-900 bg-opacity-50 border border-red-700 rounded-lg">
+                            <p className="text-red-300 text-sm">{locationError}</p>
                         </div>
                     )}
                     
@@ -104,14 +107,14 @@ const RFIDPunchModal = ({ isOpen, onClose, onSubmit, loading }) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                            className="px-6 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 hover:text-white transition-all duration-200"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={!rfid || loading}
-                            className="px-6 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 disabled:bg-yellow-300 flex items-center"
+                            className="px-6 py-2 bg-gradient-to-r from-yellow-600 to-yellow-800 text-white rounded-lg hover:from-yellow-700 hover:to-yellow-900 disabled:from-yellow-800 disabled:to-yellow-900 flex items-center transition-all duration-200"
                         >
                             {loading ? (
                                 <>

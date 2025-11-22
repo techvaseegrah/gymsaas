@@ -3,33 +3,55 @@
 @tailwind utilities;
 
 @layer components {
-  .login-illustration-bg {
-    @apply bg-[url('https://i.ibb.co/L5rK5gD/Screenshot-2023-11-20-at-10-34-40-PM.png')];
-  }
-
   .no-page-scroll {
     @apply h-screen overflow-hidden;
+  }
+  /* Custom Scrollbar for the Fighter List */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
   }
 }
 
 @layer base {
     body {
-      @apply font-sans bg-primary text-gray-500;
+      @apply font-sans bg-gray-900 text-gray-300; 
     }
- 
-    h1, h2, h3, h4, h5, h6 {
-      @apply font-bold;
-    }
- 
-    h1 {
-      @apply text-4xl;
-    }
- 
-    h2 {
-      @apply text-3xl;
-    }
- 
-    h3 {
-      @apply text-2xl;
-    }
-  }
+}
+
+/* --- LIQUID ANIMATION KEYFRAMES --- */
+@keyframes blob {
+  0% { transform: translate(0px, 0px) scale(1); }
+  33% { transform: translate(30px, -50px) scale(1.1); }
+  66% { transform: translate(-20px, 20px) scale(0.9); }
+  100% { transform: translate(0px, 0px) scale(1); }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out forwards;
+}

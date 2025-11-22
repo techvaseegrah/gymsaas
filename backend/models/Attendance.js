@@ -21,6 +21,11 @@ const attendanceSchema = new mongoose.Schema({
     location: {
         latitude: { type: Number },
         longitude: { type: Number }
+    },
+    tenant: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Tenant', 
+        required: true 
     }
 }, { timestamps: true }); // Using timestamps adds createdAt and updatedAt fields automatically
 

@@ -6,6 +6,8 @@ import { FaBars, FaTimes } from 'react-icons/fa';
 
 // Import Pages
 import LoginPage from './pages/LoginPage';
+import LandingPage from './pages/LandingPage';
+import TenantSignupPage from './pages/TenantSignupPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import DashboardPage from './pages/DashboardPage';
 import AddFighterPage from './pages/AddFighterPage';
@@ -20,6 +22,7 @@ import FighterLevelPage from './pages/FighterLevelPage';
 import FighterLevelViewPage from './pages/FighterLevelViewPage';
 import FighterFaceRecognitionPage from './pages/FighterFaceRecognitionPage';
 import AskDoubtPage from './pages/AskDoubtPage';
+import FighterProfileUpdatePage from './pages/FighterProfileUpdatePage';
 
 // Import Components
 import AdminSidebar from './components/AdminSidebar';
@@ -93,7 +96,7 @@ const App = () => {
 
     const AdminLayout = ({ children }) => {
         const location = useLocation();
-        const isAskDoubtPage = location.pathname === '/admin/ask-doubt';
+        const isAskDoubtPage = location.pathname === '/admin/ask-doubt';
         const [isSidebarOpen, setSidebarOpen] = useState(false);
         const closeSidebar = () => setSidebarOpen(false);
         return (
@@ -144,21 +147,23 @@ const App = () => {
 
     const FighterLayout = ({ children }) => {
         const location = useLocation();
-        const isAskDoubtPage = location.pathname === '/fighter/ask-doubt';
+        const isAskDoubtPage = location.pathname === '/fighter/ask-doubt';
         const [isSidebarOpen, setSidebarOpen] = useState(false);
         const closeSidebar = () => setSidebarOpen(false);
         return (
-            <div className={`relative min-h-screen bg-gray-100 ${isAskDoubtPage ? 'no-page-scroll' : ''}`}>
+            // UPDATE: Changed bg-gray-100 to bg-gray-900 to remove the white border effect
+            <div className={`relative min-h-screen bg-gray-900 ${isAskDoubtPage ? 'no-page-scroll' : ''}`}>
                 {isSidebarOpen && <div className="fixed inset-0 z-20 bg-black opacity-50 lg:hidden" onClick={closeSidebar}></div>}
     
-                <div className="lg:hidden flex justify-between items-center bg-gray-800 text-white p-4 sticky top-0 z-10">
+                <div className="lg:hidden flex justify-between items-center bg-gray-800 text-white p-4 sticky top-0 z-10 border-b border-gray-700">
                     <h1 className="text-xl font-bold">Fighter Portal</h1>
                     <button onClick={() => setSidebarOpen(!isSidebarOpen)}>
                         {isSidebarOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                     </button>
                 </div>
     
-                <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0`}>
+                {/* Added border-r border-gray-700 for a subtle dark separation instead of white */}
+                <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 border-r border-gray-700`}>
                     <FighterSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} />
                 </aside>
     
@@ -169,19 +174,19 @@ const App = () => {
                 {/* Logout Confirmation Modal for Fighter */}
                 {showLogoutConfirm && (
                     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                        <div className="bg-white rounded-lg p-6 w-96">
+                        <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 w-96 text-white">
                             <h3 className="text-xl font-bold mb-4">Confirm Logout</h3>
-                            <p className="mb-6">Are you sure you want to logout?</p>
+                            <p className="mb-6 text-gray-300">Are you sure you want to logout?</p>
                             <div className="flex justify-end space-x-4">
                                 <button 
                                     onClick={cancelLogout}
-                                    className="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400"
+                                    className="px-4 py-2 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
                                 >
                                     Cancel
                                 </button>
                                 <button 
                                     onClick={performLogout}
-                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                                 >
                                     Logout
                                 </button>
@@ -200,10 +205,10 @@ const App = () => {
     return (
         <Router>
             <Routes>
-                {/* --- THIS IS THE CORRECTED LOGIN ROUTE --- */}
-                {/* It now passes the 'user' state down and always renders LoginPage */
-                }
-                <Route path="/" element={<LoginPage setUser={setUser} user={user} />} />
+                {/* Public Routes */}
+                <Route path="/" element={<LandingPage />} />
+                                <Route path="/login" element={<LoginPage setUser={setUser} user={user} />} />
+                                <Route path="/signup" element={<TenantSignupPage />} />
 
                 {/* Admin Routes */}
                 <Route path="/fighter/level" element={<ProtectedRoute role="fighter"><FighterLayout><FighterLevelViewPage /></FighterLayout></ProtectedRoute>} />
@@ -217,11 +222,13 @@ const App = () => {
                 <Route path="/fighter/attendance/face" element={<ProtectedRoute role="fighter"><FighterLayout><FighterFaceRecognitionPage /></FighterLayout></ProtectedRoute>} />
                 <Route path="/admin/ask-doubt" element={<ProtectedRoute role="admin"><AdminLayout><AskDoubtPage /></AdminLayout></ProtectedRoute>} />
                 <Route path="/admin/fighter-level" element={<ProtectedRoute role="admin"><AdminLayout><FighterLevelPage /></AdminLayout></ProtectedRoute>} />
+                
                 {/* Fighter Routes */}
                 <Route path="/fighter/ask-doubt" element={<ProtectedRoute role="fighter"><FighterLayout><AskDoubtPage /></FighterLayout></ProtectedRoute>} />
                 <Route path="/fighter/complete-profile" element={<ProtectedRoute role="fighter"><CompleteProfilePage /></ProtectedRoute>} />
                 <Route path="/fighter" element={<ProtectedRoute role="fighter"><FighterLayout><FighterHomePage user={user} /></FighterLayout></ProtectedRoute>} />
                 <Route path="/fighter/attendance" element={<ProtectedRoute role="fighter"><FighterLayout><FighterAttendancePage user={user} /></FighterLayout></ProtectedRoute>} />
+                <Route path="/fighter/profile/update" element={<ProtectedRoute role="fighter"><FighterLayout><FighterProfileUpdatePage /></FighterLayout></ProtectedRoute>} />
             </Routes>
         </Router>
     );

@@ -5,14 +5,12 @@ const Admin = require('./models/Admin');
 
 const checkAndCreateAdmin = async () => {
     try {
-        // Connect to MongoDB
         await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/gym');
         console.log('✅ Connected to MongoDB');
 
         const email = 'techvaseegrah@gmail.com';
         const password = '123456';
 
-        // Check if admin exists
         let admin = await Admin.findOne({ email });
         
         if (admin) {
@@ -21,12 +19,9 @@ const checkAndCreateAdmin = async () => {
             console.log('   Created:', admin._id);
         } else {
             console.log('⚠️  Admin user does not exist. Creating...');
-            
-            // Hash password
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
 
-            // Create admin
             admin = new Admin({
                 email,
                 password: hashedPassword,
@@ -39,7 +34,6 @@ const checkAndCreateAdmin = async () => {
             console.log('   Password:', password);
         }
 
-        // List all admins
         const allAdmins = await Admin.find({});
         console.log('\n📋 All Admin Users:');
         allAdmins.forEach((admin, index) => {

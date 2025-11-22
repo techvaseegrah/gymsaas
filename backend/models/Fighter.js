@@ -58,6 +58,7 @@ const fighterSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true },
     profile_completed: { type: Boolean, default: false }, //
     name: { type: String }, //
     fighterBatchNo: { type: String }, //
@@ -84,7 +85,8 @@ const fighterSchema = new mongoose.Schema({
     assessment: { type: assessmentSchema, default: () => ({}) }, // Use the new schema
     
     faceEncodings: { type: mongoose.Schema.Types.Mixed }, //
-    profilePhoto: { type: String } // Store Base64 encoded image string
+    profilePhoto: { type: String }, // Store Base64 encoded image string
+    tenant: { type: mongoose.Schema.Types.ObjectId, ref: 'Tenant', required: true }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Fighter', fighterSchema);

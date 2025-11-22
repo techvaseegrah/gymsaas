@@ -2,9 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const Fighter = require('../models/Fighter');
+const Tenant = require('../models/Tenant');
 const auth = require('../middleware/authMiddleware');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
+const { addTenantFilter } = require('../utils/tenantHelper');
 
 // @route   POST api/fighters/register
 // @desc    Register a new fighter (Admin only)
@@ -40,7 +42,7 @@ router.post('/register', auth, async (req, res) => {
             return res.status(500).json({ msg: 'Database connection error' });
         }
 
-        let existingFighter = await Fighter.findOne({ $or: [{ email }, { rfid }] });
+        let existingFighter = await Fighter.findOne(addTenantFilter({ $or: [{ email }, { rfid }] }, req.user.tenant));
         if (existingFighter) {
             if (existingFighter.email === email) {
                 return res.status(400).json({ msg: 'Fighter with this email already exists' });
@@ -66,7 +68,8 @@ router.post('/register', auth, async (req, res) => {
             role: 'fighter',
             faceEncodings: faceEncodings ? JSON.parse(faceEncodings) : [],
             rfid,
-            dateOfJoining: new Date()
+            dateOfJoining: new Date(),
+            tenant: req.user.tenant
         };
         
         // Add profile photo if provided
@@ -120,7 +123,20 @@ router.post('/register', auth, async (req, res) => {
 // @access  Public
 router.get('/list', async (req, res) => {
     try {
-        const fighters = await Fighter.find({}).select('name fighterBatchNo email rfid'); 
+        // Extract tenant slug from query parameters
+        const { tenant } = req.query;
+        
+        let filter = {};
+        
+        // If tenant slug is provided, filter by tenant
+        if (tenant) {
+            const tenantDoc = await Tenant.findOne({ slug: tenant });
+            if (tenantDoc) {
+                filter = { tenant: tenantDoc._id };
+            }
+        }
+        
+        const fighters = await Fighter.find(filter).select('name fighterBatchNo email rfid profilePhoto'); 
         res.json(fighters);
     } catch (err) {
         console.error(err.message);
@@ -180,35 +196,35 @@ router.get('/dashboard-stats', auth, async (req, res) => {
             return res.status(500).json({ msg: 'Database connection error' });
         }
 
-        const totalFighters = await Fighter.countDocuments({ role: 'fighter' });
-        const profileCompleted = await Fighter.countDocuments({ role: 'fighter', profile_completed: true });
+        const totalFighters = await Fighter.countDocuments(addTenantFilter({ role: 'fighter' }, req.user.tenant));
+        const profileCompleted = await Fighter.countDocuments(addTenantFilter({ role: 'fighter', profile_completed: true }, req.user.tenant));
         const profilePending = totalFighters - profileCompleted;
 
         // Get fighters with assessments for top fighters calculation
-        const assessedFighters = await Fighter.find({
+        const assessedFighters = await Fighter.find(addTenantFilter({
             role: 'fighter',
             'assessment.specialGradeScore': { $exists: true, $ne: null }
-        }).select('name fighterBatchNo assessment.specialGradeScore dateOfJoining')
+        }, req.user.tenant)).select('name fighterBatchNo assessment.specialGradeScore dateOfJoining')
           .sort({ 'assessment.specialGradeScore': -1 })
           .limit(5);
 
         // Recent joinings (last 30 days)
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-        const recentJoinings = await Fighter.countDocuments({
+        const recentJoinings = await Fighter.countDocuments(addTenantFilter({
             role: 'fighter',
             dateOfJoining: { $gte: thirtyDaysAgo }
-        });
+        }, req.user.tenant));
 
         // Gender distribution
-        const maleCount = await Fighter.countDocuments({ role: 'fighter', gender: 'male' });
-        const femaleCount = await Fighter.countDocuments({ role: 'fighter', gender: 'female' });
+        const maleCount = await Fighter.countDocuments(addTenantFilter({ role: 'fighter', gender: 'male' }, req.user.tenant));
+        const femaleCount = await Fighter.countDocuments(addTenantFilter({ role: 'fighter', gender: 'female' }, req.user.tenant));
 
         // Age groups with error handling
         let ageGroups = [];
         try {
             ageGroups = await Fighter.aggregate([
-                { $match: { role: 'fighter', age: { $exists: true, $type: 'number' } } },
+                { $match: addTenantFilter({ role: 'fighter', age: { $exists: true, $type: 'number' } }, req.user.tenant) },
                 {
                     $group: {
                         _id: {
@@ -263,7 +279,7 @@ router.get('/roster', auth, async (req, res) => {
         return res.status(403).json({ msg: 'Access denied' });
     }
     try {
-        const fighters = await Fighter.find({ role: 'fighter' }).select('-password');
+        const fighters = await Fighter.find(addTenantFilter({ role: 'fighter' }, req.user.tenant)).select('-password');
         res.json(fighters);
     } catch (err) {
         console.error(err.message);
@@ -279,7 +295,7 @@ router.get('/rfids', auth, async (req, res) => {
         return res.status(403).json({ msg: 'Access denied' });
     }
     try {
-        const fighters = await Fighter.find({ role: 'fighter' }).select('rfid');
+        const fighters = await Fighter.find(addTenantFilter({ role: 'fighter' }, req.user.tenant)).select('rfid');
         const rfids = fighters.map(fighter => fighter.rfid);
         res.json(rfids);
     } catch (err) {
@@ -296,7 +312,7 @@ router.get('/:id', auth, async (req, res) => {
         return res.status(403).json({ msg: 'Access denied' });
     }
     try {
-        const fighter = await Fighter.findById(req.params.id).select('-password');
+        const fighter = await Fighter.findOne(addTenantFilter({ _id: req.params.id }, req.user.tenant)).select('-password');
         if (!fighter) {
             return res.status(404).json({ msg: 'Fighter not found' });
         }
@@ -315,7 +331,7 @@ router.post('/assess/:id', auth, async (req, res) => {
         return res.status(403).json({ msg: 'Access denied' });
     }
     try {
-        const fighter = await Fighter.findById(req.params.id);
+        const fighter = await Fighter.findOne(addTenantFilter({ _id: req.params.id }, req.user.tenant));
         if (!fighter) {
             return res.status(404).json({ msg: 'Fighter not found' });
         }
@@ -323,6 +339,54 @@ router.post('/assess/:id', auth, async (req, res) => {
         fighter.assessment = req.body;
         await fighter.save();
         res.json({ msg: 'Assessment saved successfully', fighter });
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   PUT api/fighters/me
+// @desc    Update current fighter's profile
+// @access  Private (Fighter only)
+router.put('/me', auth, async (req, res) => {
+    if (req.user.role !== 'fighter') {
+        return res.status(403).json({ msg: 'Access denied' });
+    }
+    
+    try {
+        // Use addTenantFilter to ensure the fighter belongs to the correct tenant
+        const fighter = await Fighter.findOne(addTenantFilter({ _id: req.user.id }, req.user.tenant));
+        if (!fighter) {
+            return res.status(404).json({ msg: 'Fighter not found' });
+        }
+        
+        // Fields that fighters can update themselves
+        const { 
+            age, gender, phNo, address, height, weight, bloodGroup, 
+            occupation, package, previousExperience, medicalIssue, 
+            motto, martialArtsKnowledge, goals, referral, profilePhoto 
+        } = req.body;
+        
+        // Update allowed fields
+        if (age !== undefined) fighter.age = age;
+        if (gender !== undefined) fighter.gender = gender;
+        if (phNo !== undefined) fighter.phNo = phNo;
+        if (address !== undefined) fighter.address = address;
+        if (height !== undefined) fighter.height = height;
+        if (weight !== undefined) fighter.weight = weight;
+        if (bloodGroup !== undefined) fighter.bloodGroup = bloodGroup;
+        if (occupation !== undefined) fighter.occupation = occupation;
+        if (package !== undefined) fighter.package = package;
+        if (previousExperience !== undefined) fighter.previousExperience = previousExperience;
+        if (medicalIssue !== undefined) fighter.medicalIssue = medicalIssue;
+        if (motto !== undefined) fighter.motto = motto;
+        if (martialArtsKnowledge !== undefined) fighter.martialArtsKnowledge = martialArtsKnowledge;
+        if (goals !== undefined) fighter.goals = goals;
+        if (referral !== undefined) fighter.referral = referral;
+        if (profilePhoto !== undefined) fighter.profilePhoto = profilePhoto;
+        
+        await fighter.save();
+        res.json({ msg: 'Profile updated successfully', fighter });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -340,7 +404,7 @@ router.put('/:id', auth, async (req, res) => {
     const { name, fighterBatchNo, email, profilePhoto, faceEncodings } = req.body;
     
     try {
-        const fighter = await Fighter.findById(req.params.id);
+        const fighter = await Fighter.findOne(addTenantFilter({ _id: req.params.id }, req.user.tenant));
         if (!fighter) {
             return res.status(404).json({ msg: 'Fighter not found' });
         }
@@ -372,12 +436,12 @@ router.delete('/:id', auth, async (req, res) => {
         return res.status(403).json({ msg: 'Access denied' });
     }
     try {
-        const fighter = await Fighter.findById(req.params.id);
+        const fighter = await Fighter.findOne(addTenantFilter({ _id: req.params.id }, req.user.tenant));
         if (!fighter) {
             return res.status(404).json({ msg: 'Fighter not found' });
         }
 
-        await Fighter.deleteOne({ _id: req.params.id });
+        await Fighter.deleteOne(addTenantFilter({ _id: req.params.id }, req.user.tenant));
         res.json({ msg: 'Fighter deleted successfully' });
     } catch (err) {
         console.error(err.message);
@@ -393,10 +457,10 @@ router.get('/with-face-data', auth, async (req, res) => {
         return res.status(403).json({ msg: 'Access denied' });
     }
     try {
-        const fighters = await Fighter.find({ 
+        const fighters = await Fighter.find(addTenantFilter({ 
             role: 'fighter',
             faceEncodings: { $exists: true, $ne: [] }
-        }).select('name fighterBatchNo faceEncodings');
+        }, req.user.tenant)).select('name fighterBatchNo faceEncodings');
         
         res.json(fighters);
     } catch (err) {

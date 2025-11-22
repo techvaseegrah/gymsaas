@@ -23,6 +23,9 @@ module.exports = {
         'xl': '1280px',
         '2xl': '1536px',
       },
+      backdropBlur: {
+        'xs': '2px',
+      }
     },
   },
   plugins: [],

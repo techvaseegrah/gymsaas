@@ -8,6 +8,11 @@ const DoubtSchema = new Schema({
         trim: true,
         maxlength: 2000
     },
+    tenant: { 
+        type: Schema.Types.ObjectId, 
+        ref: 'Tenant', 
+        required: true 
+    },
     user: {
         type: Schema.Types.ObjectId,
         required: true,
@@ -44,8 +49,7 @@ const DoubtSchema = new Schema({
     },
     timestamp: {
         type: Date,
-        default: Date.now,
-        index: true
+        default: Date.now
     },
     parentDoubt: {
         type: Schema.Types.ObjectId,
@@ -74,11 +78,5 @@ const DoubtSchema = new Schema({
         enum: ['Admin', 'Fighter']
     }
 });
-
-DoubtSchema.index({ timestamp: 1 });
-DoubtSchema.index({ user: 1, timestamp: 1 });
-DoubtSchema.index({ recipient: 1, timestamp: 1 });
-DoubtSchema.index({ recipientId: 1, timestamp: 1 }); // FIXED: Add index for recipientId
-DoubtSchema.index({ parentDoubt: 1, timestamp: 1 });
 
 module.exports = mongoose.model('Doubt', DoubtSchema);

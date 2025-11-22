@@ -16,6 +16,21 @@ const createAdmin = async () => {
     const email = 'techvaseegrah@gmail.com';
     const password = '123456';
 
+    // For demo purposes, create a default tenant
+    const Tenant = require('./models/Tenant');
+    let tenant = await Tenant.findOne({ slug: 'default' });
+    if (!tenant) {
+      tenant = new Tenant({
+        name: 'Default Gym',
+        slug: 'default',
+        email: 'admin@defaultgym.com',
+        subscriptionPlan: 'enterprise',
+        subscriptionStatus: 'active'
+      });
+      await tenant.save();
+      console.log('Default tenant created.');
+    }
+
     // Check if the admin user already exists to avoid duplicates
     let admin = await Admin.findOne({ email });
     if (admin) {
@@ -32,6 +47,7 @@ const createAdmin = async () => {
       email,
       password: hashedPassword,
       role: 'admin',
+      tenant: tenant._id
     });
     await admin.save();
 

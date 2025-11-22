@@ -403,7 +403,7 @@ const AdminAttendancePage = () => {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                         <div>
-                                            {record.checkIns.map((punch, index) => (
+                                            {record.checkIns && record.checkIns.map ? record.checkIns.map((punch, index) => (
                                                 <div key={`in-${index}`} className="flex items-center gap-2">
                                                     {punch.missed && (
                                                         <FaExclamationTriangle 
@@ -415,12 +415,12 @@ const AdminAttendancePage = () => {
                                                         {new Date(punch.time).toLocaleTimeString()}
                                                     </span>
                                                 </div>
-                                            ))}
+                                            )) : null}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                     <div>
-                                        {record.checkOuts.map((punch, index) => (
+                                        {record.checkOuts && record.checkOuts.map ? record.checkOuts.map((punch, index) => (
                                             <div key={`out-${index}`} className="flex items-center gap-2">
                                                 {punch.late ? (
                                                     // Style for a LATE (corrected) punch-out
@@ -439,7 +439,7 @@ const AdminAttendancePage = () => {
                                                     </span>
                                                 )}
                                             </div>
-                                        ))}
+                                        )) : null}
                                     </div>
                                 </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">{record.duration}</td>
@@ -549,18 +549,18 @@ const AdminAttendancePage = () => {
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                                 {/* RENDER REGULAR CHECK-INS */}
-                                                                {regularCheckIns.map((punch, index) => (
+                                                                {regularCheckIns && regularCheckIns.map ? regularCheckIns.map((punch, index) => (
                                                                     <div key={`in-${index}`} className="flex items-center gap-2">
                                                                         <span className="text-green-600 font-semibold">
                                                                             {new Date(punch.time).toLocaleTimeString()}
                                                                         </span>
                                                                     </div>
-                                                                ))}
+                                                                )) : null}
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm">
                                                                 {/* RENDER ALL CHECK-OUTS (LATE AND REGULAR) */}
                                                                 <div className="flex flex-col space-y-0.1">
-                                                                    {allCheckOuts.map((punch, index) => (
+                                                                    {allCheckOuts && allCheckOuts.map ? allCheckOuts.map((punch, index) => (
                                                                         <div key={`out-${index}`} className="flex items-center gap-2">
                                                                             {punch.late ? (
                                                                                 // Style for a LATE (corrected) punch-out
@@ -580,7 +580,7 @@ const AdminAttendancePage = () => {
                                                                                 </span>
                                                                             )}
                                                                         </div>
-                                                                    ))}
+                                                                    )) : null}
                                                                 </div>
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-800">

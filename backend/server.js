@@ -29,11 +29,15 @@ app.set('io', io);
 
 // Middleware
 app.use(express.json({ limit: '10mb' })); // Increase limit for Base64 images
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 
 // Import Models
 const Admin = require('./models/Admin');
-const Settings = require('./models/Settings');
+const Settings = require('./models/SettingsModel');
+const Tenant = require('./models/Tenant');
 
 // Database Connection with error handling
 const connectDB = async () => {
@@ -45,19 +49,8 @@ const connectDB = async () => {
     });
     console.log('MongoDB connected successfully');
 
-    // Check for and create initial settings document if it doesn't exist
-    const settings = await Settings.findOne();
-    if (!settings) {
-      console.log('No settings found. Creating initial settings...');
-      const newSettings = new Settings({
-        location: {
-          latitude: 12.9716, // Default Latitude (e.g., Bangalore, India)
-          longitude: 77.5946  // Default Longitude (e.g., Bangalore, India)
-        }
-      });
-      await newSettings.save();
-      console.log('Initial settings created with default location.');
-    }
+    // Note: Settings are now tenant-specific and will be created per-tenant
+    // when needed via the settings routes
 
   } catch (err) {
     console.error('MongoDB connection error:', err.message);
@@ -76,9 +69,10 @@ app.get('/api/test', (req, res) => {
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/fighters', require('./routes/fighters'));
-app.use('/api/settings', require('./routes/settings'));
+app.use('/api/settings', require('./routes/settingsRoutes'));
 app.use('/api/attendance', require('./routes/attendance'));
 app.use('/api/doubts', require('./routes/doubts'));
+app.use('/api/tenants', require('./routes/tenants'));
 
 // Global error handler
 app.use((err, req, res, next) => {

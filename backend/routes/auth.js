@@ -3,11 +3,12 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Fighter = require('../models/Fighter');
 const Admin = require('../models/Admin');
+const Tenant = require('../models/Tenant');
 const auth = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, tenantSlug } = req.body;
     
     // Basic validation
     if (!email || !password) {
@@ -15,9 +16,17 @@ router.post('/login', async (req, res) => {
     }
 
     try {
+        let tenant = null;
+        if (tenantSlug) {
+            tenant = await Tenant.findOne({ slug: tenantSlug.toLowerCase() });
+            if (!tenant) {
+                return res.status(400).json({ msg: 'Gym not found' });
+            }
+        }
+
         // --- CORRECTED LOGIC ---
         // 1. Check for an Admin first
-        let user = await Admin.findOne({ email });
+        let user = await Admin.findOne({ email, ...(tenant && { tenant: tenant._id }) });
 
         if (user) {
             // Admin found, check password
@@ -27,7 +36,7 @@ router.post('/login', async (req, res) => {
             }
         } else {
             // 2. If no Admin, check for a Fighter
-            user = await Fighter.findOne({ email });
+            user = await Fighter.findOne({ email, ...(tenant && { tenant: tenant._id }) });
 
             if (!user) {
                 return res.status(400).json({ msg: 'Invalid credentials' });
@@ -45,7 +54,8 @@ router.post('/login', async (req, res) => {
             user: {
                 id: user.id,
                 role: user.role,
-                profile_completed: user.profile_completed
+                profile_completed: user.profile_completed,
+                tenant: user.tenant
             }
         };
 
@@ -76,6 +86,20 @@ router.get('/user', auth, async (req, res) => {
         } else {
             user = await Fighter.findById(req.user.id).select('-password');
         }
+        
+        // Add tenant information if available
+        if (user && user.tenant) {
+            const Tenant = require('../models/Tenant');
+            const tenant = await Tenant.findById(user.tenant).select('name slug');
+            if (tenant) {
+                user.tenantInfo = {
+                    id: tenant._id,
+                    name: tenant.name,
+                    slug: tenant.slug
+                };
+            }
+        }
+        
         res.json(user);
     } catch (err) {
         console.error(err.message);

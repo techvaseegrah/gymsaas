@@ -5,6 +5,7 @@ const auth = require('../middleware/authMiddleware');
 const Doubt = require('../models/Doubt');
 const Admin = require('../models/Admin');
 const Fighter = require('../models/Fighter');
+const { addTenantFilter } = require('../utils/tenantHelper');
 
 // @route   GET /api/doubts
 // @desc    Get all relevant doubts for the user
@@ -17,7 +18,7 @@ router.get('/', auth, async (req, res) => {
     const userId = new mongoose.Types.ObjectId(req.user.id);
 
     // Build query - both admin and fighter get filtered results
-    const query = {
+    const query = addTenantFilter({
       isVisible: true,
       $or: [
         { recipient: null },       // Common messages (no recipient)
@@ -25,7 +26,7 @@ router.get('/', auth, async (req, res) => {
         { recipient: userId },     // Messages sent to user
         { recipientId: userId }    // FIXED: Also check recipientId field
       ]
-    };
+    }, req.user.tenant);
 
     console.log('[DOUBTS] Query:', JSON.stringify(query, null, 2));
 
@@ -133,7 +134,8 @@ router.post('/', auth, async (req, res) => {
       userModel: req.user.role === 'admin' ? 'Admin' : 'Fighter',
       messageType: validatedMessageType, // FIXED: Use validated message type
       isVisible: true,
-      parentDoubt: parentDoubt ? new mongoose.Types.ObjectId(parentDoubt) : null
+      parentDoubt: parentDoubt ? new mongoose.Types.ObjectId(parentDoubt) : null,
+      tenant: req.user.tenant
     };
 
     // Handle recipient for private messages
@@ -239,7 +241,7 @@ router.put('/:id/toggle', auth, async (req, res) => {
     const messageId = req.params.id;
     console.log(`[DOUBTS] Toggling visibility for message: ${messageId} by user: ${req.user.id}`);
 
-    const doubt = await Doubt.findById(messageId);
+    const doubt = await Doubt.findOne(addTenantFilter({ _id: messageId }, req.user.tenant));
     if (!doubt) {
       return res.status(404).json({ msg: 'Message not found' });
     }
@@ -280,7 +282,7 @@ router.put('/:id/resolve', auth, async (req, res) => {
     const messageId = req.params.id;
     console.log(`[DOUBTS] Resolving message: ${messageId} by admin: ${req.user.id}`);
 
-    const doubt = await Doubt.findById(messageId);
+    const doubt = await Doubt.findOne(addTenantFilter({ _id: messageId }, req.user.tenant));
     if (!doubt) {
       return res.status(404).json({ msg: 'Message not found' });
     }
@@ -309,7 +311,7 @@ router.delete('/:id', auth, async (req, res) => {
     const messageId = req.params.id;
     console.log(`[DOUBTS] Deleting message: ${messageId} by admin: ${req.user.id}`);
 
-    const doubt = await Doubt.findById(messageId);
+    const doubt = await Doubt.findOne(addTenantFilter({ _id: messageId }, req.user.tenant));
     if (!doubt) {
       return res.status(404).json({ msg: 'Message not found' });
     }
@@ -358,12 +360,12 @@ router.get('/stats', auth, async (req, res) => {
     }
 
     const stats = await Promise.all([
-      Doubt.countDocuments({ isVisible: true }),
-      Doubt.countDocuments({ isVisible: true, recipient: null }),
-      Doubt.countDocuments({ isVisible: true, recipient: { $ne: null } }),
-      Doubt.countDocuments({ isVisible: true, messageType: 'doubt' }),
-      Doubt.countDocuments({ isVisible: true, messageType: 'clarity' }),
-      Doubt.countDocuments({ isResolved: true })
+      Doubt.countDocuments(addTenantFilter({ isVisible: true }, req.user.tenant)),
+      Doubt.countDocuments(addTenantFilter({ isVisible: true, recipient: null }, req.user.tenant)),
+      Doubt.countDocuments(addTenantFilter({ isVisible: true, recipient: { $ne: null } }, req.user.tenant)),
+      Doubt.countDocuments(addTenantFilter({ isVisible: true, messageType: 'doubt' }, req.user.tenant)),
+      Doubt.countDocuments(addTenantFilter({ isVisible: true, messageType: 'clarity' }, req.user.tenant)),
+      Doubt.countDocuments(addTenantFilter({ isResolved: true }, req.user.tenant))
     ]);
 
     res.json({
@@ -389,7 +391,7 @@ router.post('/:id/read', auth, async (req, res) => {
     const messageId = req.params.id;
     console.log(`[DOUBTS] Marking message ${messageId} as read by user ${req.user.id} (${req.user.role})`);
 
-    const doubt = await Doubt.findById(messageId);
+    const doubt = await Doubt.findOne(addTenantFilter({ _id: messageId }, req.user.tenant));
     if (!doubt) {
       return res.status(404).json({ msg: 'Message not found' });
     }
@@ -441,7 +443,7 @@ router.post('/mark-chat-read', auth, async (req, res) => {
     };
 
     // Update all matching messages to mark them as read
-    const result = await Doubt.updateMany(query, {
+    const result = await Doubt.updateMany(addTenantFilter(query, req.user.tenant), {
       $addToSet: { 
         readBy: new mongoose.Types.ObjectId(req.user.id) 
       },
@@ -480,7 +482,7 @@ router.get('/unread-counts', auth, async (req, res) => {
     };
 
     // Find all unread messages and group by sender
-    const unreadMessages = await Doubt.find(query).select('user recipientId');
+    const unreadMessages = await Doubt.find(addTenantFilter(query, req.user.tenant)).select('user recipientId');
     
     // Count unread messages by sender
     const unreadCounts = {};
