@@ -192,6 +192,15 @@ const LoginPage = ({ setUser }) => {
                                         </div>
                                     </div>
                                 </button>
+                                
+                                <div className="text-center mt-4">
+                                    <button 
+                                        onClick={() => navigate('/superadmin/login')} 
+                                        className="text-gray-400 hover:text-purple-400 text-sm transition-colors"
+                                    >
+                                        Super Admin Login
+                                    </button>
+                                </div>
                             </div>
 
                         /* VIEW 2: GYM ID SELECTION */
