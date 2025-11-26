@@ -16,9 +16,11 @@ const ForgotPasswordPage = () => {
         setMessage('');
 
         try {
+            // THIS LINE MUST MATCH THE BACKEND ROUTE
             const res = await api.post('/auth/forgot-password', { email });
-            setMessage(res.data.msg || 'If an account exists with that email, a password reset link has been sent.');
+            setMessage(res.data.msg || 'Email sent successfully.');
         } catch (err) {
+            // If this returns 404, it means the route above doesn't exist on the server
             setError(err.response?.data?.msg || 'An error occurred. Please try again.');
         } finally {
             setLoading(false);
@@ -30,7 +32,7 @@ const ForgotPasswordPage = () => {
             <div className="bg-gray-800 rounded-2xl shadow-2xl p-8 w-full max-w-md border border-gray-700">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-white mb-2">Forgot Password</h1>
-                    <p className="text-gray-400">Enter your email to receive a password reset link</p>
+                    <p className="text-gray-400">Enter your email to receive a reset link</p>
                 </div>
 
                 {message && (

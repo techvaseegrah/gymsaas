@@ -17,7 +17,7 @@ import AdminSettingsPage from './pages/AdminSettingsPage';
 import AdminAttendancePage from './pages/AdminAttendancePage';
 import AdminSubscriptionPage from './pages/AdminSubscriptionPage';
 import AskDoubtPage from './pages/AskDoubtPage';
-// import FighterLevelPage from './pages/FighterLevelPage'; // Replaced by GymStatsPage
+// import FighterLevelPage from './pages/FighterLevelPage'; // REMOVED: Replaced by GymStatsPage
 
 // Fighter Pages
 import FighterHomePage from './pages/FighterHomePage';
@@ -30,11 +30,11 @@ import GymStatsPage from './pages/GymStatsPage'; // NEW: Replaces FighterLevelVi
 
 // Super Admin Pages
 import SuperAdminDashboardPage from './pages/SuperAdminDashboardPage';
+import SuperAdminLoginPage from './pages/SuperAdminLoginPage';
 
 // Password Reset Pages
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
-import SuperAdminLoginPage from './pages/SuperAdminLoginPage';
 
 // --- Import Components ---
 import AdminSidebar from './components/AdminSidebar';
@@ -223,26 +223,20 @@ const App = () => {
                 <Route path="/reset-password/:resetToken" element={<ResetPasswordPage />} />
 
                 {/* --- SUPER ADMIN ROUTES --- */}
+                <Route path="/superadmin/login" element={<SuperAdminLoginPage setUser={setUser} />} />
+
                 <Route 
                     path="/superadmin/*" 
                     element={
-                        <Routes>
-                            <Route path="login" element={<SuperAdminLoginPage setUser={setUser} />} />
-                            <Route 
-                                path="*" 
-                                element={
-                                    <ProtectedRoute role="superadmin">
-                                        <SuperAdminLayout>
-                                            <Routes>
-                                                <Route path="dashboard" element={<SuperAdminDashboardPage />} />
-                                                <Route path="tenants" element={<SuperAdminDashboardPage />} />
-                                                <Route path="*" element={<Navigate to="/superadmin/dashboard" />} />
-                                            </Routes>
-                                        </SuperAdminLayout>
-                                    </ProtectedRoute>
-                                } 
-                            />
-                        </Routes>
+                        <ProtectedRoute role="superadmin">
+                            <SuperAdminLayout>
+                                <Routes>
+                                    <Route path="dashboard" element={<SuperAdminDashboardPage />} />
+                                    <Route path="tenants" element={<SuperAdminDashboardPage />} />
+                                    <Route path="*" element={<Navigate to="/superadmin/dashboard" />} />
+                                </Routes>
+                            </SuperAdminLayout>
+                        </ProtectedRoute>
                     } 
                 />
 
@@ -256,7 +250,6 @@ const App = () => {
                 <Route path="/admin/settings" element={<ProtectedRoute role="admin"><AdminLayout><AdminSettingsPage /></AdminLayout></ProtectedRoute>} />
                 <Route path="/admin/subscriptions" element={<ProtectedRoute role="admin"><AdminLayout><AdminSubscriptionPage /></AdminLayout></ProtectedRoute>} />
                 <Route path="/admin/ask-doubt" element={<ProtectedRoute role="admin"><AdminLayout><AskDoubtPage /></AdminLayout></ProtectedRoute>} />
-                {/* <Route path="/admin/fighter-level" element={<ProtectedRoute role="admin"><AdminLayout><FighterLevelPage /></AdminLayout></ProtectedRoute>} /> */}
                 
                 {/* --- FIGHTER ROUTES --- */}
                 

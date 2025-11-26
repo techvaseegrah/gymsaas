@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom'; // Added Link import
 import { FaEye, FaEyeSlash, FaUser, FaLock, FaSearch, FaBuilding, FaArrowLeft, FaDumbbell, FaUserShield } from 'react-icons/fa';
 import api from '../api/api';
 
@@ -313,6 +313,16 @@ const LoginPage = ({ setUser }) => {
                                                 : (showFighterPassword ? <FaEyeSlash /> : <FaEye />)
                                             }
                                         </button>
+                                    </div>
+
+                                    {/* Forgot Password Link - ADDED HERE */}
+                                    <div className="flex justify-end">
+                                        <Link 
+                                            to="/forgot-password"
+                                            className="text-sm text-blue-300 hover:text-white transition-colors"
+                                        >
+                                            Forgot Password?
+                                        </Link>
                                     </div>
 
                                     {error && (
