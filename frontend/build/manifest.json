@@ -1,0 +1,20 @@
+{
+  "short_name": "Ashura's Tribe",
+  "name": "Ashura's Tribe Gym Management",
+  "icons": [
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "logo.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#dc2626",
+  "background_color": "#ffffff"
+}

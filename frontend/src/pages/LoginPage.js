@@ -39,6 +39,13 @@ const LoginPage = ({ setUser }) => {
         }
     }, [selectedGym, loginType]);
 
+    // --- HELPER FUNCTIONS ---
+    const getInitials = (name) => {
+        if (!name) return '';
+        const initials = name.split(' ').map(word => word[0]).join('').toUpperCase();
+        return initials.substring(0, 2); // Max 2 initials
+    };
+
     // --- HANDLERS ---
     const handleAdminLogin = async (e) => {
         e.preventDefault();
@@ -69,6 +76,7 @@ const LoginPage = ({ setUser }) => {
             const { data } = await api.post('/auth/login', {
                 email: selectedFighter.email,
                 password: fighterPassword,
+                role: 'fighter',
                 tenantSlug: selectedGym?.slug
             });
             localStorage.setItem('token', data.token);
@@ -232,11 +240,11 @@ const LoginPage = ({ setUser }) => {
                         ) : loginType === 'fighter' && !selectedFighter ? (
                             <div className="w-full animate-fade-in">
                                 <div className="relative mb-6 max-w-md mx-auto">
-                                    <FaSearch className="absolute left-4 top-3.5 text-gray-400" />
+                                    <FaSearch className="absolute left-4 top-3.5 text-gray-400 group-focus-within:text-white transition-colors" />
                                     <input
                                         type="text"
                                         placeholder="Search your name..."
-                                        className="w-full pl-12 pr-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:bg-black/40 focus:border-white/30"
+                                        className="w-full pl-12 pr-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:bg-black/40 focus:border-white/30 transition-all glass-card"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
@@ -250,25 +258,36 @@ const LoginPage = ({ setUser }) => {
                                             <div 
                                                 key={fighter._id} 
                                                 onClick={() => handleFighterSelect(fighter)} 
-                                                className="group bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/30 rounded-2xl p-4 flex flex-col items-center cursor-pointer transition-all hover:scale-105"
+                                                className="glass-card group rounded-2xl p-4 flex flex-col items-center cursor-pointer transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:border-white/20"
                                             >
-                                                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-transparent group-hover:border-blue-400 mb-3 transition-all relative">
-                                                    <img
-                                                        src={fighter.profilePhoto || "/logo.png"}
-                                                        alt={fighter.name}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => { e.target.src = "/logo.png"; }}
-                                                    />
+                                                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-transparent group-hover:border-red-400 mb-3 transition-all relative flex items-center justify-center" style={{ backgroundColor: fighter.profilePhoto ? 'transparent' : '#EF4444' }}>
+                                                    {fighter.profilePhoto ? (
+                                                        <img
+                                                            src={fighter.profilePhoto}
+                                                            alt={fighter.name}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => { e.target.src = "/logo.png"; }}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-white text-xl font-bold">
+                                                            {getInitials(fighter.name)}
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <h4 className="text-white font-semibold text-sm text-center truncate w-full">{fighter.name}</h4>
-                                                <p className="text-xs text-gray-400">{fighter.rfid}</p>
+                                                <p className="text-xs text-gray-400 truncate w-full text-center">{fighter.rfid}</p>
                                             </div>
                                         ))}
                                         {filteredFighters.length === 0 && <p className="col-span-full text-center text-gray-500">No fighters found.</p>}
                                     </div>
                                 )}
                                 <div className="text-center mt-6">
-                                    <button onClick={resetGymSelection} className="text-gray-400 hover:text-white text-sm">Change Gym</button>
+                                    <button 
+                                        onClick={resetGymSelection} 
+                                        className="text-gray-400 hover:text-white text-sm transition-colors duration-300 flex items-center justify-center gap-1 mx-auto"
+                                    >
+                                        <FaArrowLeft size={14} /> Change Gym
+                                    </button>
                                 </div>
                             </div>
 

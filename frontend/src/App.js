@@ -17,7 +17,6 @@ import AdminSettingsPage from './pages/AdminSettingsPage';
 import AdminAttendancePage from './pages/AdminAttendancePage';
 import AdminSubscriptionPage from './pages/AdminSubscriptionPage';
 import AskDoubtPage from './pages/AskDoubtPage';
-// import FighterLevelPage from './pages/FighterLevelPage'; // REMOVED: Replaced by GymStatsPage
 
 // Fighter Pages
 import FighterHomePage from './pages/FighterHomePage';
@@ -26,11 +25,17 @@ import CompleteProfilePage from './pages/CompleteProfilePage';
 import FighterFaceRecognitionPage from './pages/FighterFaceRecognitionPage';
 import FighterProfileUpdatePage from './pages/FighterProfileUpdatePage';
 import SubscriptionDetailsPage from './pages/SubscriptionDetailsPage';
-import GymStatsPage from './pages/GymStatsPage'; // NEW: Replaces FighterLevelViewPage
+import GymStatsPage from './pages/GymStatsPage';
 
 // Super Admin Pages
 import SuperAdminDashboardPage from './pages/SuperAdminDashboardPage';
 import SuperAdminLoginPage from './pages/SuperAdminLoginPage';
+import SuperAdminGymsPage from './pages/SuperAdminGymsPage';
+import SuperAdminCreateGymPage from './pages/SuperAdminCreateGymPage';
+import SuperAdminUsersPage from './pages/SuperAdminUsersPage';
+import SuperAdminBillingPage from './pages/SuperAdminBillingPage';
+import SuperAdminAnalyticsPage from './pages/SuperAdminAnalyticsPage';
+import SuperAdminSettingsPage from './pages/SuperAdminSettingsPage';
 
 // Password Reset Pages
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -39,7 +44,7 @@ import ResetPasswordPage from './pages/ResetPasswordPage';
 // --- Import Components ---
 import AdminSidebar from './components/AdminSidebar';
 import FighterSidebar from './components/FighterSidebar';
-// import SuperAdminSidebar from './components/SuperAdminSidebar'; // If you created a separate one
+import SuperAdminSidebar from './components/SuperAdminSidebar';
 
 import api from './api/api';
 
@@ -87,7 +92,6 @@ const App = () => {
         }
         
         // 2. If role doesn't match -> Kick out
-        // (e.g. A 'fighter' trying to access a 'superadmin' route)
         if (role && user.role !== role) {
             return <Navigate to="/" replace />;
         }
@@ -122,7 +126,8 @@ const App = () => {
                     </button>
                 </div>
                 <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0`}>
-                    <AdminSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} />
+                    {/* KEY CHANGE: user prop passed here */}
+                    <AdminSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} user={user} />
                 </aside>
                 <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen">{children}</main>
                 <LogoutModal />
@@ -144,7 +149,8 @@ const App = () => {
                     </button>
                 </div>
                 <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 border-r border-gray-700`}>
-                    <FighterSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} />
+                    {/* KEY CHANGE: user prop passed here */}
+                    <FighterSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} user={user} />
                 </aside>
                 <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen">{children}</main>
                 <LogoutModal />
@@ -166,25 +172,7 @@ const App = () => {
                     </button>
                 </div>
                 <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-900 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 border-r border-gray-800`}>
-                    <div className="flex flex-col h-full">
-                        <div className="p-6 text-center border-b border-gray-800">
-                            <h1 className="text-xl font-bold text-white tracking-wider">SUPER ADMIN</h1>
-                            <p className="text-xs text-purple-400 mt-1">Control Panel</p>
-                        </div>
-                        <nav className="flex-grow px-4 py-6 space-y-2">
-                            <a href="/superadmin/dashboard" className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors">
-                                Dashboard
-                            </a>
-                             <a href="/superadmin/tenants" className="flex items-center px-4 py-3 text-gray-300 hover:bg-gray-800 hover:text-white rounded-lg transition-colors">
-                                Gyms
-                            </a>
-                        </nav>
-                        <div className="p-4 border-t border-gray-800">
-                            <button onClick={performLogout} className="w-full flex items-center justify-center px-4 py-3 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors">
-                                Logout
-                            </button>
-                        </div>
-                    </div>
+                    <SuperAdminSidebar handleLogout={performLogout} closeSidebar={closeSidebar} />
                 </aside>
                 <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-800">{children}</main>
                 <LogoutModal />
@@ -232,7 +220,21 @@ const App = () => {
                             <SuperAdminLayout>
                                 <Routes>
                                     <Route path="dashboard" element={<SuperAdminDashboardPage />} />
-                                    <Route path="tenants" element={<SuperAdminDashboardPage />} />
+                                    <Route path="tenants" element={<SuperAdminGymsPage />} />
+                                    <Route path="tenants/create" element={<SuperAdminCreateGymPage />} />
+                                    <Route path="tenants/inactive" element={<SuperAdminGymsPage />} />
+                                    <Route path="users/admins" element={<SuperAdminUsersPage />} />
+                                    <Route path="users/fighters" element={<SuperAdminUsersPage />} />
+                                    <Route path="users/superadmins" element={<SuperAdminUsersPage />} />
+                                    <Route path="billing/subscriptions" element={<SuperAdminBillingPage />} />
+                                    <Route path="billing/payments" element={<SuperAdminBillingPage />} />
+                                    <Route path="billing/invoices" element={<SuperAdminBillingPage />} />
+                                    <Route path="billing/refunds" element={<SuperAdminBillingPage />} />
+                                    <Route path="analytics" element={<SuperAdminAnalyticsPage />} />
+                                    <Route path="settings/general" element={<SuperAdminSettingsPage />} />
+                                    <Route path="settings/notifications" element={<SuperAdminSettingsPage />} />
+                                    <Route path="settings/database" element={<SuperAdminSettingsPage />} />
+                                    <Route path="settings/logs" element={<SuperAdminSettingsPage />} />
                                     <Route path="*" element={<Navigate to="/superadmin/dashboard" />} />
                                 </Routes>
                             </SuperAdminLayout>
