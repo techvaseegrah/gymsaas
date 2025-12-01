@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaUser, FaLock, FaSearch, FaBuilding, FaArrowLeft, FaDumbbell, FaUserShield } from 'react-icons/fa';
 import api from '../api/api';
 
@@ -20,6 +20,23 @@ const LoginPage = ({ setUser }) => {
     const [fighterPassword, setFighterPassword] = useState('');
     
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // --- INITIALIZATION & URL SYNC ---
+    // This effect restores state from URL on page load (Fixes refresh issue)
+    useEffect(() => {
+        const roleParam = searchParams.get('role');
+        const gymParam = searchParams.get('gym');
+
+        if (roleParam && (roleParam === 'admin' || roleParam === 'fighter')) {
+            setLoginType(roleParam);
+        }
+
+        if (gymParam && !selectedGym) {
+            setTenantSlug(gymParam);
+            fetchGymBySlug(gymParam);
+        }
+    }, [searchParams]);
 
     // Fetch fighters when a gym is selected
     useEffect(() => {
@@ -39,7 +56,38 @@ const LoginPage = ({ setUser }) => {
         }
     }, [selectedGym, loginType]);
 
+    // --- HELPER FUNCTIONS ---
+    const fetchGymBySlug = async (slug) => {
+        setLoading(true);
+        try {
+            const res = await api.get(`/tenants/${slug}`);
+            setSelectedGym(res.data);
+        } catch (err) {
+            setTenantError('Gym not found from URL.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getInitials = (name) => {
+        if (!name) return '';
+        const initials = name.split(' ').map(word => word[0]).join('').toUpperCase();
+        return initials.substring(0, 2);
+    };
+
+    const updateUrl = (role, gym) => {
+        const params = {};
+        if (role) params.role = role;
+        if (gym) params.gym = gym;
+        setSearchParams(params);
+    };
+
     // --- HANDLERS ---
+    const handleRoleSelect = (role) => {
+        setLoginType(role);
+        updateUrl(role, selectedGym?.slug);
+    };
+
     const handleAdminLogin = async (e) => {
         e.preventDefault();
         setError(null);
@@ -69,6 +117,7 @@ const LoginPage = ({ setUser }) => {
             const { data } = await api.post('/auth/login', {
                 email: selectedFighter.email,
                 password: fighterPassword,
+                role: 'fighter',
                 tenantSlug: selectedGym?.slug
             });
             localStorage.setItem('token', data.token);
@@ -92,6 +141,7 @@ const LoginPage = ({ setUser }) => {
         try {
             const res = await api.get(`/tenants/${tenantSlug}`);
             setSelectedGym(res.data);
+            updateUrl(loginType, res.data.slug); // Update URL with gym
         } catch (err) {
             setTenantError('Gym not found. Please check the ID.');
         } finally {
@@ -113,6 +163,20 @@ const LoginPage = ({ setUser }) => {
         setSearchTerm('');
         setTenantSlug('');
         setTenantError('');
+        setFighterPassword('');
+        setSearchParams({}); // Clear URL
+    };
+
+    const backToGymSelection = () => {
+        // Go back one step: keep role, clear gym
+        setSelectedGym(null);
+        setTenantSlug('');
+        setTenantError('');
+        updateUrl(loginType, null);
+    };
+
+    const backToFighterList = () => {
+        setSelectedFighter(null);
         setFighterPassword('');
     };
 
@@ -166,7 +230,7 @@ const LoginPage = ({ setUser }) => {
                         {!loginType ? (
                             <div className="w-full max-w-md space-y-4 animate-fade-in">
                                 <button 
-                                    onClick={() => setLoginType('admin')} 
+                                    onClick={() => handleRoleSelect('admin')} 
                                     className="group w-full relative overflow-hidden rounded-2xl p-[1px] transition-all hover:scale-[1.02]"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
@@ -180,7 +244,7 @@ const LoginPage = ({ setUser }) => {
                                 </button>
 
                                 <button 
-                                    onClick={() => setLoginType('fighter')} 
+                                    onClick={() => handleRoleSelect('fighter')} 
                                     className="group w-full relative overflow-hidden rounded-2xl p-[1px] transition-all hover:scale-[1.02]"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
@@ -192,6 +256,15 @@ const LoginPage = ({ setUser }) => {
                                         </div>
                                     </div>
                                 </button>
+                                
+                                <div className="text-center mt-4">
+                                    <button 
+                                        onClick={() => navigate('/superadmin/login')} 
+                                        className="text-gray-400 hover:text-purple-400 text-sm transition-colors"
+                                    >
+                                        Super Admin Login
+                                    </button>
+                                </div>
                             </div>
 
                         /* VIEW 2: GYM ID SELECTION */
@@ -223,11 +296,11 @@ const LoginPage = ({ setUser }) => {
                         ) : loginType === 'fighter' && !selectedFighter ? (
                             <div className="w-full animate-fade-in">
                                 <div className="relative mb-6 max-w-md mx-auto">
-                                    <FaSearch className="absolute left-4 top-3.5 text-gray-400" />
+                                    <FaSearch className="absolute left-4 top-3.5 text-gray-400 group-focus-within:text-white transition-colors" />
                                     <input
                                         type="text"
                                         placeholder="Search your name..."
-                                        className="w-full pl-12 pr-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:bg-black/40 focus:border-white/30"
+                                        className="w-full pl-12 pr-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:bg-black/40 focus:border-white/30 transition-all glass-card"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
@@ -241,25 +314,36 @@ const LoginPage = ({ setUser }) => {
                                             <div 
                                                 key={fighter._id} 
                                                 onClick={() => handleFighterSelect(fighter)} 
-                                                className="group bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/30 rounded-2xl p-4 flex flex-col items-center cursor-pointer transition-all hover:scale-105"
+                                                className="glass-card group rounded-2xl p-4 flex flex-col items-center cursor-pointer transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:border-white/20"
                                             >
-                                                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-transparent group-hover:border-blue-400 mb-3 transition-all relative">
-                                                    <img
-                                                        src={fighter.profilePhoto || "/logo.png"}
-                                                        alt={fighter.name}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => { e.target.src = "/logo.png"; }}
-                                                    />
+                                                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-transparent group-hover:border-red-400 mb-3 transition-all relative flex items-center justify-center" style={{ backgroundColor: fighter.profilePhoto ? 'transparent' : '#EF4444' }}>
+                                                    {fighter.profilePhoto ? (
+                                                        <img
+                                                            src={fighter.profilePhoto}
+                                                            alt={fighter.name}
+                                                            className="w-full h-full object-cover"
+                                                            onError={(e) => { e.target.src = "/logo.png"; }}
+                                                        />
+                                                    ) : (
+                                                        <span className="text-white text-xl font-bold">
+                                                            {getInitials(fighter.name)}
+                                                        </span>
+                                                    )}
                                                 </div>
                                                 <h4 className="text-white font-semibold text-sm text-center truncate w-full">{fighter.name}</h4>
-                                                <p className="text-xs text-gray-400">{fighter.rfid}</p>
+                                                <p className="text-xs text-gray-400 truncate w-full text-center">{fighter.rfid}</p>
                                             </div>
                                         ))}
                                         {filteredFighters.length === 0 && <p className="col-span-full text-center text-gray-500">No fighters found.</p>}
                                     </div>
                                 )}
                                 <div className="text-center mt-6">
-                                    <button onClick={resetGymSelection} className="text-gray-400 hover:text-white text-sm">Change Gym</button>
+                                    <button 
+                                        onClick={backToGymSelection} 
+                                        className="text-gray-400 hover:text-white text-sm transition-colors duration-300 flex items-center justify-center gap-1 mx-auto"
+                                    >
+                                        <FaArrowLeft size={14} /> Change Gym
+                                    </button>
                                 </div>
                             </div>
 
@@ -306,6 +390,16 @@ const LoginPage = ({ setUser }) => {
                                         </button>
                                     </div>
 
+                                    {/* Forgot Password Link */}
+                                    <div className="flex justify-end">
+                                        <Link 
+                                            to="/forgot-password"
+                                            className="text-sm text-blue-300 hover:text-white transition-colors"
+                                        >
+                                            Forgot Password?
+                                        </Link>
+                                    </div>
+
                                     {error && (
                                         <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/40 text-red-200 text-sm text-center animate-pulse">
                                             {error}
@@ -327,7 +421,7 @@ const LoginPage = ({ setUser }) => {
 
                                 <div className="text-center mt-6">
                                     <button 
-                                        onClick={loginType === 'fighter' ? () => { setSelectedFighter(null); setFighterPassword(''); } : resetGymSelection} 
+                                        onClick={loginType === 'fighter' ? backToFighterList : backToGymSelection} 
                                         className="text-gray-400 hover:text-white text-sm flex items-center justify-center gap-2 mx-auto transition-colors"
                                     >
                                         <FaArrowLeft /> {loginType === 'fighter' ? 'Back to Fighters' : 'Back to Gym'}

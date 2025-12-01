@@ -1,3 +1,4 @@
+/* gym live/gym/frontend/src/index.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,7 +7,17 @@
   .no-page-scroll {
     @apply h-screen overflow-hidden;
   }
-  /* Custom Scrollbar for the Fighter List */
+  
+  /* Glassmorphism Utility */
+  .glass-panel {
+    @apply bg-gray-900/40 backdrop-blur-xl border border-white/10 shadow-xl;
+  }
+  
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-lg hover:bg-white/10 transition-all duration-300;
+  }
+
+  /* Custom Scrollbar */
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
@@ -26,7 +37,7 @@
     }
 }
 
-/* --- LIQUID ANIMATION KEYFRAMES --- */
+/* BLOB ANIMATIONS (Already in your file, kept here for the background effect) */
 @keyframes blob {
   0% { transform: translate(0px, 0px) scale(1); }
   33% { transform: translate(30px, -50px) scale(1.1); }

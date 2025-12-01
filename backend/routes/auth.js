@@ -1,243 +1,189 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto'); // Built-in Node module
+const nodemailer = require('nodemailer'); // You may need to run: npm install nodemailer
 const Fighter = require('../models/Fighter');
 const Admin = require('../models/Admin');
 const Tenant = require('../models/Tenant');
 const auth = require('../middleware/authMiddleware');
 const router = express.Router();
 
-router.post('/login', async (req, res) => {
-    const { email, password, tenantSlug } = req.body;
-    
-    // Basic validation
-    if (!email || !password) {
-        return res.status(400).json({ msg: 'Please enter all fields' });
+// ... [Keep your existing /login, /user routes etc.] ...
+
+// ==========================================
+//          PASSWORD RESET ROUTES
+// ==========================================
+
+// Utility: Send Email (Mock function included for dev)
+const sendEmail = async (options) => {
+    // 1. Create Transporter (Configure with your SMTP credentials for production)
+    // For GMail: service: 'gmail', auth: { user: '...', pass: '...' }
+    const transporter = nodemailer.createTransport({
+        service: 'gmail', 
+        auth: {
+            user: process.env.EMAIL_USER, // Add to your .env
+            pass: process.env.EMAIL_PASS  // Add to your .env
+        }
+    });
+
+    const message = {
+        from: `${process.env.FROM_NAME || 'Gym Support'} <${process.env.FROM_EMAIL || 'noreply@gym.com'}>`,
+        to: options.email,
+        subject: options.subject,
+        text: options.message
+    };
+
+    // For development without SMTP, we just log the message
+    if (!process.env.EMAIL_USER) {
+        console.log('--- EMAIL SIMULATION ---');
+        console.log(`To: ${options.email}`);
+        console.log(`Subject: ${options.subject}`);
+        console.log(`Message: ${options.message}`);
+        console.log('------------------------');
+        return;
     }
 
+    await transporter.sendMail(message);
+};
+
+// @route   POST api/auth/forgot-password
+// @desc    Forgot Password - Send Reset Link
+router.post('/forgot-password', async (req, res) => {
+    const { email } = req.body;
+
     try {
-        let tenant = null;
-        if (tenantSlug) {
-            tenant = await Tenant.findOne({ slug: tenantSlug.toLowerCase() });
-            if (!tenant) {
-                return res.status(400).json({ msg: 'Gym not found' });
-            }
+        // 1. Find User (Check Admin first, then Fighter)
+        let user = await Admin.findOne({ email });
+        let model = Admin;
+
+        if (!user) {
+            user = await Fighter.findOne({ email });
+            model = Fighter;
         }
 
-        // --- CORRECTED LOGIC ---
-        // 1. Check for an Admin first
-        let user = await Admin.findOne({ email, ...(tenant && { tenant: tenant._id }) });
-
-        if (user) {
-            // Admin found, check password
-            const isMatch = await bcrypt.compare(password, user.password);
-            if (!isMatch) {
-                return res.status(400).json({ msg: 'Invalid credentials' });
-            }
-        } else {
-            // 2. If no Admin, check for a Fighter
-            user = await Fighter.findOne({ email, ...(tenant && { tenant: tenant._id }) });
-
-            if (!user) {
-                return res.status(400).json({ msg: 'Invalid credentials' });
-            }
-
-            // Fighter found, check password
-            const isMatch = await bcrypt.compare(password, user.password);
-            if (!isMatch) {
-                return res.status(400).json({ msg: 'Invalid credentials' });
-            }
+        if (!user) {
+            return res.status(404).json({ msg: 'No account found with that email' });
         }
-        
-        // 3. If password is correct, create and send token
-        const payload = {
-            user: {
-                id: user.id,
-                role: user.role,
-                profile_completed: user.profile_completed,
-                tenant: user.tenant
-            }
-        };
 
-        jwt.sign(
-            payload,
-            process.env.JWT_SECRET,
-            { expiresIn: 3600 },
-            (err, token) => {
-                if (err) throw err;
-                res.json({ token, user: payload.user });
-            }
-        );
+        // 2. Generate Reset Token
+        const resetToken = crypto.randomBytes(20).toString('hex');
+
+        // 3. Hash token and save to database
+        user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+        user.resetPasswordExpire = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+        await user.save();
+
+        // 4. Create Reset URL
+        // Assumes frontend is running on localhost:3000
+        const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
+
+        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. \n\n Please make a PUT request to: \n\n ${resetUrl}`;
+
+        try {
+            await sendEmail({
+                email: user.email,
+                subject: 'Password Reset Token',
+                message
+            });
+
+            res.json({ success: true, msg: 'Email sent' });
+        } catch (err) {
+            console.error(err);
+            user.resetPasswordToken = undefined;
+            user.resetPasswordExpire = undefined;
+            await user.save();
+            return res.status(500).json({ msg: 'Email could not be sent' });
+        }
 
     } catch (err) {
-        console.error('Login error:', err.message);
-        res.status(500).send('Server error');
+        console.error(err);
+        res.status(500).send('Server Error');
     }
 });
 
-// @route   GET api/auth/user
-// @desc    Get user data by token
-// @access  Private
-router.get('/user', auth, async (req, res) => {
+// @route   POST api/auth/reset-password/:resetToken
+// @desc    Reset Password using token
+router.post('/reset-password/:resetToken', async (req, res) => {
     try {
+        // 1. Get hashed token
+        const resetPasswordToken = crypto
+            .createHash('sha256')
+            .update(req.params.resetToken)
+            .digest('hex');
+
+        // 2. Find user with valid token and expiration
+        let user = await Admin.findOne({
+            resetPasswordToken,
+            resetPasswordExpire: { $gt: Date.now() }
+        });
+
+        if (!user) {
+            user = await Fighter.findOne({
+                resetPasswordToken,
+                resetPasswordExpire: { $gt: Date.now() }
+            });
+        }
+
+        if (!user) {
+            return res.status(400).json({ msg: 'Invalid or expired token' });
+        }
+
+        // 3. Set new password
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(req.body.password, salt);
+
+        // 4. Clear reset fields
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+        await user.save();
+
+        res.json({ success: true, msg: 'Password updated successfully' });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   POST api/auth/change-password
+// @desc    Change Password (Logged In User)
+// @access  Private
+router.post('/change-password', auth, async (req, res) => {
+    const { oldPassword, newPassword } = req.body;
+
+    try {
+        // 1. Determine User Model based on role
         let user;
         if (req.user.role === 'admin') {
-            user = await Admin.findById(req.user.id).select('-password');
+            user = await Admin.findById(req.user.id);
         } else {
-            user = await Fighter.findById(req.user.id).select('-password');
+            user = await Fighter.findById(req.user.id);
         }
-        
-        // Add tenant information if available
-        if (user && user.tenant) {
-            const Tenant = require('../models/Tenant');
-            const tenant = await Tenant.findById(user.tenant).select('name slug');
-            if (tenant) {
-                user.tenantInfo = {
-                    id: tenant._id,
-                    name: tenant.name,
-                    slug: tenant.slug
-                };
-            }
+
+        if (!user) {
+            return res.status(404).json({ msg: 'User not found' });
         }
-        
-        res.json(user);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
-    }
-});
 
-// @route   GET api/auth/admin-id
-// @desc    Get the ID of an admin user
-// @access  Private
-router.get('/admin-id', auth, async (req, res) => {
-    try {
-        console.log(`[AUTH] /admin-id called by user: ${req.user.id} (${req.user.role})`);
-        
-        let adminId;
-        
-        if (req.user.role === 'admin') {
-            // If current user is admin, return their ID
-            adminId = req.user.id;
-            console.log(`[AUTH] Returning current admin ID: ${adminId}`);
-        } else {
-            // FIXED: For fighter, return the specific admin that should be used for chat
-            // This ensures consistent chat routing
-            
-            // TEMPORARY OVERRIDE: Force return the logged-in admin's ID
-            const targetAdminId = '68bc3872c7f20dc76f9da534';
-            console.log(`[AUTH] FORCING admin ID for fighter: ${targetAdminId}`);
-            
-            // Verify this admin exists
-            const targetAdmin = await Admin.findById(targetAdminId);
-            if (targetAdmin) {
-                adminId = targetAdminId;
-                console.log(`[AUTH] Successfully returning target admin: ${adminId}`);
-            } else {
-                // Fallback to any admin
-                const admin = await Admin.findOne({ role: 'admin' }).select('_id');
-                if (!admin) {
-                    return res.status(404).json({ msg: 'No admin accounts found.' });
-                }
-                adminId = admin._id;
-                console.log(`[AUTH] Target admin not found, fallback to: ${adminId}`);
-                }
+        // 2. Check Old Password
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ msg: 'Incorrect current password' });
         }
-        
-        res.json({ adminId: adminId });
+
+        // 3. Hash New Password
+        const salt = await bcrypt.genSalt(10);
+        user.password = await bcrypt.hash(newPassword, salt);
+
+        await user.save();
+
+        res.json({ success: true, msg: 'Password changed successfully' });
     } catch (err) {
-        console.error('Error fetching admin ID:', err.message);
+        console.error(err);
         res.status(500).send('Server Error');
     }
 });
-
-// @route   POST api/auth/logout
-// @desc    Logout user
-// @access  Private
-router.post('/logout', auth, (req, res) => {
-    res.json({ msg: 'User logged out successfully' });
-});
-
-// @route   GET api/auth/list-admins
-// @desc    List all admins for debugging
-// @access  Private
-router.get('/list-admins', auth, async (req, res) => {
-    try {
-        const admins = await Admin.find().select('_id email role');
-        console.log('[AUTH] All admins in database:', admins);
-        res.json({ 
-            admins: admins,
-            currentUserId: req.user.id,
-            currentUserRole: req.user.role
-        });
-    } catch (err) {
-        console.error('Error listing admins:', err.message);
-        res.status(500).send('Server Error');
-    }
-});
-
-// @route   GET api/auth/current-admin
-// @desc    Get the currently active admin for fighter chat
-// @access  Private
-router.get('/current-admin', auth, async (req, res) => {
-    try {
-        console.log(`[AUTH] /current-admin called by user: ${req.user.id} (${req.user.role})`);
-        
-        // Find the admin with the specific ID that should be used for chat
-        // This is a temporary fix - in production you'd want better logic
-        const targetAdminId = '68bc3872c7f20dc76f9da534'; // The logged-in admin
-        
-        const admin = await Admin.findById(targetAdminId).select('_id email');
-        if (!admin) {
-            return res.status(404).json({ msg: 'Target admin not found.' });
-        }
-        
-        console.log(`[AUTH] Returning target admin for chat: ${admin._id}`);
-        res.json({ adminId: admin._id, adminEmail: admin.email });
-    } catch (err) {
-        console.error('Error fetching current admin:', err.message);
-        res.status(500).send('Server Error');
-    }
-});
-
-// @route   GET api/auth/debug-users
-// @desc    Debug endpoint to check user relationships
-// @access  Private
-router.get('/debug-users', auth, async (req, res) => {
-    try {
-        const allAdmins = await Admin.find().select('_id email role');
-        const allFighters = await Fighter.find().select('_id name email');
-        
-        res.json({
-            currentUser: {
-                id: req.user.id,
-                role: req.user.role
-            },
-            allAdmins: allAdmins,
-            allFighters: allFighters.slice(0, 5) // Limit to first 5 for readability
-        });
-    } catch (err) {
-        console.error('Error in debug endpoint:', err.message);
-        res.status(500).send('Server Error');
-    }
-});
-
-// @route   GET api/auth/admin
-// @desc    Get the admin user's details
-// @access  Private
-router.get('/admin', auth, async (req, res) => {
-    try {
-        // Find the first admin user
-        const admin = await Admin.findOne().select('-password');
-        if (!admin) {
-            return res.status(404).json({ msg: 'Admin user not found' });
-        }
-        res.json(admin);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
-    }
-});
-
 
 module.exports = router;
