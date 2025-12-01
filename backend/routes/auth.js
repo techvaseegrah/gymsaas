@@ -9,7 +9,165 @@ const Tenant = require('../models/Tenant');
 const auth = require('../middleware/authMiddleware');
 const router = express.Router();
 
-// ... [Keep your existing /login, /user routes etc.] ...
+// @route   POST api/auth/login
+// @desc    Authenticate user & get token (Admin, Fighter, SuperAdmin)
+// @access  Public
+router.post('/login', async (req, res) => {
+    const { email, password, role, tenantSlug } = req.body;
+
+    try {
+        console.log('Login attempt:', { email, password, role, tenantSlug });
+        
+        // Validate required fields
+        if (!email || !password || !role) {
+            return res.status(400).json({ msg: 'Email, password, and role are required' });
+        }
+        
+        // Validate role
+        if (!['admin', 'fighter', 'superadmin'].includes(role)) {
+            return res.status(400).json({ msg: 'Invalid role specified' });
+        }
+
+        let user;
+
+        // Find user based on role
+        if (role === 'superadmin') {
+            user = await Admin.findOne({ email, role: 'superadmin' });
+            console.log('Superadmin user lookup:', user ? 'Found' : 'Not found');
+        } else if (role === 'admin') {
+            // For admin, we need to verify tenant
+            if (!tenantSlug) {
+                return res.status(400).json({ msg: 'Tenant slug is required for admin login' });
+            }
+            
+            const tenant = await Tenant.findOne({ slug: tenantSlug });
+            if (!tenant) {
+                console.log('Admin tenant not found:', tenantSlug);
+                return res.status(400).json({ msg: 'Invalid tenant' });
+            }
+            
+            user = await Admin.findOne({ email, tenant: tenant._id });
+            console.log('Admin user lookup:', user ? 'Found' : 'Not found');
+        } else if (role === 'fighter') {
+            // For fighter, we need to verify tenant
+            if (!tenantSlug) {
+                return res.status(400).json({ msg: 'Tenant slug is required for fighter login' });
+            }
+            
+            const tenant = await Tenant.findOne({ slug: tenantSlug });
+            if (!tenant) {
+                console.log('Fighter tenant not found:', tenantSlug);
+                return res.status(400).json({ msg: 'Invalid tenant' });
+            }
+            
+            user = await Fighter.findOne({ email, tenant: tenant._id });
+            console.log('Fighter user lookup:', user ? 'Found' : 'Not found', user?.email);
+        }
+
+        // Check if user exists
+        if (!user) {
+            return res.status(400).json({ msg: 'Invalid Credentials' });
+        }
+
+        // Compare password
+        console.log('Comparing passwords for user:', user.email);
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Password match result:', isMatch);
+        if (!isMatch) {
+            return res.status(400).json({ msg: 'Invalid Credentials' });
+        }
+
+        // Create JWT payload
+        const payload = {
+            user: {
+                id: user.id,
+                role: user.role,
+                tenant: user.tenant
+            }
+        };
+
+        // Sign token
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' },
+            (err, token) => {
+                if (err) {
+                    console.error('JWT signing error:', err);
+                    return res.status(500).json({ msg: 'Token generation failed' });
+                }
+                console.log('Login successful for user:', user.email);
+                res.json({
+                    token,
+                    user: {
+                        id: user.id,
+                        name: user.name || '',
+                        email: user.email,
+                        role: user.role,
+                        tenant: user.tenant,
+                        profile_completed: user.profile_completed || false
+                    }
+                });
+            }
+        );
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+});
+
+// @route   GET api/auth/user
+// @desc    Get user data
+// @access  Private
+router.get('/user', auth, async (req, res) => {
+    try {
+        let user;
+        if (req.user.role === 'admin') {
+            user = await Admin.findById(req.user.id).select('-password');
+        } else if (req.user.role === 'fighter') {
+            user = await Fighter.findById(req.user.id).select('-password');
+        } else {
+            return res.status(400).json({ msg: 'Invalid user role' });
+        }
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   POST api/auth/refresh
+// @desc    Refresh JWT token
+// @access  Private
+router.post('/refresh', auth, async (req, res) => {
+    try {
+        // Create new JWT payload
+        const payload = {
+            user: {
+                id: req.user.id,
+                role: req.user.role,
+                tenant: req.user.tenant
+            }
+        };
+
+        // Sign new token
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' },
+            (err, token) => {
+                if (err) {
+                    console.error('JWT signing error:', err);
+                    return res.status(500).json({ msg: 'Token generation failed' });
+                }
+                res.json({ token });
+            }
+        );
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
 
 // ==========================================
 //          PASSWORD RESET ROUTES
@@ -79,7 +237,11 @@ router.post('/forgot-password', async (req, res) => {
         // Assumes frontend is running on localhost:3000
         const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
 
-        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. \n\n Please make a PUT request to: \n\n ${resetUrl}`;
+        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. 
+
+ Please make a PUT request to: 
+
+ ${resetUrl}`;
 
         try {
             await sendEmail({
