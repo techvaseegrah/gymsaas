@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/api';
 import { FaLock, FaUserShield } from 'react-icons/fa';
@@ -13,6 +13,25 @@ const SuperAdminLoginPage = ({ setUser }) => {
     const navigate = useNavigate();
 
     const { email, password } = formData;
+
+    // Check if there's a valid token on page load
+    useEffect(() => {
+        const checkToken = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    // Try to get user data with current token
+                    const res = await api.get('/auth/user');
+                    setUser(res.data);
+                    navigate('/superadmin/dashboard');
+                } catch (err) {
+                    // Token might be expired, continue to login form
+                    console.log('Token expired or invalid, showing login form');
+                }
+            }
+        };
+        checkToken();
+    }, [navigate, setUser]);
 
     const onChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

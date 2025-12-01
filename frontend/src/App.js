@@ -27,7 +27,7 @@ import FighterProfileUpdatePage from './pages/FighterProfileUpdatePage';
 import SubscriptionDetailsPage from './pages/SubscriptionDetailsPage';
 import GymStatsPage from './pages/GymStatsPage';
 
-// Super Admin Pages
+// --- SUPER ADMIN PAGES (New Imports) ---
 import SuperAdminDashboardPage from './pages/SuperAdminDashboardPage';
 import SuperAdminLoginPage from './pages/SuperAdminLoginPage';
 import SuperAdminGymsPage from './pages/SuperAdminGymsPage';
@@ -62,7 +62,17 @@ const App = () => {
                     setUser(data);
                 } catch (error) {
                     console.error("Session expired or token is invalid.");
-                    setUser(null);
+                    // Try to refresh the token
+                    try {
+                        await api.post('/auth/refresh');
+                        // If successful, try to get user data again
+                        const { data } = await api.get('/auth/user');
+                        setUser(data);
+                    } catch (refreshError) {
+                        console.error("Token refresh failed.");
+                        localStorage.removeItem('token');
+                        setUser(null);
+                    }
                 }
             }
             setLoading(false);
@@ -88,6 +98,12 @@ const App = () => {
 
         // 1. If not logged in -> Login Page
         if (!user) {
+            // Try to refresh token if it exists
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Redirect to a token refresh page or handle it automatically
+                return <Navigate to="/superadmin/login" replace />;
+            }
             return <Navigate to="/login" replace />;
         }
         
@@ -126,7 +142,6 @@ const App = () => {
                     </button>
                 </div>
                 <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0`}>
-                    {/* KEY CHANGE: user prop passed here */}
                     <AdminSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} user={user} />
                 </aside>
                 <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen">{children}</main>
@@ -149,7 +164,6 @@ const App = () => {
                     </button>
                 </div>
                 <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 border-r border-gray-700`}>
-                    {/* KEY CHANGE: user prop passed here */}
                     <FighterSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} user={user} />
                 </aside>
                 <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen">{children}</main>
@@ -219,22 +233,27 @@ const App = () => {
                         <ProtectedRoute role="superadmin">
                             <SuperAdminLayout>
                                 <Routes>
+                                    {/* 1. Dashboard */}
                                     <Route path="dashboard" element={<SuperAdminDashboardPage />} />
-                                    <Route path="tenants" element={<SuperAdminGymsPage />} />
-                                    <Route path="tenants/create" element={<SuperAdminCreateGymPage />} />
-                                    <Route path="tenants/inactive" element={<SuperAdminGymsPage />} />
-                                    <Route path="users/admins" element={<SuperAdminUsersPage />} />
-                                    <Route path="users/fighters" element={<SuperAdminUsersPage />} />
-                                    <Route path="users/superadmins" element={<SuperAdminUsersPage />} />
-                                    <Route path="billing/subscriptions" element={<SuperAdminBillingPage />} />
-                                    <Route path="billing/payments" element={<SuperAdminBillingPage />} />
-                                    <Route path="billing/invoices" element={<SuperAdminBillingPage />} />
-                                    <Route path="billing/refunds" element={<SuperAdminBillingPage />} />
+                                    
+                                    {/* 2. Gyms */}
+                                    <Route path="gyms" element={<SuperAdminGymsPage />} />
+                                    <Route path="gyms/create" element={<SuperAdminCreateGymPage />} />
+                                    
+                                    {/* 3. Users */}
+                                    <Route path="users" element={<SuperAdminUsersPage />} />
+                                    
+                                    {/* 4. Billing */}
+                                    <Route path="billing" element={<SuperAdminBillingPage />} />
+                                    
+                                    {/* 5. Settings */}
+                                    <Route path="settings" element={<SuperAdminSettingsPage />} />
+                                    
+                                    {/* Analytics */}
                                     <Route path="analytics" element={<SuperAdminAnalyticsPage />} />
-                                    <Route path="settings/general" element={<SuperAdminSettingsPage />} />
-                                    <Route path="settings/notifications" element={<SuperAdminSettingsPage />} />
-                                    <Route path="settings/database" element={<SuperAdminSettingsPage />} />
-                                    <Route path="settings/logs" element={<SuperAdminSettingsPage />} />
+                                    
+                                    {/* Redirects for legacy links or root */}
+                                    <Route path="tenants*" element={<Navigate to="/superadmin/gyms" replace />} />
                                     <Route path="*" element={<Navigate to="/superadmin/dashboard" />} />
                                 </Routes>
                             </SuperAdminLayout>
@@ -254,10 +273,7 @@ const App = () => {
                 <Route path="/admin/ask-doubt" element={<ProtectedRoute role="admin"><AdminLayout><AskDoubtPage /></AdminLayout></ProtectedRoute>} />
                 
                 {/* --- FIGHTER ROUTES --- */}
-                
-                {/* UPDATED: Replaced /fighter/level with /fighter/stats */}
                 <Route path="/fighter/stats" element={<ProtectedRoute role="fighter"><FighterLayout><GymStatsPage /></FighterLayout></ProtectedRoute>} />
-                
                 <Route path="/fighter/attendance/face" element={<ProtectedRoute role="fighter"><FighterLayout><FighterFaceRecognitionPage /></FighterLayout></ProtectedRoute>} />
                 <Route path="/fighter/ask-doubt" element={<ProtectedRoute role="fighter"><FighterLayout><AskDoubtPage /></FighterLayout></ProtectedRoute>} />
                 <Route path="/fighter/complete-profile" element={<ProtectedRoute role="fighter"><CompleteProfilePage /></ProtectedRoute>} />

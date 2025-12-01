@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams, Link } from 'react-router-dom'; // Added Link import
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaUser, FaLock, FaSearch, FaBuilding, FaArrowLeft, FaDumbbell, FaUserShield } from 'react-icons/fa';
 import api from '../api/api';
 
@@ -20,6 +20,23 @@ const LoginPage = ({ setUser }) => {
     const [fighterPassword, setFighterPassword] = useState('');
     
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    // --- INITIALIZATION & URL SYNC ---
+    // This effect restores state from URL on page load (Fixes refresh issue)
+    useEffect(() => {
+        const roleParam = searchParams.get('role');
+        const gymParam = searchParams.get('gym');
+
+        if (roleParam && (roleParam === 'admin' || roleParam === 'fighter')) {
+            setLoginType(roleParam);
+        }
+
+        if (gymParam && !selectedGym) {
+            setTenantSlug(gymParam);
+            fetchGymBySlug(gymParam);
+        }
+    }, [searchParams]);
 
     // Fetch fighters when a gym is selected
     useEffect(() => {
@@ -40,13 +57,37 @@ const LoginPage = ({ setUser }) => {
     }, [selectedGym, loginType]);
 
     // --- HELPER FUNCTIONS ---
+    const fetchGymBySlug = async (slug) => {
+        setLoading(true);
+        try {
+            const res = await api.get(`/tenants/${slug}`);
+            setSelectedGym(res.data);
+        } catch (err) {
+            setTenantError('Gym not found from URL.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const getInitials = (name) => {
         if (!name) return '';
         const initials = name.split(' ').map(word => word[0]).join('').toUpperCase();
-        return initials.substring(0, 2); // Max 2 initials
+        return initials.substring(0, 2);
+    };
+
+    const updateUrl = (role, gym) => {
+        const params = {};
+        if (role) params.role = role;
+        if (gym) params.gym = gym;
+        setSearchParams(params);
     };
 
     // --- HANDLERS ---
+    const handleRoleSelect = (role) => {
+        setLoginType(role);
+        updateUrl(role, selectedGym?.slug);
+    };
+
     const handleAdminLogin = async (e) => {
         e.preventDefault();
         setError(null);
@@ -100,6 +141,7 @@ const LoginPage = ({ setUser }) => {
         try {
             const res = await api.get(`/tenants/${tenantSlug}`);
             setSelectedGym(res.data);
+            updateUrl(loginType, res.data.slug); // Update URL with gym
         } catch (err) {
             setTenantError('Gym not found. Please check the ID.');
         } finally {
@@ -121,6 +163,20 @@ const LoginPage = ({ setUser }) => {
         setSearchTerm('');
         setTenantSlug('');
         setTenantError('');
+        setFighterPassword('');
+        setSearchParams({}); // Clear URL
+    };
+
+    const backToGymSelection = () => {
+        // Go back one step: keep role, clear gym
+        setSelectedGym(null);
+        setTenantSlug('');
+        setTenantError('');
+        updateUrl(loginType, null);
+    };
+
+    const backToFighterList = () => {
+        setSelectedFighter(null);
         setFighterPassword('');
     };
 
@@ -174,7 +230,7 @@ const LoginPage = ({ setUser }) => {
                         {!loginType ? (
                             <div className="w-full max-w-md space-y-4 animate-fade-in">
                                 <button 
-                                    onClick={() => setLoginType('admin')} 
+                                    onClick={() => handleRoleSelect('admin')} 
                                     className="group w-full relative overflow-hidden rounded-2xl p-[1px] transition-all hover:scale-[1.02]"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
@@ -188,7 +244,7 @@ const LoginPage = ({ setUser }) => {
                                 </button>
 
                                 <button 
-                                    onClick={() => setLoginType('fighter')} 
+                                    onClick={() => handleRoleSelect('fighter')} 
                                     className="group w-full relative overflow-hidden rounded-2xl p-[1px] transition-all hover:scale-[1.02]"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
@@ -283,7 +339,7 @@ const LoginPage = ({ setUser }) => {
                                 )}
                                 <div className="text-center mt-6">
                                     <button 
-                                        onClick={resetGymSelection} 
+                                        onClick={backToGymSelection} 
                                         className="text-gray-400 hover:text-white text-sm transition-colors duration-300 flex items-center justify-center gap-1 mx-auto"
                                     >
                                         <FaArrowLeft size={14} /> Change Gym
@@ -334,7 +390,7 @@ const LoginPage = ({ setUser }) => {
                                         </button>
                                     </div>
 
-                                    {/* Forgot Password Link - ADDED HERE */}
+                                    {/* Forgot Password Link */}
                                     <div className="flex justify-end">
                                         <Link 
                                             to="/forgot-password"
@@ -365,7 +421,7 @@ const LoginPage = ({ setUser }) => {
 
                                 <div className="text-center mt-6">
                                     <button 
-                                        onClick={loginType === 'fighter' ? () => { setSelectedFighter(null); setFighterPassword(''); } : resetGymSelection} 
+                                        onClick={loginType === 'fighter' ? backToFighterList : backToGymSelection} 
                                         className="text-gray-400 hover:text-white text-sm flex items-center justify-center gap-2 mx-auto transition-colors"
                                     >
                                         <FaArrowLeft /> {loginType === 'fighter' ? 'Back to Fighters' : 'Back to Gym'}
