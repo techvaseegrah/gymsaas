@@ -12,8 +12,8 @@ export const initSocket = (user) => {
 
   currentUser = user;
   
-  // Connect to WebSocket server
-  socket = io('http://localhost:5000');
+  // Connect to WebSocket server (using the same port as the API)
+  socket = io('http://localhost:5002');
 
   // Register user with server
   socket.emit('register_user', {

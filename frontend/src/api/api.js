@@ -37,6 +37,12 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers['x-auth-token'] = token;
   }
+  
+  // Add cache control headers to prevent caching
+  config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+  config.headers['Pragma'] = 'no-cache';
+  config.headers['Expires'] = '0';
+  
   return config;
 }, error => {
   return Promise.reject(error);

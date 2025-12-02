@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 
 const AdminAssessment = ({ fighterId }) => {
@@ -7,9 +7,29 @@ const AdminAssessment = ({ fighterId }) => {
         skill: {},
         specialGradeScore: 0
     });
+    const [fighter, setFighter] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     const technicalSkills = ['Stance', 'Jab', 'Straight', 'Left Hook', 'Right Hook', 'Thigh Kick', 'Rib Kick', 'Face Slap Kick', 'Inner Kick', 'Outer Kick', 'Front Kick', 'Rise Kick', 'Boxing Movements', 'Push Ups', 'Cambo'];
     const skillAdvantages = ['Stamina', 'Speed', 'Flexibility', 'Power', 'Martial Arts Knowledge', 'Discipline'];
+
+    // Fetch fighter data
+    useEffect(() => {
+        const fetchFighter = async () => {
+            try {
+                const res = await api.get(`/fighters/${fighterId}`);
+                setFighter(res.data);
+            } catch (err) {
+                console.error('Error fetching fighter:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (fighterId) {
+            fetchFighter();
+        }
+    }, [fighterId]);
 
     const handleScoreChange = (type, skill, key, value) => {
         setScores(prev => ({
@@ -155,12 +175,18 @@ const AdminAssessment = ({ fighterId }) => {
     return (
         <div className="bg-white rounded-lg p-4 md:p-6">
             <h2 className="text-xl md:text-2xl font-bold text-center text-red-600 mb-3">STRICKER - Fighter Level</h2>
-            <div className="text-gray-700 text-xs md:text-sm mb-4 space-y-2">
-                <p>"Fighter Batch no: ASHURA's! This is a Stricker - fighter level- The Foundation of your martial arts journey. A basic Level test to measure your skills. Score at least 75% to awaken Ashura's Aura Level and rise to Tribe Level 8. Upgrade your skill. stay focus and All The Best."</p>
-                <p>"Your result will be evaluated by the Master and two senior fighter."</p>
-                <p>"If you don't pass this Stricker Level test, don't be discouraged. Check your progress, your attendance, your practice - and most importantly, your focus on martial arts. Reflect. Refine. Rise. Upgrade yourself and come back stronger."</p>
-                <p>"This assessment will be conducted three months from your entry date. The next level test will be held after another three months based on your progress."</p>
-            </div>
+            {loading ? (
+                <p>Loading fighter information...</p>
+            ) : (
+                <div className="text-gray-700 text-xs md:text-sm mb-4 space-y-2">
+                    <p>
+                        "Fighter Batch no: {fighter?.fighterBatchNo || 'Unknown'}! This is a Stricker - fighter level- The Foundation of your martial arts journey. A basic Level test to measure your skills. Score at least 75% to awaken your Aura Level and rise to Tribe Level 8. Upgrade your skill. stay focus and All The Best."
+                    </p>
+                    <p>"Your result will be evaluated by the Master and two senior fighter."</p>
+                    <p>"If you don't pass this Stricker Level test, don't be discouraged. Check your progress, your attendance, your practice - and most importantly, your focus on martial arts. Reflect. Refine. Rise. Upgrade yourself and come back stronger."</p>
+                    <p>"This assessment will be conducted three months from your entry date. The next level test will be held after another three months based on your progress."</p>
+                </div>
+            )}
 
             <div className="flex flex-wrap justify-around items-center text-center font-bold text-gray-800 my-4 gap-2">
                 <div className="p-2 bg-red-200 rounded-md min-w-[90px]">

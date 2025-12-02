@@ -3,10 +3,10 @@ import FighterDashboard from '../components/FighterDashboard';
 import EnhancedLevelProgress from '../components/EnhancedLevelProgress';
 import api from '../api/api';
 import { useNavigate } from 'react-router-dom';
-import { FaUserEdit, FaCrown, FaIdCard } from 'react-icons/fa'; // Changed Icon to Crown for Membership
+import { FaUserEdit, FaCrown, FaIdCard } from 'react-icons/fa';
 import ProfilePhotoModal from '../components/ProfilePhotoModal';
 
-const FighterHomePage = ({ user }) => {
+const FighterHomePage = ({ user, confirmLogout }) => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const [fighterData, setFighterData] = useState(null);
     const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
@@ -41,9 +41,9 @@ const FighterHomePage = ({ user }) => {
 
     const renderContent = () => {
         if (activeTab === 'dashboard') {
-            return <FighterDashboard user={user} fighterData={fighterData} />;
+            return <FighterDashboard user={user} fighterData={fighterData} confirmLogout={confirmLogout} />;
         }
-        if (activeTab === 'membership') { // Updated key to 'membership'
+        if (activeTab === 'membership') {
             return <EnhancedLevelProgress fighterData={fighterData || user} />;
         }
         return null;
@@ -135,7 +135,7 @@ const FighterHomePage = ({ user }) => {
                             <FaIdCard className="text-base md:text-lg" /> Dashboard
                         </button>
                         <button
-                            onClick={() => setActiveTab('membership')} // Updated to 'membership'
+                            onClick={() => setActiveTab('membership')}
                             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 ${
                                 activeTab === 'membership'
                                     ? 'bg-gradient-to-br from-red-600 to-red-800 text-white shadow-lg shadow-red-900/50 ring-1 ring-white/20'
@@ -160,7 +160,7 @@ const FighterHomePage = ({ user }) => {
                 fighterName={fighterData?.name}
             />
 
-            <style jsx>{`
+            <style>{`
                 @keyframes fade-in-up {
                     from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }

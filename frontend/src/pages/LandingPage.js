@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
     FiMenu,
@@ -59,7 +59,7 @@ const benefits = [
 const pricingTiers = [
     {
         name: 'Starter',
-        price: '$49',
+        price: '₹3,999',
         cadence: 'per month',
         description: 'Perfect for boutique academies getting started with digital ops.',
         features: ['30 fighters included', 'Attendance automation', '1 admin seat', 'Email support'],
@@ -68,7 +68,7 @@ const pricingTiers = [
     {
         name: 'Growth',
         highlight: true,
-        price: '$129',
+        price: '₹9,999',
         cadence: 'per month',
         description: 'Everything you need to run a multi-location combat program.',
         features: ['120 fighters included', 'Advanced analytics', '3 admin seats', 'Priority support'],
@@ -86,7 +86,7 @@ const pricingTiers = [
 
 const testimonials = [
     {
-        quote: 'Mutants Academy turned our chaotic attendance manual into a 2-minute ritual. Fighters love the instant feedback.',
+        quote: 'GymRatz turned our chaotic attendance manual into a 2-minute ritual. Fighters love the instant feedback.',
         name: 'Coach Aisha Bhatt',
         role: 'Head Coach, Iron Circle',
     },
@@ -131,6 +131,20 @@ const scrollToSection = (target) => {
 const LandingPage = () => {
     const [isMenuOpen, setMenuOpen] = useState(false);
     const [openFaqIndex, setOpenFaqIndex] = useState(0);
+    const [scrollProgress, setScrollProgress] = useState(0);
+
+    // --- SCROLL PROGRESS LOGIC ---
+    useEffect(() => {
+        const handleScroll = () => {
+            const totalScroll = document.documentElement.scrollTop;
+            const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scroll = totalScroll / windowHeight;
+            setScrollProgress(scroll);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const toggleFaq = (index) => {
         setOpenFaqIndex((prev) => (prev === index ? -1 : index));
@@ -142,66 +156,71 @@ const LandingPage = () => {
     };
 
     return (
-        <div className="bg-neutral text-slate-800 min-h-screen">
-            <div className="relative isolate overflow-hidden text-white bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800">
-                <div className="absolute inset-0 opacity-70 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.45),_transparent_55%)]" />
-                <div className="absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.35),_transparent_60%)]" />
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-950/80" />
-
-                <div className="relative z-10">
-                    <header className="mx-auto px-6 lg:px-8 py-6 flex items-center justify-between">
-                        <div className="flex items-center space-x-3">
-                            <div className="h-10 w-10 rounded-2xl bg-accent/20 border border-white/20 flex items-center justify-center font-bold">
-                                MA
-                            </div>
-                            <div>
-                                <p className="text-xl font-semibold">Mutants Academy</p>
-                                <p className="text-xs text-white/70 tracking-widest uppercase">Combat Platform</p>
-                            </div>
+        <div className="bg-neutral text-slate-800 min-h-screen relative">
+            
+            {/* --- FIXED HEADER --- */}
+            <header className="fixed top-0 w-full z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 transition-all duration-300">
+                <div className="mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                        <div className="h-10 w-10 rounded-2xl bg-accent/20 border border-white/20 flex items-center justify-center font-bold text-white">
+                            GR
                         </div>
-                        <nav className="hidden lg:flex items-center space-x-8 text-sm uppercase tracking-wide">
-                            {navItems.map((item) => (
-                                <button
-                                    key={item.target}
-                                    onClick={() => handleNavClick(item.target)}
-                                    className="text-white/80 hover:text-white transition"
-                                >
-                                    {item.label}
-                                </button>
-                            ))}
-                            <Link
-                                to="/login"
-                                className="inline-flex items-center space-x-2 bg-white text-primary font-semibold px-5 py-2 rounded-full hover:bg-accent hover:text-white transition"
+                        <div>
+                            <p className="text-xl font-semibold text-white">GymRatz</p>
+                            <p className="text-xs text-white/70 tracking-widest uppercase">Combat Platform</p>
+                        </div>
+                    </div>
+                    <nav className="hidden lg:flex items-center space-x-8 text-sm uppercase tracking-wide">
+                        {navItems.map((item) => (
+                            <button
+                                key={item.target}
+                                onClick={() => handleNavClick(item.target)}
+                                className="text-white/80 hover:text-white transition"
                             >
-                                <span>Login</span>
-                            </Link>
-                            <Link
-                                to="/signup"
-                                className="inline-flex items-center space-x-2 bg-accent text-white font-semibold px-5 py-2 rounded-full hover:bg-accent/80 transition"
-                            >
-                                <span>Sign Up</span>
-                            </Link>
-                        </nav>
-                        <button
-                            className="lg:hidden text-white text-2xl"
-                            onClick={() => setMenuOpen((prev) => !prev)}
-                            aria-label="Toggle navigation menu"
+                                {item.label}
+                            </button>
+                        ))}
+                        <Link
+                            to="/login"
+                            className="inline-flex items-center space-x-2 bg-white text-primary font-semibold px-5 py-2 rounded-full hover:bg-accent hover:text-white transition"
                         >
-                            {isMenuOpen ? <FiX /> : <FiMenu />}
-                        </button>
-                    </header>
+                            <span>Login</span>
+                        </Link>
+                        <Link
+                            to="/signup"
+                            className="inline-flex items-center space-x-2 bg-accent text-white font-semibold px-5 py-2 rounded-full hover:bg-accent/80 transition"
+                        >
+                            <span>Sign Up</span>
+                        </Link>
+                    </nav>
+                    <button
+                        className="lg:hidden text-white text-2xl"
+                        onClick={() => setMenuOpen((prev) => !prev)}
+                        aria-label="Toggle navigation menu"
+                    >
+                        {isMenuOpen ? <FiX /> : <FiMenu />}
+                    </button>
+                </div>
 
-                    {isMenuOpen && (
-                        <div className="lg:hidden px-6 pb-6 text-white space-y-4">
-                            {navItems.map((item) => (
-                                <button
-                                    key={item.target}
-                                    onClick={() => handleNavClick(item.target)}
-                                    className="block w-full text-left py-2 text-lg font-semibold"
-                                >
-                                    {item.label}
-                                </button>
-                            ))}
+                {/* --- SCROLL PROGRESS BAR (MOVED INSIDE HEADER, BOTTOM) --- */}
+                <div 
+                    className="absolute bottom-0 left-0 h-1 bg-accent z-50 transition-all duration-150 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                    style={{ width: `${scrollProgress * 100}%` }}
+                />
+
+                {/* Mobile Menu Dropdown */}
+                {isMenuOpen && (
+                    <div className="lg:hidden px-6 pb-6 text-white space-y-4 bg-slate-900 border-t border-white/10 animate-fade-in">
+                        {navItems.map((item) => (
+                            <button
+                                key={item.target}
+                                onClick={() => handleNavClick(item.target)}
+                                className="block w-full text-left py-3 text-lg font-semibold border-b border-white/5 last:border-none"
+                            >
+                                {item.label}
+                            </button>
+                        ))}
+                        <div className="flex flex-col gap-3 pt-4">
                             <Link
                                 to="/login"
                                 onClick={() => setMenuOpen(false)}
@@ -217,8 +236,18 @@ const LandingPage = () => {
                                 <span>Sign Up</span>
                             </Link>
                         </div>
-                    )}
+                    </div>
+                )}
+            </header>
 
+            {/* --- HERO SECTION --- */}
+            {/* Added pt-28 to push content down below the fixed header */}
+            <div className="relative isolate overflow-hidden text-white bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 pt-28">
+                <div className="absolute inset-0 opacity-70 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.45),_transparent_55%)]" />
+                <div className="absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.35),_transparent_60%)]" />
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-950/80" />
+
+                <div className="relative z-10">
                     <section className="mx-auto px-6 lg:px-8 pb-16 pt-10 lg:pt-16">
                         <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
                             <div className="space-y-8">
@@ -230,7 +259,7 @@ const LandingPage = () => {
                                     Elite training orchestration for high-growth academies.
                                 </h1>
                                 <p className="text-lg text-white/80">
-                                    Mutants Academy unifies attendance, leveling, doubts, and coaching workflows so teams can train harder and ship results faster.
+                                    GymRatz unifies attendance, leveling, doubts, and coaching workflows so teams can train harder and ship results faster.
                                 </p>
                                 <div className="flex flex-wrap gap-4">
                                     <Link
@@ -374,7 +403,7 @@ const LandingPage = () => {
                         See the platform in action
                     </h2>
                     <p className="text-lg text-slate-600 mb-12 max-w-2xl mx-auto">
-                        Watch how Mutants Academy transforms academy operations from chaos to clarity.
+                        Watch how GymRatz transforms academy operations from chaos to clarity.
                     </p>
                     <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl overflow-hidden border border-slate-700 aspect-video max-w-4xl mx-auto">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.15),_transparent_70%)]" />
@@ -466,7 +495,7 @@ const LandingPage = () => {
                             Loved by academy leaders worldwide
                         </h2>
                         <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
-                            Join thousands of academy leaders who trust Mutants Academy to streamline operations and boost fighter performance.
+                            Join thousands of academy leaders who trust GymRatz to streamline operations and boost fighter performance.
                         </p>
                     </div>
                     <div className="grid md:grid-cols-3 gap-8">
@@ -532,7 +561,7 @@ const LandingPage = () => {
                         Ready to transform your academy?
                     </h2>
                     <p className="text-lg text-slate-300 mb-10 max-w-2xl mx-auto">
-                        Join thousands of academy leaders who trust Mutants Academy to streamline operations and boost fighter performance.
+                        Join thousands of academy leaders who trust GymRatz to streamline operations and boost fighter performance.
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
                         <Link
@@ -558,10 +587,10 @@ const LandingPage = () => {
                         <div className="lg:col-span-2">
                             <div className="flex items-center space-x-3 mb-6">
                                 <div className="h-10 w-10 rounded-2xl bg-accent/20 border border-white/20 flex items-center justify-center font-bold text-white">
-                                    MA
+                                    GR
                                 </div>
                                 <div>
-                                    <p className="text-xl font-semibold text-white">Mutants Academy</p>
+                                    <p className="text-xl font-semibold text-white">GymRatz</p>
                                     <p className="text-xs text-white/70 tracking-widest uppercase">Combat Platform</p>
                                 </div>
                             </div>
@@ -609,7 +638,7 @@ const LandingPage = () => {
                         </div>
                     </div>
                     <div className="border-t border-slate-800 mt-16 pt-8 text-sm text-center">
-                        <p>© {new Date().getFullYear()} Mutants Academy. All rights reserved.</p>
+                        <p>© {new Date().getFullYear()} GymRatz. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

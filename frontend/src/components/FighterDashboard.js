@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import api from '../api/api';
 import { useNavigate } from 'react-router-dom';
 
-const FighterDashboard = ({ user, fighterData }) => {
+const FighterDashboard = ({ user, fighterData, confirmLogout }) => {
     const [loading, setLoading] = useState(!fighterData);
     const navigate = useNavigate();
 
@@ -11,12 +11,6 @@ const FighterDashboard = ({ user, fighterData }) => {
             setLoading(false);
         }
     }, [fighterData]);
-
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        navigate('/');
-        window.location.reload();
-    };
 
     if (loading) {
         return (
@@ -36,7 +30,7 @@ const FighterDashboard = ({ user, fighterData }) => {
                     <h1 className="text-3xl font-bold text-red-400 mb-4">Profile Not Found</h1>
                     <p className="text-gray-300 mb-8 font-light">Please contact the administrator to initialize your fighter profile.</p>
                     <button 
-                        onClick={handleLogout}
+                        onClick={confirmLogout}
                         className="w-full py-3.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl shadow-lg hover:shadow-red-500/30 transition-all duration-300"
                     >
                         Logout

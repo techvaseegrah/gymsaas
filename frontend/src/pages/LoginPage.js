@@ -23,7 +23,6 @@ const LoginPage = ({ setUser }) => {
     const [searchParams, setSearchParams] = useSearchParams();
 
     // --- INITIALIZATION & URL SYNC ---
-    // This effect restores state from URL on page load (Fixes refresh issue)
     useEffect(() => {
         const roleParam = searchParams.get('role');
         const gymParam = searchParams.get('gym');
@@ -38,7 +37,6 @@ const LoginPage = ({ setUser }) => {
         }
     }, [searchParams]);
 
-    // Fetch fighters when a gym is selected
     useEffect(() => {
         if (selectedGym && loginType === 'fighter') {
             const fetchFighters = async () => {
@@ -141,7 +139,7 @@ const LoginPage = ({ setUser }) => {
         try {
             const res = await api.get(`/tenants/${tenantSlug}`);
             setSelectedGym(res.data);
-            updateUrl(loginType, res.data.slug); // Update URL with gym
+            updateUrl(loginType, res.data.slug); 
         } catch (err) {
             setTenantError('Gym not found. Please check the ID.');
         } finally {
@@ -164,11 +162,10 @@ const LoginPage = ({ setUser }) => {
         setTenantSlug('');
         setTenantError('');
         setFighterPassword('');
-        setSearchParams({}); // Clear URL
+        setSearchParams({});
     };
 
     const backToGymSelection = () => {
-        // Go back one step: keep role, clear gym
         setSelectedGym(null);
         setTenantSlug('');
         setTenantError('');
@@ -196,7 +193,6 @@ const LoginPage = ({ setUser }) => {
                 <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-4000"></div>
             </div>
             
-            {/* Glass Texture Overlay */}
             <div className="absolute inset-0 z-0 bg-gray-900/60 backdrop-blur-sm"></div>
 
             {/* 2. MAIN GLASS CARD */}
@@ -205,18 +201,28 @@ const LoginPage = ({ setUser }) => {
                     
                     {/* --- HEADER SECTION --- */}
                     <div className="p-8 text-center border-b border-white/10 relative">
-                        {/* DYNAMIC LOGO: Changes to Fighter Photo when selected */}
+                        {/* DYNAMIC LOGO: Changes to Fighter Photo when selected OR SHOWS 'GR' */}
                         <div className="inline-block p-1 bg-gradient-to-br from-white/20 to-transparent rounded-full mb-4 backdrop-blur-md shadow-lg ring-1 ring-white/30">
-                            <img
-                                src={selectedFighter?.profilePhoto || "/logo.png"} 
-                                alt="Logo"
-                                className="w-20 h-20 rounded-full object-cover"
-                                onError={(e) => { e.target.src = "/logo.png"; }}
-                            />
+                            {selectedFighter?.profilePhoto ? (
+                                <img
+                                    src={selectedFighter.profilePhoto} 
+                                    alt="Logo"
+                                    className="w-20 h-20 rounded-full object-cover"
+                                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
+                                />
+                            ) : (
+                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl font-bold text-white">
+                                    GR
+                                </div>
+                            )}
+                            {/* Hidden fallback div if image fails to load */}
+                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 items-center justify-center text-2xl font-bold text-white hidden">
+                                GR
+                            </div>
                         </div>
                         
                         <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight drop-shadow-lg">
-                            {selectedFighter ? selectedFighter.name : (selectedGym ? selectedGym.name : 'Mutants Academy')}
+                            {selectedFighter ? selectedFighter.name : (selectedGym ? selectedGym.name : 'GymRatz')}
                         </h1>
                         <p className="text-blue-200 text-sm font-medium tracking-wider uppercase mt-2">
                             {selectedFighter ? 'Enter Password' : (loginType ? `${loginType} Portal` : 'Welcome Warrior')}
@@ -322,7 +328,8 @@ const LoginPage = ({ setUser }) => {
                                                             src={fighter.profilePhoto}
                                                             alt={fighter.name}
                                                             className="w-full h-full object-cover"
-                                                            onError={(e) => { e.target.src = "/logo.png"; }}
+                                                            onError={(e) => { e.target.src = "/logo.png"; }} 
+                                                            /* Note: Still using logo.png as last resort fallback in roster if image fails, but mainly relied on initials */
                                                         />
                                                     ) : (
                                                         <span className="text-white text-xl font-bold">
