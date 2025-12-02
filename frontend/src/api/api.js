@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5002/api'
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
 });
 
 // Store refresh promise to prevent multiple concurrent refreshes
@@ -15,7 +15,7 @@ const refreshToken = async () => {
       throw new Error('No token found');
     }
     
-    const response = await axios.post('http://localhost:5002/api/auth/refresh', {}, {
+    const response = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/refresh`, {}, {
       headers: {
         'x-auth-token': token
       }

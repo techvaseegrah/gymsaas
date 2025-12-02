@@ -1,9 +1,5 @@
 import React from 'react';
-import { 
-    FaBuilding, FaUsers, FaChartLine, FaMoneyBillWave, 
-    FaCogs, FaUserShield, FaDatabase, FaBell, FaCreditCard, 
-    FaReceipt, FaUserFriends, FaPlus, FaBan, FaCheckCircle 
-} from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
 
 const SuperAdminPageTemplate = ({ title, subtitle, icon: Icon, children }) => {
     return (

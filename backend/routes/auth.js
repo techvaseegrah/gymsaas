@@ -9,7 +9,117 @@ const Tenant = require('../models/Tenant');
 const auth = require('../middleware/authMiddleware');
 const router = express.Router();
 
-// ... [Keep your existing /login, /user routes etc.] ...
+// @route   POST api/auth/login
+// @desc    Authenticate user & get token
+// @access  Public
+router.post('/login', async (req, res) => {
+    const { email, password, role } = req.body;
+
+    // Basic validation
+    if (!email || !password) {
+        return res.status(400).json({ msg: 'Please enter all fields' });
+    }
+
+    try {
+        let user;
+        
+        // Check for user based on role
+        if (role === 'superadmin') {
+            user = await Admin.findOne({ email, role: 'superadmin' });
+        } else if (role === 'admin') {
+            user = await Admin.findOne({ email, role: 'admin' });
+        } else {
+            user = await Fighter.findOne({ email });
+        }
+
+        if (!user) {
+            return res.status(400).json({ msg: 'Invalid credentials' });
+        }
+
+        // Check password
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ msg: 'Invalid credentials' });
+        }
+
+        // Create and send token
+        const payload = {
+            user: {
+                id: user.id,
+                role: user.role,
+                profile_completed: user.profile_completed
+            }
+        };
+
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: 3600 },
+            (err, token) => {
+                if (err) throw err;
+                res.json({
+                    token,
+                    user: {
+                        id: user.id,
+                        email: user.email,
+                        role: user.role,
+                        name: user.name,
+                        profile_completed: user.profile_completed
+                    }
+                });
+            }
+        );
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   GET api/auth/user
+// @desc    Get user data
+// @access  Private
+router.get('/user', auth, async (req, res) => {
+    try {
+        let user;
+        if (req.user.role === 'admin' || req.user.role === 'superadmin') {
+            user = await Admin.findById(req.user.id).select('-password');
+        } else {
+            user = await Fighter.findById(req.user.id).select('-password');
+        }
+        res.json(user);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   POST api/auth/refresh
+// @desc    Refresh authentication token
+// @access  Public
+router.post('/refresh', auth, async (req, res) => {
+    try {
+        // Just return a new token with extended expiry
+        const payload = {
+            user: {
+                id: req.user.id,
+                role: req.user.role
+            }
+        };
+
+        jwt.sign(
+            payload,
+            process.env.JWT_SECRET,
+            { expiresIn: 3600 },
+            (err, token) => {
+                if (err) throw err;
+                res.json({ token });
+            }
+        );
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
 
 // ==========================================
 //          PASSWORD RESET ROUTES
@@ -79,7 +189,11 @@ router.post('/forgot-password', async (req, res) => {
         // Assumes frontend is running on localhost:3000
         const resetUrl = `http://localhost:3000/reset-password/${resetToken}`;
 
-        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. \n\n Please make a PUT request to: \n\n ${resetUrl}`;
+        const message = `You are receiving this email because you (or someone else) has requested the reset of a password. 
+
+ Please make a PUT request to: 
+
+ ${resetUrl}`;
 
         try {
             await sendEmail({
@@ -96,7 +210,6 @@ router.post('/forgot-password', async (req, res) => {
             await user.save();
             return res.status(500).json({ msg: 'Email could not be sent' });
         }
-
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -141,7 +254,6 @@ router.post('/reset-password/:resetToken', async (req, res) => {
         await user.save();
 
         res.json({ success: true, msg: 'Password updated successfully' });
-
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -157,7 +269,7 @@ router.post('/change-password', auth, async (req, res) => {
     try {
         // 1. Determine User Model based on role
         let user;
-        if (req.user.role === 'admin') {
+        if (req.user.role === 'admin' || req.user.role === 'superadmin') {
             user = await Admin.findById(req.user.id);
         } else {
             user = await Fighter.findById(req.user.id);

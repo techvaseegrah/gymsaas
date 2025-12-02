@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api/api';
 import { FaClock, FaIdCard, FaCamera, FaExclamationTriangle, FaCalendarAlt, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +21,7 @@ const FighterAttendancePage = () => {
     const [confirmModalData, setConfirmModalData] = useState(null);
 
     // Fetch attendance (Triggered on load AND when date changes)
-    const fetchAndProcessAttendance = async () => {
+    const fetchAndProcessAttendance = useCallback(async () => {
         setLoading(true);
         try {
             // Append date query if a date is selected
@@ -34,11 +34,11 @@ const FighterAttendancePage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedDate]);
 
     useEffect(() => {
         fetchAndProcessAttendance();
-    }, [selectedDate]); // Re-run when date changes
+    }, [selectedDate, fetchAndProcessAttendance]); // Re-run when date changes
 
     // Helper to get precise location
     const getPreciseLocation = () => {

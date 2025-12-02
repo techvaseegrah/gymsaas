@@ -569,42 +569,42 @@ const LandingPage = () => {
                                 Elite training orchestration for high-growth academies worldwide.
                             </p>
                             <div className="flex space-x-4">
-                                <a href="#" className="text-slate-400 hover:text-white transition">
+                                <button className="text-slate-400 hover:text-white transition" aria-label="Social media link">
                                     <FiUsers className="text-xl" />
-                                </a>
-                                <a href="#" className="text-slate-400 hover:text-white transition">
+                                </button>
+                                <button className="text-slate-400 hover:text-white transition" aria-label="Social media link">
                                     <FiClock className="text-xl" />
-                                </a>
-                                <a href="#" className="text-slate-400 hover:text-white transition">
+                                </button>
+                                <button className="text-slate-400 hover:text-white transition" aria-label="Social media link">
                                     <FiCpu className="text-xl" />
-                                </a>
+                                </button>
                             </div>
                         </div>
                         <div>
                             <h4 className="text-white font-semibold mb-6">Product</h4>
                             <ul className="space-y-4">
-                                <li><a href="#" className="hover:text-white transition">Features</a></li>
-                                <li><a href="#" className="hover:text-white transition">Solutions</a></li>
-                                <li><a href="#" className="hover:text-white transition">Pricing</a></li>
-                                <li><a href="#" className="hover:text-white transition">Demo</a></li>
+                                <li><button className="hover:text-white transition">Features</button></li>
+                                <li><button className="hover:text-white transition">Solutions</button></li>
+                                <li><button className="hover:text-white transition">Pricing</button></li>
+                                <li><button className="hover:text-white transition">Demo</button></li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="text-white font-semibold mb-6">Resources</h4>
                             <ul className="space-y-4">
-                                <li><a href="#" className="hover:text-white transition">Blog</a></li>
-                                <li><a href="#" className="hover:text-white transition">Documentation</a></li>
-                                <li><a href="#" className="hover:text-white transition">Guides</a></li>
-                                <li><a href="#" className="hover:text-white transition">Support</a></li>
+                                <li><button className="hover:text-white transition">Blog</button></li>
+                                <li><button className="hover:text-white transition">Documentation</button></li>
+                                <li><button className="hover:text-white transition">Guides</button></li>
+                                <li><button className="hover:text-white transition">Support</button></li>
                             </ul>
                         </div>
                         <div>
                             <h4 className="text-white font-semibold mb-6">Company</h4>
                             <ul className="space-y-4">
-                                <li><a href="#" className="hover:text-white transition">About</a></li>
-                                <li><a href="#" className="hover:text-white transition">Careers</a></li>
-                                <li><a href="#" className="hover:text-white transition">Contact</a></li>
-                                <li><a href="#" className="hover:text-white transition">Partners</a></li>
+                                <li><button className="hover:text-white transition">About</button></li>
+                                <li><button className="hover:text-white transition">Careers</button></li>
+                                <li><button className="hover:text-white transition">Contact</button></li>
+                                <li><button className="hover:text-white transition">Partners</button></li>
                             </ul>
                         </div>
                     </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { FaEye, FaEyeSlash, FaUser, FaLock, FaSearch, FaBuilding, FaArrowLeft, FaDumbbell, FaUserShield } from 'react-icons/fa';
 import api from '../api/api';
@@ -22,6 +22,19 @@ const LoginPage = ({ setUser }) => {
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
+    // --- HELPER FUNCTIONS ---
+    const fetchGymBySlug = useCallback(async (slug) => {
+        setLoading(true);
+        try {
+            const res = await api.get(`/tenants/${slug}`);
+            setSelectedGym(res.data);
+        } catch (err) {
+            setTenantError('Gym not found from URL.');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     // --- INITIALIZATION & URL SYNC ---
     // This effect restores state from URL on page load (Fixes refresh issue)
     useEffect(() => {
@@ -36,7 +49,7 @@ const LoginPage = ({ setUser }) => {
             setTenantSlug(gymParam);
             fetchGymBySlug(gymParam);
         }
-    }, [searchParams]);
+    }, [searchParams, fetchGymBySlug, selectedGym]);
 
     // Fetch fighters when a gym is selected
     useEffect(() => {
@@ -55,19 +68,6 @@ const LoginPage = ({ setUser }) => {
             fetchFighters();
         }
     }, [selectedGym, loginType]);
-
-    // --- HELPER FUNCTIONS ---
-    const fetchGymBySlug = async (slug) => {
-        setLoading(true);
-        try {
-            const res = await api.get(`/tenants/${slug}`);
-            setSelectedGym(res.data);
-        } catch (err) {
-            setTenantError('Gym not found from URL.');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const getInitials = (name) => {
         if (!name) return '';

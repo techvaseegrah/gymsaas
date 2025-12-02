@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import api from '../api/api';
 import { FaIdCard, FaCheckCircle, FaCamera, FaUserTag, FaTimes, FaExclamationTriangle, FaCalendarAlt, FaFilter, FaFileExcel, FaFilePdf } from 'react-icons/fa';
 import Webcam from 'react-webcam';
@@ -239,7 +239,7 @@ const AdminAttendancePage = () => {
     };
 
     // Function to fetch fighter attendance report
-    const fetchFighterAttendance = async (fighterId) => {
+    const fetchFighterAttendance = useCallback(async (fighterId) => {
         setFighterReportLoading(true);
         try {
             // Build query parameters for date filtering
@@ -262,7 +262,7 @@ const AdminAttendancePage = () => {
         } finally {
             setFighterReportLoading(false);
         }
-    };
+    }, [dateFilter]);
 
     // Effect to fetch attendance when date filter changes
     useEffect(() => {
@@ -272,7 +272,7 @@ const AdminAttendancePage = () => {
                 fetchFighterAttendance(selectedFighter.id);
             }
         }
-    }, [dateFilter, showFighterReport, selectedFighter]);
+    }, [dateFilter, showFighterReport, selectedFighter, fetchFighterAttendance]);
 
     // Function to open fighter report modal
     const openFighterReport = async (fighterName, record) => {
