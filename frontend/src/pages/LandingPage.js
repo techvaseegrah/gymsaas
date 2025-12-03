@@ -5,13 +5,19 @@ import {
     FiX,
     FiArrowRight,
     FiShield,
-    FiClock,
-    FiCpu,
-    FiUsers,
+    FiTrendingUp,
+    FiZap,
     FiCheckCircle,
     FiPlayCircle,
-    FiTrendingUp,
-    FiZap
+    FiUsers,
+    FiClock,
+    FiCpu,
+    FiInstagram,
+    FiYoutube,
+    FiMail,
+    FiCamera,
+    FiDollarSign,
+    FiMessageSquare
 } from 'react-icons/fi';
 
 const navItems = [
@@ -25,19 +31,24 @@ const navItems = [
 
 const featureCards = [
     {
-        title: 'AI-ready Attendance',
-        description: 'Hybrid RFID + face recognition stack that keeps every class accountable in seconds.',
-        icon: FiShield,
+        title: 'AI-Powered Face Recognition Attendance',
+        description: 'Kill the queue. Clock in with a look. Our proprietary AI stack verifies identity in milliseconds.',
+        icon: FiCamera,
     },
     {
-        title: 'Realtime dashboards',
-        description: 'See every fighter\'s training streak, readiness, and gaps with live updating metrics.',
+        title: 'Realtime Dashboards',
+        description: 'Your entire academy at a glance. Track roster health and revenue in real-time.',
         icon: FiTrendingUp,
     },
     {
-        title: 'Automated workflows',
-        description: 'Smart nudges, doubt resolution queues, and leveling checkpoints built-in.',
-        icon: FiZap,
+        title: 'Revenue & Subscription Tracking',
+        description: 'Never miss a renewal. Automated expiry tracking keeps your cash flow positive.',
+        icon: FiDollarSign,
+    },
+    {
+        title: '"Doubt" & Query Resolution',
+        description: 'Coaching doesn\'t stop when class ends. A dedicated channel for technique Q&A.',
+        icon: FiMessageSquare,
     },
 ];
 
@@ -156,41 +167,43 @@ const LandingPage = () => {
     };
 
     return (
-        <div className="bg-neutral text-slate-800 min-h-screen relative">
+        // Changed main bg to slate-950 and text to slate-300 for dark mode base
+        <div className="bg-slate-950 text-slate-300 min-h-screen relative font-sans selection:bg-accent selection:text-white">
             
             {/* --- FIXED HEADER --- */}
-            <header className="fixed top-0 w-full z-40 bg-slate-900/95 backdrop-blur-md border-b border-white/10 transition-all duration-300">
+            <header className="fixed top-0 w-full z-40 bg-slate-950/80 backdrop-blur-md border-b border-white/5 transition-all duration-300">
                 <div className="mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                        <div className="h-10 w-10 rounded-2xl bg-accent/20 border border-white/20 flex items-center justify-center font-bold text-white">
+                        {/* Logo Container */}
+                        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-accent to-blue-700 flex items-center justify-center font-bold text-white shadow-lg shadow-accent/20">
                             GR
                         </div>
                         <div>
-                            <p className="text-xl font-semibold text-white">GymRatz</p>
-                            <p className="text-xs text-white/70 tracking-widest uppercase">Combat Platform</p>
+                            <p className="text-xl font-bold text-white tracking-tight">GymRatz</p>
+                            <p className="text-[10px] text-slate-400 tracking-[0.2em] uppercase font-medium">Combat Platform</p>
                         </div>
                     </div>
-                    <nav className="hidden lg:flex items-center space-x-8 text-sm uppercase tracking-wide">
+                    <nav className="hidden lg:flex items-center space-x-8 text-sm font-medium">
                         {navItems.map((item) => (
                             <button
                                 key={item.target}
                                 onClick={() => handleNavClick(item.target)}
-                                className="text-white/80 hover:text-white transition"
+                                className="text-slate-400 hover:text-white transition duration-200"
                             >
                                 {item.label}
                             </button>
                         ))}
                         <Link
                             to="/login"
-                            className="inline-flex items-center space-x-2 bg-white text-primary font-semibold px-5 py-2 rounded-full hover:bg-accent hover:text-white transition"
+                            className="text-white hover:text-accent transition font-medium"
                         >
-                            <span>Login</span>
+                            Login
                         </Link>
                         <Link
                             to="/signup"
-                            className="inline-flex items-center space-x-2 bg-accent text-white font-semibold px-5 py-2 rounded-full hover:bg-accent/80 transition"
+                            className="bg-accent hover:bg-blue-600 text-white px-5 py-2 rounded-lg transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] font-semibold"
                         >
-                            <span>Sign Up</span>
+                            Get Started
                         </Link>
                     </nav>
                     <button
@@ -202,38 +215,38 @@ const LandingPage = () => {
                     </button>
                 </div>
 
-                {/* --- SCROLL PROGRESS BAR (MOVED INSIDE HEADER, BOTTOM) --- */}
+                {/* Progress Bar */}
                 <div 
-                    className="absolute bottom-0 left-0 h-1 bg-accent z-50 transition-all duration-150 ease-out shadow-[0_0_10px_rgba(59,130,246,0.5)]"
+                    className="absolute bottom-0 left-0 h-[2px] bg-gradient-to-r from-accent to-purple-500 z-50 transition-all duration-150 ease-out"
                     style={{ width: `${scrollProgress * 100}%` }}
                 />
 
-                {/* Mobile Menu Dropdown */}
+                {/* Mobile Menu */}
                 {isMenuOpen && (
-                    <div className="lg:hidden px-6 pb-6 text-white space-y-4 bg-slate-900 border-t border-white/10 animate-fade-in">
+                    <div className="lg:hidden px-6 pb-8 pt-4 bg-slate-900 border-b border-white/10 animate-fade-in absolute w-full left-0">
                         {navItems.map((item) => (
                             <button
                                 key={item.target}
                                 onClick={() => handleNavClick(item.target)}
-                                className="block w-full text-left py-3 text-lg font-semibold border-b border-white/5 last:border-none"
+                                className="block w-full text-left py-4 text-lg font-medium text-slate-300 border-b border-white/5 last:border-none hover:text-white"
                             >
                                 {item.label}
                             </button>
                         ))}
-                        <div className="flex flex-col gap-3 pt-4">
+                        <div className="flex flex-col gap-4 pt-6">
                             <Link
                                 to="/login"
                                 onClick={() => setMenuOpen(false)}
-                                className="inline-flex w-full items-center justify-center space-x-2 bg-white text-primary font-semibold px-5 py-3 rounded-full hover:bg-accent hover:text-white transition"
+                                className="w-full text-center py-3 rounded-lg border border-white/10 text-white font-semibold hover:bg-white/5 transition"
                             >
-                                <span>Login</span>
+                                Login
                             </Link>
                             <Link
                                 to="/signup"
                                 onClick={() => setMenuOpen(false)}
-                                className="inline-flex w-full items-center justify-center space-x-2 bg-accent text-white font-semibold px-5 py-3 rounded-full hover:bg-accent/80 transition"
+                                className="w-full text-center py-3 rounded-lg bg-accent text-white font-semibold shadow-lg shadow-accent/20"
                             >
-                                <span>Sign Up</span>
+                                Get Started
                             </Link>
                         </div>
                     </div>
@@ -241,91 +254,101 @@ const LandingPage = () => {
             </header>
 
             {/* --- HERO SECTION --- */}
-            {/* Added pt-28 to push content down below the fixed header */}
-            <div className="relative isolate overflow-hidden text-white bg-gradient-to-r from-slate-950 via-slate-900 to-slate-800 pt-28">
-                <div className="absolute inset-0 opacity-70 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.45),_transparent_55%)]" />
-                <div className="absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_bottom_right,_rgba(16,185,129,0.35),_transparent_60%)]" />
-                <div className="absolute inset-0 bg-gradient-to-b from-slate-900/40 via-transparent to-slate-950/80" />
+            <div className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+                {/* Background Glows */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
+                    <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] mix-blend-screen animate-blob" />
+                    <div className="absolute top-40 right-1/4 w-[400px] h-[400px] bg-purple-600/20 rounded-full blur-[120px] mix-blend-screen animate-blob animation-delay-2000" />
+                </div>
 
-                <div className="relative z-10">
-                    <section className="mx-auto px-6 lg:px-8 pb-16 pt-10 lg:pt-16">
-                        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
-                            <div className="space-y-8">
-                                <p className="inline-flex items-center space-x-2 text-sm uppercase tracking-[0.3em] text-white/60">
-                                    <span className="h-px w-8 bg-white/40" />
-                                    <span>Combat ops cloud</span>
-                                </p>
-                                <h1 className="text-4xl sm:text-5xl lg:text-6xl leading-tight font-semibold">
-                                    Elite training orchestration for high-growth academies.
-                                </h1>
-                                <p className="text-lg text-white/80">
-                                    GymRatz unifies attendance, leveling, doubts, and coaching workflows so teams can train harder and ship results faster.
-                                </p>
-                                <div className="flex flex-wrap gap-4">
-                                    <Link
-                                        to="/login"
-                                        className="inline-flex items-center space-x-3 bg-accent text-white font-semibold px-6 py-3 rounded-full shadow-lg shadow-accent/30 hover:-translate-y-0.5 transition transform"
-                                    >
-                                        <span>Go to Console</span>
-                                        <FiArrowRight />
-                                    </Link>
-                                    <button
-                                        onClick={() => handleNavClick('demo')}
-                                        className="inline-flex items-center space-x-3 border border-white/30 bg-white/10 backdrop-blur px-6 py-3 rounded-full hover:bg-white/20 transition"
-                                    >
-                                        <FiPlayCircle className="text-xl" />
-                                        <span>Watch Demo</span>
-                                    </button>
-                                </div>
-                                <div className="grid grid-cols-2 gap-6 text-white/80">
-                                    <div>
-                                        <p className="text-4xl font-bold">12k+</p>
-                                        <p className="text-sm uppercase tracking-wide">Sessions automated</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-4xl font-bold">97%</p>
-                                        <p className="text-sm uppercase tracking-wide">Attendance accuracy</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="relative">
-                                <div className="absolute -inset-4 bg-accent/20 blur-3xl rounded-[56px]" />
-                                <div className="relative bg-white/5 border border-white/10 rounded-[48px] aspect-video flex items-center justify-center">
-                                    <div className="bg-gradient-to-br from-accent/20 to-accent/5 border border-accent/20 rounded-[40px] w-[90%] h-[90%] flex items-center justify-center">
-                                        <FiPlayCircle className="text-5xl text-accent" />
-                                    </div>
-                                </div>
-                            </div>
+                <div className="relative z-10 mx-auto px-6 lg:px-8 max-w-7xl">
+                    <div className="text-center max-w-4xl mx-auto mb-12">
+                        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-sm">
+                            <span className="flex h-2 w-2 rounded-full bg-green-400 animate-pulse"></span>
+                            <span className="text-xs font-medium text-slate-300 tracking-wide uppercase">v2.0 Now Live</span>
                         </div>
-                    </section>
+                        <h1 className="text-5xl lg:text-7xl font-bold tracking-tight text-white mb-8 leading-tight">
+                            Elite orchestration for <br/>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-purple-400">combat academies</span>
+                        </h1>
+                        <p className="text-lg lg:text-xl text-slate-400 mb-10 max-w-2xl mx-auto leading-relaxed">
+                            Unify attendance, fighter progression, and academy operations in one high-performance command center.
+                        </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <Link
+                                to="/signup"
+                                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-accent hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-lg transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)] hover:shadow-[0_0_30px_rgba(59,130,246,0.6)] hover:-translate-y-1"
+                            >
+                                <span>Start Free Trial</span>
+                                <FiArrowRight />
+                            </Link>
+                            <button
+                                onClick={() => handleNavClick('demo')}
+                                className="w-full sm:w-auto inline-flex items-center justify-center space-x-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold px-8 py-4 rounded-lg backdrop-blur-sm transition"
+                            >
+                                <FiPlayCircle className="text-xl" />
+                                <span>Watch Demo</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {/* Hero Stats/Image Placeholder */}
+                    <div className="relative mx-auto max-w-5xl mt-16">
+                        <div className="absolute -inset-1 bg-gradient-to-r from-accent to-purple-600 rounded-2xl blur opacity-20"></div>
+                        <div className="relative bg-slate-900 border border-white/10 rounded-2xl aspect-[16/9] flex items-center justify-center overflow-hidden shadow-2xl">
+                             <div className="text-center">
+                                <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 border border-white/10">
+                                    <FiPlayCircle className="text-4xl text-accent" />
+                                </div>
+                                <p className="text-slate-500 font-medium">Platform Interface Preview</p>
+                             </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Features Section */}
-            <section id="features" className="py-20 bg-white">
-                <div className="mx-auto px-6 lg:px-8 max-w-7xl">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <p className="inline-flex items-center space-x-2 text-sm uppercase tracking-[0.3em] text-slate-500 mb-4">
-                            <span className="h-px w-8 bg-slate-400" />
-                            <span>Platform capabilities</span>
-                        </p>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-                            Precision tools for modern academies
+            {/* --- FEATURES SECTION --- */}
+            <section id="features" className="py-24 bg-slate-900 relative overflow-hidden">
+                {/* Animated background elements */}
+                <div className="absolute top-0 left-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
+                
+                <div className="mx-auto px-6 lg:px-8 max-w-7xl relative z-10">
+                    <div className="max-w-3xl mb-16 text-center mx-auto">
+                        <h2 className="text-3xl lg:text-5xl font-bold text-white mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
+                            Precision tools for the gym
                         </h2>
-                        <p className="text-lg text-slate-600">
-                            Purpose-built features that eliminate manual work and surface actionable insights.
+                        <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+                            Built by fighters for gym owners. Features that actually save you time.
                         </p>
                     </div>
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {featureCards.map((feature, index) => {
                             const Icon = feature.icon;
                             return (
-                                <div key={index} className="bg-slate-50 rounded-2xl p-6 border border-slate-200 hover:border-accent/30 hover:shadow-lg transition">
-                                    <div className="w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 flex items-center justify-center mb-6">
-                                        <Icon className="text-accent text-xl" />
+                                <div 
+                                    key={index} 
+                                    className="group p-8 rounded-2xl bg-gradient-to-br from-white/5 to-white/1 border border-white/10 hover:from-white/10 hover:to-white/5 hover:border-white/20 transition-all duration-500 transform hover:-translate-y-3 hover:shadow-2xl backdrop-blur-sm"
+                                >
+                                    {/* Icon container with enhanced animation */}
+                                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-accent/20 to-purple-500/20 border border-accent/30 flex items-center justify-center mb-6 group-hover:scale-110 transition-all duration-300 shadow-lg shadow-accent/10">
+                                        <Icon className="text-accent text-2xl group-hover:text-white transition-colors duration-300 drop-shadow-lg" />
                                     </div>
-                                    <h3 className="text-xl font-semibold text-slate-900 mb-3">{feature.title}</h3>
-                                    <p className="text-slate-600">{feature.description}</p>
+                                    
+                                    {/* Title with gradient effect */}
+                                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-accent group-hover:to-purple-400 transition-all duration-300">
+                                        {feature.title}
+                                    </h3>
+                                    
+                                    {/* Description with better spacing */}
+                                    <p className="text-slate-400 leading-relaxed mb-6">
+                                        {feature.description}
+                                    </p>
+                                    
+                                    {/* Animated accent bar */}
+                                    <div className="mt-4 opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
+                                        <div className="w-full h-1 bg-gradient-to-r from-accent to-purple-500 rounded-full"></div>
+                                    </div>
                                 </div>
                             );
                         })}
@@ -333,146 +356,109 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Benefits Section */}
-            <section id="benefits" className="py-20 bg-slate-50">
+            {/* --- BENEFITS SECTION --- */}
+            <section id="benefits" className="py-24 bg-slate-950">
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
-                        <div>
-                            <p className="inline-flex items-center space-x-2 text-sm uppercase tracking-[0.3em] text-slate-500 mb-4">
-                                <span className="h-px w-8 bg-slate-400" />
-                                <span>Proven outcomes</span>
-                            </p>
-                            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-                                Measurable impact across your academy
-                            </h2>
-                            <div className="space-y-8">
+                        <div className="space-y-10">
+                            <div>
+                                <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
+                                    Measurable impact
+                                </h2>
+                                <p className="text-lg text-slate-400">
+                                    Stop guessing. Start tracking data that drives revenue and retention.
+                                </p>
+                            </div>
+                            <div className="space-y-6">
                                 {benefits.map((benefit, index) => (
-                                    <div key={index} className="flex gap-4">
+                                    <div key={index} className="flex gap-4 p-4 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-white/5">
                                         <div className="flex-shrink-0 mt-1">
                                             <FiCheckCircle className="text-accent text-xl" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-semibold text-slate-900 mb-2">{benefit.title}</h3>
-                                            <p className="text-slate-600">{benefit.description}</p>
+                                            <h3 className="text-lg font-bold text-white mb-2">{benefit.title}</h3>
+                                            <p className="text-slate-400">{benefit.description}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
-                        <div className="bg-gradient-to-br from-accent/10 to-accent/5 rounded-3xl p-8 border border-accent/20">
-                            <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="font-semibold text-slate-900">Weekly Attendance</span>
-                                    <span className="text-sm text-slate-500">Last 30 days</span>
+                        
+                        {/* Abstract Graph UI */}
+                        <div className="relative">
+                            <div className="absolute inset-0 bg-accent/10 blur-3xl rounded-full" />
+                            <div className="relative bg-slate-900 border border-white/10 rounded-2xl p-8 shadow-2xl">
+                                <div className="flex items-center justify-between mb-8">
+                                    <div className="space-y-1">
+                                        <p className="text-sm text-slate-400 uppercase tracking-wider">Attendance Rate</p>
+                                        <p className="text-3xl font-bold text-white">94.2%</p>
+                                    </div>
+                                    <div className="px-3 py-1 bg-green-500/10 border border-green-500/20 text-green-400 text-sm rounded-full flex items-center gap-1">
+                                        <FiTrendingUp /> +12%
+                                    </div>
                                 </div>
-                                <div className="h-32 flex items-end gap-2">
-                                    {[65, 78, 82, 75, 90, 85, 92].map((value, index) => (
-                                        <div key={index} className="flex-1 flex flex-col items-center">
-                                            <div
-                                                className="w-full bg-gradient-to-t from-accent to-accent/80 rounded-t-sm"
-                                                style={{ height: `${value}%` }}
+                                <div className="h-48 flex items-end gap-3">
+                                    {[40, 65, 55, 80, 70, 90, 85, 95].map((h, i) => (
+                                        <div key={i} className="flex-1 w-full bg-slate-800 rounded-t-sm relative group overflow-hidden">
+                                            <div 
+                                                className="absolute bottom-0 left-0 w-full bg-accent group-hover:bg-blue-400 transition-all duration-500" 
+                                                style={{ height: `${h}%` }}
                                             />
-                                            <span className="text-xs text-slate-500 mt-2">{index + 1}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white rounded-xl p-4 border border-slate-200">
-                                    <p className="text-2xl font-bold text-slate-900">89%</p>
-                                    <p className="text-sm text-slate-600">Avg. retention</p>
-                                </div>
-                                <div className="bg-white rounded-xl p-4 border border-slate-200">
-                                    <p className="text-2xl font-bold text-slate-900">2.1x</p>
-                                    <p className="text-sm text-slate-600">Faster leveling</p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Demo Section */}
-            <section id="demo" className="py-20 bg-white">
-                <div className="mx-auto px-6 lg:px-8 max-w-4xl text-center">
-                    <p className="inline-flex items-center space-x-2 text-sm uppercase tracking-[0.3em] text-slate-500 mb-4">
-                        <span className="h-px w-8 bg-slate-400" />
-                        <span>Interactive preview</span>
-                    </p>
-                    <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-                        See the platform in action
-                    </h2>
-                    <p className="text-lg text-slate-600 mb-12 max-w-2xl mx-auto">
-                        Watch how GymRatz transforms academy operations from chaos to clarity.
-                    </p>
-                    <div className="relative bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl overflow-hidden border border-slate-700 aspect-video max-w-4xl mx-auto">
-                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(59,130,246,0.15),_transparent_70%)]" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <button className="inline-flex items-center space-x-3 bg-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:bg-accent/90 transition">
-                                <FiPlayCircle className="text-2xl" />
-                                <span>Play Demo (2:47)</span>
-                            </button>
-                        </div>
-                        <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-                            <div className="text-white/80 text-sm">Platform Tour</div>
-                            <div className="text-white/60 text-sm">2:47</div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Pricing Section */}
-            <section id="pricing" className="py-20 bg-slate-50">
+            {/* --- PRICING SECTION --- */}
+            <section id="pricing" className="py-24 bg-slate-900">
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl">
                     <div className="text-center max-w-3xl mx-auto mb-16">
-                        <p className="inline-flex items-center space-x-2 text-sm uppercase tracking-[0.3em] text-slate-500 mb-4">
-                            <span className="h-px w-8 bg-slate-400" />
-                            <span>Simple pricing</span>
-                        </p>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-                            Plans that scale with your academy
+                        <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
+                            Simple, transparent pricing
                         </h2>
-                        <p className="text-lg text-slate-600">
-                            Start free, then pay as you grow. All plans include core features.
+                        <p className="text-lg text-slate-400">
+                            No hidden fees. Upgrade or cancel anytime.
                         </p>
                     </div>
-                    <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         {pricingTiers.map((tier, index) => (
                             <div
                                 key={index}
-                                className={`rounded-2xl p-8 border ${tier.highlight
-                                        ? 'border-accent bg-gradient-to-b from-accent/5 to-white relative ring-1 ring-accent/20 shadow-lg shadow-accent/10'
-                                        : 'border-slate-200 bg-white'
+                                className={`relative rounded-2xl p-8 border transition-all duration-300 ${tier.highlight
+                                        ? 'bg-white/5 border-accent shadow-2xl shadow-accent/10 scale-105 z-10'
+                                        : 'bg-slate-950/50 border-white/5 hover:border-white/10'
                                     }`}
                             >
                                 {tier.highlight && (
-                                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-accent text-white px-4 py-1 rounded-full text-sm font-semibold">
-                                        MOST POPULAR
+                                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-accent text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg">
+                                        Most Popular
                                     </div>
                                 )}
-                                <h3 className={`text-xl font-semibold mb-2 ${tier.highlight ? 'text-slate-900' : 'text-slate-900'}`}>
-                                    {tier.name}
-                                </h3>
-                                <div className="mb-4">
-                                    <span className="text-4xl font-bold text-slate-900">{tier.price}</span>
-                                    {tier.cadence && <span className="text-slate-600"> {tier.cadence}</span>}
+                                <h3 className="text-xl font-bold text-white mb-2">{tier.name}</h3>
+                                <div className="mb-6">
+                                    <span className="text-4xl font-bold text-white">{tier.price}</span>
+                                    {tier.cadence && <span className="text-slate-500 text-sm"> / {tier.cadence}</span>}
                                 </div>
-                                <p className={`mb-6 ${tier.highlight ? 'text-slate-700' : 'text-slate-600'}`}>
+                                <p className="text-slate-400 mb-8 h-12 text-sm leading-relaxed">
                                     {tier.description}
                                 </p>
-                                <ul className="mb-8 space-y-3">
+                                <ul className="space-y-4 mb-8">
                                     {tier.features.map((feature, idx) => (
-                                        <li key={idx} className="flex items-center">
-                                            <FiCheckCircle className={`mr-2 ${tier.highlight ? 'text-accent' : 'text-slate-400'}`} />
-                                            <span className={tier.highlight ? 'text-slate-700' : 'text-slate-600'}>{feature}</span>
+                                        <li key={idx} className="flex items-start">
+                                            <FiCheckCircle className={`mt-1 mr-3 flex-shrink-0 ${tier.highlight ? 'text-accent' : 'text-slate-600'}`} />
+                                            <span className="text-slate-300 text-sm">{feature}</span>
                                         </li>
                                     ))}
                                 </ul>
                                 <Link
                                     to="/signup"
-                                    className={`w-full py-3 rounded-lg font-semibold text-center transition ${tier.highlight
-                                            ? 'bg-accent text-white hover:bg-accent/90 shadow-md shadow-accent/20'
-                                            : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
+                                    className={`block w-full py-3 rounded-lg font-bold text-center transition-all ${tier.highlight
+                                            ? 'bg-accent hover:bg-blue-600 text-white shadow-lg shadow-accent/25'
+                                            : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
                                         }`}
                                 >
                                     {tier.cta}
@@ -483,31 +469,25 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* Testimonials Section */}
-            <section id="testimonials" className="py-20 bg-white">
+            {/* --- TESTIMONIALS --- */}
+            <section id="testimonials" className="py-24 bg-slate-950 border-t border-white/5">
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <p className="inline-flex items-center space-x-2 text-sm uppercase tracking-[0.3em] text-slate-500 mb-4">
-                            <span className="h-px w-8 bg-slate-400" />
-                            <span>Trusted by pros</span>
-                        </p>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-                            Loved by academy leaders worldwide
-                        </h2>
-                        <p className="text-lg text-slate-600 mb-10 max-w-2xl mx-auto">
-                            Join thousands of academy leaders who trust GymRatz to streamline operations and boost fighter performance.
-                        </p>
-                    </div>
-                    <div className="grid md:grid-cols-3 gap-8">
+                    <h2 className="text-3xl font-bold text-white text-center mb-16">Trusted by the best</h2>
+                    <div className="grid md:grid-cols-3 gap-6">
                         {testimonials.map((testimonial, index) => (
-                            <div key={index} className="bg-slate-50 rounded-2xl p-8 border border-slate-200">
-                                <div className="text-accent mb-4">
-                                    {'★'.repeat(5)}
-                                </div>
-                                <p className="text-lg text-slate-700 mb-6 italic">"{testimonial.quote}"</p>
-                                <div>
-                                    <p className="font-semibold text-slate-900">{testimonial.name}</p>
-                                    <p className="text-slate-600">{testimonial.role}</p>
+                            <div key={index} className="bg-slate-900 p-8 rounded-2xl border border-white/5 relative">
+                                <div className="text-accent/30 text-6xl absolute top-4 left-4 font-serif">"</div>
+                                <p className="text-slate-300 relative z-10 mb-6 leading-relaxed pt-4">
+                                    {testimonial.quote}
+                                </p>
+                                <div className="flex items-center gap-4 border-t border-white/5 pt-6">
+                                    <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-800 rounded-full flex items-center justify-center font-bold text-white text-sm">
+                                        {testimonial.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-white text-sm">{testimonial.name}</p>
+                                        <p className="text-slate-500 text-xs uppercase tracking-wide">{testimonial.role}</p>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -515,130 +495,90 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* FAQ Section */}
-            <section id="faq" className="py-20 bg-slate-50">
-                <div className="mx-auto px-6 lg:px-8 max-w-4xl">
-                    <div className="text-center max-w-3xl mx-auto mb-16">
-                        <p className="inline-flex items-center space-x-2 text-sm uppercase tracking-[0.3em] text-slate-500 mb-4">
-                            <span className="h-px w-8 bg-slate-400" />
-                            <span>Questions answered</span>
-                        </p>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6">
-                            Frequently asked questions
-                        </h2>
-                    </div>
+            {/* --- FAQ SECTION --- */}
+            <section id="faq" className="py-24 bg-slate-900">
+                <div className="mx-auto px-6 lg:px-8 max-w-3xl">
+                    <h2 className="text-3xl font-bold text-white text-center mb-12">FAQ</h2>
                     <div className="space-y-4">
                         {faqs.map((faq, index) => (
                             <div
                                 key={index}
-                                className="bg-white rounded-2xl border border-slate-200 overflow-hidden"
+                                className="bg-white/5 rounded-xl border border-white/5 overflow-hidden transition-colors hover:border-white/10"
                             >
                                 <button
                                     className="w-full flex justify-between items-center p-6 text-left"
                                     onClick={() => toggleFaq(index)}
                                 >
-                                    <span className="font-semibold text-slate-900">{faq.question}</span>
+                                    <span className="font-medium text-white">{faq.question}</span>
                                     <FiArrowRight
-                                        className={`transform transition-transform ${openFaqIndex === index ? 'rotate-90' : ''
+                                        className={`text-slate-500 transform transition-transform duration-300 ${openFaqIndex === index ? 'rotate-90 text-accent' : ''
                                             }`}
                                     />
                                 </button>
-                                {openFaqIndex === index && (
-                                    <div className="px-6 pb-6 text-slate-600">
-                                        {faq.answer}
-                                    </div>
-                                )}
+                                <div 
+                                    className={`px-6 text-slate-400 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-48 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
+                                >
+                                    {faq.answer}
+                                </div>
                             </div>
                         ))}
                     </div>
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="py-20 bg-gradient-to-r from-slate-900 to-slate-800 text-white">
-                <div className="mx-auto px-6 lg:px-8 max-w-4xl text-center">
-                    <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-                        Ready to transform your academy?
-                    </h2>
-                    <p className="text-lg text-slate-300 mb-10 max-w-2xl mx-auto">
-                        Join thousands of academy leaders who trust GymRatz to streamline operations and boost fighter performance.
-                    </p>
-                    <div className="flex flex-wrap justify-center gap-4">
-                        <Link
-                            to="/signup"
-                            className="inline-flex items-center space-x-3 bg-accent text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:bg-accent/90 transition"
-                        >
-                            <span>Start Free Trial</span>
-                        </Link>
-                        <Link
-                            to="/login"
-                            className="inline-flex items-center space-x-3 border border-white/30 bg-white/10 backdrop-blur px-8 py-4 rounded-full hover:bg-white/20 transition"
-                        >
-                            <span>Login</span>
-                        </Link>
-                    </div>
-                </div>
-            </section>
-
-            {/* Footer */}
-            <footer className="bg-slate-900 text-slate-400 py-16">
+            {/* --- FOOTER --- */}
+            <footer className="bg-slate-950 border-t border-white/10 pt-20 pb-10">
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12">
-                        <div className="lg:col-span-2">
-                            <div className="flex items-center space-x-3 mb-6">
-                                <div className="h-10 w-10 rounded-2xl bg-accent/20 border border-white/20 flex items-center justify-center font-bold text-white">
-                                    GR
-                                </div>
-                                <div>
-                                    <p className="text-xl font-semibold text-white">GymRatz</p>
-                                    <p className="text-xs text-white/70 tracking-widest uppercase">Combat Platform</p>
-                                </div>
-                            </div>
-                            <p className="mb-6 max-w-sm">
-                                Elite training orchestration for high-growth academies worldwide.
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                        <div className="col-span-1 md:col-span-1">
+                            <div className="text-2xl font-bold text-white mb-4">GymRatz</div>
+                            <p className="text-slate-500 text-sm mb-6">
+                                The operating system for modern combat sports academies.
                             </p>
                             <div className="flex space-x-4">
-                                <a href="#" className="text-slate-400 hover:text-white transition">
-                                    <FiUsers className="text-xl" />
+                                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition cursor-pointer">
+                                    <FiInstagram size={20} />
                                 </a>
-                                <a href="#" className="text-slate-400 hover:text-white transition">
-                                    <FiClock className="text-xl" />
+                                <a href="https://www.youtube.com/@TechVaseegrah" target="_blank" rel="noopener noreferrer" className="text-slate-500 hover:text-white transition cursor-pointer">
+                                    <FiYoutube size={20} />
                                 </a>
-                                <a href="#" className="text-slate-400 hover:text-white transition">
-                                    <FiCpu className="text-xl" />
+                                <a href="mailto:techvaseegrah@gmail.com" className="text-slate-500 hover:text-white transition cursor-pointer">
+                                    <FiMail size={20} />
                                 </a>
                             </div>
                         </div>
+                        {/* Footer Links (simplified for layout) */}
                         <div>
-                            <h4 className="text-white font-semibold mb-6">Product</h4>
-                            <ul className="space-y-4">
-                                <li><a href="#" className="hover:text-white transition">Features</a></li>
-                                <li><a href="#" className="hover:text-white transition">Solutions</a></li>
-                                <li><a href="#" className="hover:text-white transition">Pricing</a></li>
-                                <li><a href="#" className="hover:text-white transition">Demo</a></li>
+                            <h4 className="text-white font-bold mb-6">Product</h4>
+                            <ul className="space-y-3 text-sm text-slate-500">
+                                <li className="hover:text-accent cursor-pointer transition">Features</li>
+                                <li className="hover:text-accent cursor-pointer transition">Pricing</li>
+                                <li className="hover:text-accent cursor-pointer transition">API</li>
                             </ul>
                         </div>
                         <div>
-                            <h4 className="text-white font-semibold mb-6">Resources</h4>
-                            <ul className="space-y-4">
-                                <li><a href="#" className="hover:text-white transition">Blog</a></li>
-                                <li><a href="#" className="hover:text-white transition">Documentation</a></li>
-                                <li><a href="#" className="hover:text-white transition">Guides</a></li>
-                                <li><a href="#" className="hover:text-white transition">Support</a></li>
+                            <h4 className="text-white font-bold mb-6">Company</h4>
+                            <ul className="space-y-3 text-sm text-slate-500">
+                                <li className="hover:text-accent cursor-pointer transition">About</li>
+                                <li className="hover:text-accent cursor-pointer transition">Blog</li>
+                                <li className="hover:text-accent cursor-pointer transition">Careers</li>
                             </ul>
                         </div>
                         <div>
-                            <h4 className="text-white font-semibold mb-6">Company</h4>
-                            <ul className="space-y-4">
-                                <li><a href="#" className="hover:text-white transition">About</a></li>
-                                <li><a href="#" className="hover:text-white transition">Careers</a></li>
-                                <li><a href="#" className="hover:text-white transition">Contact</a></li>
-                                <li><a href="#" className="hover:text-white transition">Partners</a></li>
+                            <h4 className="text-white font-bold mb-6">Legal</h4>
+                            <ul className="space-y-3 text-sm text-slate-500">
+                                <li className="hover:text-accent cursor-pointer transition">Privacy</li>
+                                <li className="hover:text-accent cursor-pointer transition">Terms</li>
+                                <li className="hover:text-accent cursor-pointer transition">Security</li>
                             </ul>
                         </div>
                     </div>
-                    <div className="border-t border-slate-800 mt-16 pt-8 text-sm text-center">
-                        <p>© {new Date().getFullYear()} GymRatz. All rights reserved.</p>
+                    <div className="border-t border-white/5 pt-8 text-center text-slate-600 text-sm">
+                        <div className="flex flex-col md:flex-row justify-center items-center gap-2">
+                            <span>&copy; {new Date().getFullYear()} GymRatz Inc. All rights reserved.</span>
+                            <span className="hidden md:inline">•</span>
+                            <span className="text-slate-500">Powered by <a href="https://www.youtube.com/@TechVaseegrah" target="_blank" rel="noopener noreferrer" className="text-accent hover:text-white transition">Tech Vaseegrah</a></span>
+                        </div>
                     </div>
                 </div>
             </footer>
