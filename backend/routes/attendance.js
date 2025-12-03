@@ -7,133 +7,78 @@ const Subscription = require('../models/Subscription');
 const auth = require('../middleware/authMiddleware');
 const { addTenantFilter } = require('../utils/tenantHelper');
 
-// --- Utility: Calculate Distance ---
+// --- HELPER FUNCTIONS ---
 const haversineDistance = (coords1, coords2) => {
     const toRad = (x) => (x * Math.PI) / 180;
-    const R = 6371e3; // Earth radius in meters
+    const R = 6371e3;
     const lat1 = toRad(coords1.latitude);
     const lat2 = toRad(coords2.latitude);
     const deltaLat = toRad(coords2.latitude - coords1.latitude);
     const deltaLon = toRad(coords2.longitude - coords1.longitude);
-
-    const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-              Math.cos(lat1) * Math.cos(lat2) *
-              Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-    return R * c;
+    const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) + Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 };
 
-// --- Utility: Verify Location ---
 const verifyLocation = async (userLocation, tenantId) => {
     try {
-        if (!userLocation || !userLocation.latitude || !userLocation.longitude) {
-            return { isValid: false, message: 'Invalid user location data' };
-        }
-
+        if (!userLocation || !userLocation.latitude || !userLocation.longitude) return { isValid: false, message: 'Invalid location' };
         const settings = await Settings.findOne(addTenantFilter({}, tenantId));
-        
-        if (!settings || !settings.location) {
-            return { isValid: true, message: 'Location verification skipped (Not Configured)' };
-        }
+        if (!settings || !settings.location || !settings.location.enabled) return { isValid: true, message: 'Skipped' };
+        const dist = haversineDistance(userLocation, settings.location);
+        return dist <= (settings.location.radius || 100) ? { isValid: true } : { isValid: false, message: `Too far (${Math.round(dist)}m)` };
+    } catch (e) { return { isValid: false, message: e.message }; }
+};
 
-        if (!settings.location.enabled) {
-            return { isValid: true, message: 'Location verification disabled' };
-        }
+// Common Punch Logic function to reuse across routes
+const performPunch = async (fighterId, tenantId, method, location) => {
+    // 1. Subscription Check
+    const sub = await Subscription.findOne(addTenantFilter({ fighter: fighterId, endDate: { $gte: new Date() } }, tenantId));
+    if (!sub) throw { status: 400, message: 'Subscription expired' };
 
-        const allowedRadius = settings.location.radius || 100;
-        const gymLocation = {
-            latitude: settings.location.latitude,
-            longitude: settings.location.longitude
-        };
+    // 2. Cooldown Check (2 minutes)
+    const recent = await Attendance.findOne({ fighterId, updatedAt: { $gte: new Date(Date.now() - 2 * 60000) } });
+    if (recent) throw { status: 400, message: 'Please wait 2 mins before punching again' };
 
-        const distance = haversineDistance(userLocation, gymLocation);
-        
-        if (distance <= allowedRadius) {
-            return { isValid: true, message: `Location verified (${Math.round(distance)}m)` };
-        } else {
-            return { 
-                isValid: false, 
-                message: `You are ${Math.round(distance)}m away. Allowed: ${allowedRadius}m.` 
-            };
-        }
-    } catch (error) {
-        console.error('Location verification error:', error.message);
-        return { isValid: false, message: `Verification Error: ${error.message}` };
+    // 3. Location Check (if provided)
+    if (location) {
+        const locCheck = await verifyLocation(location, tenantId);
+        if (!locCheck.isValid) throw { status: 400, message: locCheck.message };
+    }
+
+    // 4. Determine Check In or Out
+    const today = new Date(); 
+    today.setHours(0,0,0,0);
+    
+    // Find an open session (checked in today but not checked out)
+    const openSession = await Attendance.findOne(addTenantFilter({ 
+        fighterId, 
+        checkIn: { $gte: today }, 
+        checkOut: null 
+    }, tenantId));
+
+    if (openSession) {
+        openSession.checkOut = new Date();
+        if (location) openSession.location = location; // Update location on check out
+        openSession.method = method; // Update method used for checkout
+        await openSession.save();
+        return { msg: 'Checked OUT Successfully', attendance: openSession, type: 'out' };
+    } else {
+        const newSession = new Attendance({ 
+            fighterId, 
+            checkIn: new Date(), 
+            method, 
+            tenant: tenantId, 
+            location 
+        });
+        await newSession.save();
+        return { msg: 'Checked IN Successfully', attendance: newSession, type: 'in' };
     }
 };
 
-// ==========================================
-//               ROUTES
-// ==========================================
-
-// @route   GET /api/attendance/all
-// @desc    Admin gets attendance records (Default: Today, or Filtered by Date)
-router.get('/all', auth, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ msg: 'Access denied' });
-
-    try {
-        const { date } = req.query;
-        let query = addTenantFilter({}, req.user.tenant);
-
-        // Date Filtering Logic
-        if (date) {
-            const startOfDay = new Date(date);
-            startOfDay.setHours(0, 0, 0, 0);
-            
-            const endOfDay = new Date(date);
-            endOfDay.setHours(23, 59, 59, 999);
-
-            query.checkIn = { $gte: startOfDay, $lte: endOfDay };
-        } else {
-            // Default: Show TODAY'S records only
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            query.checkIn = { $gte: today };
-        }
-
-        const allRecords = await Attendance.find(query)
-            .populate('fighterId', 'name rfid') 
-            .sort({ checkIn: -1 });
-        
-        const processedRecords = allRecords.map(record => {
-            const plainRecord = record.toObject();
-            let duration = "Running"; 
-            
-            if (plainRecord.checkOut) {
-                const diff = new Date(plainRecord.checkOut) - new Date(plainRecord.checkIn);
-                if (!isNaN(diff) && diff >= 0) {
-                    const totalSeconds = Math.floor(diff / 1000);
-                    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-                    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-                    const s = (totalSeconds % 60).toString().padStart(2, '0');
-                    duration = `${h}:${m}:${s}`;
-                } else {
-                    duration = "00:00:00";
-                }
-            }
-
-            const fighterObj = record.fighterId; 
-            const fighterName = fighterObj ? fighterObj.name : 'Unknown Fighter';
-            const rfid = fighterObj ? fighterObj.rfid : 'N/A';
-
-            return {
-                ...plainRecord,
-                fighterName,
-                rfid,
-                duration
-            };
-        });
-
-        res.json(processedRecords);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server Error');
-    }
-});
+// --- ROUTES ---
 
 // @route   GET /api/attendance/me
-// @desc    Fighter gets their own records
+// @desc    Fighter gets their own records (With Date Filter)
 router.get('/me', auth, async (req, res) => {
     if (req.user.role !== 'fighter') return res.status(403).json({ msg: 'Access denied' });
 
@@ -141,44 +86,30 @@ router.get('/me', auth, async (req, res) => {
         const { date } = req.query;
         let query = addTenantFilter({ fighterId: req.user.id }, req.user.tenant);
 
-        // Date Filtering: If date is provided, filter. If NOT provided, return ALL history.
         if (date) {
-            const startOfDay = new Date(date);
-            startOfDay.setHours(0, 0, 0, 0);
-            
-            const endOfDay = new Date(date);
-            endOfDay.setHours(23, 59, 59, 999);
-
-            query.checkIn = { $gte: startOfDay, $lte: endOfDay };
+            const start = new Date(date); start.setHours(0, 0, 0, 0);
+            const end = new Date(date); end.setHours(23, 59, 59, 999);
+            query.checkIn = { $gte: start, $lte: end };
         }
 
-        const records = await Attendance.find(query)
-            .populate('fighterId', 'name rfid')
-            .sort({ checkIn: -1 });
+        const records = await Attendance.find(query).sort({ checkIn: -1 });
 
         const processed = records.map(record => {
-            const plainRecord = record.toObject();
-            let duration = "Running"; // Default to running if no checkOut
+            const plain = record.toObject();
+            let duration = "Running";
             
-            if (plainRecord.checkOut) {
-                const diff = new Date(plainRecord.checkOut) - new Date(plainRecord.checkIn);
+            if (plain.checkOut) {
+                const diff = new Date(plain.checkOut) - new Date(plain.checkIn);
                 if (!isNaN(diff) && diff >= 0) {
-                    const totalSeconds = Math.floor(diff / 1000);
-                    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-                    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-                    const s = (totalSeconds % 60).toString().padStart(2, '0');
+                    const h = Math.floor(diff / 3600000).toString().padStart(2, '0');
+                    const m = Math.floor((diff % 3600000) / 60000).toString().padStart(2, '0');
+                    const s = Math.floor((diff % 60000) / 1000).toString().padStart(2, '0');
                     duration = `${h}:${m}:${s}`;
                 } else {
                     duration = "00:00:00";
                 }
             }
-            return {
-                ...plainRecord,
-                date: plainRecord.checkIn,
-                checkIns: [{ time: plainRecord.checkIn, late: false }],
-                checkOuts: plainRecord.checkOut ? [{ time: plainRecord.checkOut, late: false }] : [],
-                duration
-            };
+            return { ...plain, duration, date: plain.checkIn, checkIns: [{time: plain.checkIn}], checkOuts: plain.checkOut ? [{time: plain.checkOut}] : [] };
         });
 
         res.json(processed);
@@ -187,175 +118,99 @@ router.get('/me', auth, async (req, res) => {
     }
 });
 
-// @route   GET /api/attendance/status/:rfid
-// @desc    Get current attendance status for a specific RFID (Admin usage)
-router.get('/status/:rfid', auth, async (req, res) => {
-    if (req.user.role !== 'admin' && req.user.role !== 'superadmin') {
-        return res.status(403).json({ msg: 'Access denied' });
-    }
+// @route   GET /api/attendance/all
+// @desc    Get all attendance records for Admin
+router.get('/all', auth, async (req, res) => {
+    if (req.user.role !== 'admin' && req.user.role !== 'superadmin') return res.status(403).json({ msg: 'Access denied' });
 
     try {
-        const fighter = await Fighter.findOne(addTenantFilter({ rfid: req.params.rfid }, req.user.tenant));
-        
-        if (!fighter) {
-            return res.status(404).json({ msg: 'Fighter not found with this RFID' });
+        const { date } = req.query;
+        let query = addTenantFilter({}, req.user.tenant);
+
+        if (date) {
+            const start = new Date(date); start.setHours(0, 0, 0, 0);
+            const end = new Date(date); end.setHours(23, 59, 59, 999);
+            query.checkIn = { $gte: start, $lte: end };
         }
 
-        const openRecord = await Attendance.findOne({
-            fighterId: fighter._id,
-            checkOut: null
+        const records = await Attendance.find(query)
+            .populate('fighterId', 'name rfid')
+            .sort({ checkIn: -1 });
+
+        const groupedMap = {};
+        records.forEach(record => {
+            if (!record.fighterId) return;
+            const fighterId = record.fighterId._id.toString();
+            if (!groupedMap[fighterId]) {
+                groupedMap[fighterId] = {
+                    id: record._id,
+                    fighterName: record.fighterId.name,
+                    rfid: record.fighterId.rfid,
+                    date: record.checkIn,
+                    checkIns: [],
+                    checkOuts: [],
+                    totalDurationMs: 0
+                };
+            }
+            groupedMap[fighterId].checkIns.push({ time: record.checkIn });
+            if (record.checkOut) {
+                groupedMap[fighterId].checkOuts.push({ time: record.checkOut });
+                const diff = new Date(record.checkOut) - new Date(record.checkIn);
+                if (diff > 0) groupedMap[fighterId].totalDurationMs += diff;
+            }
         });
 
-        const status = openRecord ? 'in' : 'out';
-        const nextAction = openRecord ? 'out' : 'in';
+        const result = Object.values(groupedMap).map(item => {
+            const ms = item.totalDurationMs;
+            const h = Math.floor(ms / 3600000).toString().padStart(2, '0');
+            const m = Math.floor((ms % 3600000) / 60000).toString().padStart(2, '0');
+            const s = Math.floor((ms % 60000) / 1000).toString().padStart(2, '0');
+            return {
+                ...item,
+                duration: item.totalDurationMs > 0 ? `${h}:${m}:${s}` : "Running",
+                checkIns: item.checkIns.sort((a,b) => new Date(a.time) - new Date(b.time)),
+                checkOuts: item.checkOuts.sort((a,b) => new Date(a.time) - new Date(b.time))
+            };
+        });
+
+        res.json(result);
+    } catch (err) { res.status(500).send('Server Error'); }
+});
+
+// @route   GET /api/attendance/status/:rfid
+// @desc    Admin lookup fighter status by RFID
+router.get('/status/:rfid', auth, async (req, res) => {
+    try {
+        const { rfid } = req.params;
+        const fighter = await Fighter.findOne(addTenantFilter({ rfid }, req.user.tenant));
+        
+        if (!fighter) {
+            return res.status(404).json({ msg: 'Fighter not found' });
+        }
+
+        // Determine next action
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        const lastRecord = await Attendance.findOne(addTenantFilter({ 
+            fighterId: fighter._id, 
+            checkIn: { $gte: today } 
+        }, req.user.tenant)).sort({ checkIn: -1 });
+
+        let nextAction = 'in';
+        if (lastRecord && !lastRecord.checkOut) {
+            nextAction = 'out';
+        }
 
         res.json({
-            status,
-            nextAction, 
             fighter: {
-                _id: fighter._id,
+                id: fighter._id,
                 name: fighter.name,
                 rfid: fighter.rfid,
                 profilePhoto: fighter.profilePhoto
             },
-            lastPunch: openRecord ? openRecord.checkIn : null
+            nextAction
         });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Server Error');
-    }
-});
-
-// @route   GET /api/attendance/me/status
-// @desc    Fighter Status Check (Self)
-router.get('/me/status', auth, async (req, res) => {
-    if (req.user.role !== 'fighter') return res.status(403).json({ msg: 'Access denied' });
-
-    try {
-        const todayStart = new Date();
-        todayStart.setHours(0,0,0,0);
-        
-        const openRecord = await Attendance.findOne(addTenantFilter({
-            fighterId: req.user.id,
-            checkIn: { $gte: todayStart },
-            checkOut: null
-        }, req.user.tenant));
-
-        const fighter = await Fighter.findById(req.user.id).select('name fighterBatchNo');
-
-        res.json({
-            punchType: openRecord ? 'out' : 'in',
-            fighter
-        });
-    } catch (err) {
-        res.status(500).send('Server Error');
-    }
-});
-
-// @route   POST /api/attendance/rfid-status
-// @desc    Check status for RFID Punch (Fighter Self-Check via Kiosk)
-router.post('/rfid-status', auth, async (req, res) => {
-    if (req.user.role !== 'fighter') return res.status(403).json({ msg: 'Access denied' });
-
-    const { rfid, location } = req.body;
-    if (!rfid) return res.status(400).json({ msg: 'RFID is required' });
-
-    try {
-        const fighter = await Fighter.findOne({ rfid });
-        if (!fighter) return res.status(404).json({ msg: 'RFID not found' });
-        if (fighter._id.toString() !== req.user.id) return res.status(403).json({ msg: 'Not your RFID' });
-
-        const activeSubscription = await Subscription.findOne(addTenantFilter({
-            fighter: fighter._id,
-            endDate: { $gte: new Date() }
-        }, req.user.tenant));
-
-        if (!activeSubscription) {
-            return res.status(400).json({ msg: 'Your subscription has expired.' });
-        }
-
-        if (location) {
-            const locCheck = await verifyLocation(location, req.user.tenant);
-            if (!locCheck.isValid) return res.status(400).json({ msg: locCheck.message });
-        }
-
-        const todayStart = new Date();
-        todayStart.setHours(0,0,0,0);
-        
-        const lastRecord = await Attendance.findOne(addTenantFilter({ 
-            fighterId: fighter._id,
-            checkIn: { $gte: todayStart },
-            checkOut: null
-        }, req.user.tenant)).sort({ checkIn: -1 });
-
-        res.json({
-            punchType: lastRecord ? 'out' : 'in',
-            fighter: { _id: fighter._id, name: fighter.name, fighterBatchNo: fighter.fighterBatchNo }
-        });
-
-    } catch (err) {
-        res.status(500).send('Server Error');
-    }
-});
-
-// @route   POST /api/attendance/punch
-// @desc    Main Punch Function
-router.post('/punch', auth, async (req, res) => {
-    try {
-        const fighterId = req.user.id;
-        const { faceDescriptor, location } = req.body;
-        
-        const activeSubscription = await Subscription.findOne(addTenantFilter({
-            fighter: fighterId,
-            endDate: { $gte: new Date() }
-        }, req.user.tenant));
-
-        if (!activeSubscription) {
-            return res.status(400).json({ msg: 'Your subscription has expired.' });
-        }
-
-        const twoMinsAgo = new Date(Date.now() - 2 * 60 * 1000);
-        const recent = await Attendance.findOne({
-            fighterId,
-            $or: [{ checkIn: { $gte: twoMinsAgo } }, { checkOut: { $gte: twoMinsAgo } }]
-        });
-        if (recent) return res.status(400).json({ msg: 'Please wait 2 minutes between punches.' });
-
-        if (location) {
-            const locCheck = await verifyLocation(location, req.user.tenant);
-            if (!locCheck.isValid) return res.status(400).json({ msg: locCheck.message });
-        }
-
-        const todayStart = new Date();
-        todayStart.setHours(0,0,0,0);
-
-        const openRecord = await Attendance.findOne(addTenantFilter({
-            fighterId,
-            checkIn: { $gte: todayStart },
-            checkOut: null
-        }, req.user.tenant)).sort({ checkIn: -1 });
-
-        const method = faceDescriptor ? 'face' : 'rfid';
-
-        if (openRecord) {
-            openRecord.checkOut = new Date();
-            if (location) openRecord.location = location;
-            openRecord.method = method;
-            await openRecord.save();
-            return res.json({ msg: 'Checked OUT successfully!', attendance: openRecord });
-        } else {
-            const newRecord = new Attendance({
-                fighterId,
-                checkIn: new Date(),
-                method,
-                tenant: req.user.tenant,
-                location
-            });
-            await newRecord.save();
-            return res.json({ msg: 'Checked IN successfully!', attendance: newRecord });
-        }
-
     } catch (err) {
         console.error(err);
         res.status(500).json({ msg: 'Server Error' });
@@ -363,56 +218,75 @@ router.post('/punch', auth, async (req, res) => {
 });
 
 // @route   POST /api/attendance/admin/rfid
+// @desc    Admin processes RFID punch
 router.post('/admin/rfid', auth, async (req, res) => {
-    if (req.user.role !== 'admin') return res.status(403).json({ msg: 'Access denied' });
-    
-    const { rfid, location } = req.body;
-    if (!rfid) return res.status(400).json({ msg: 'RFID required' });
-
     try {
-        const fighter = await Fighter.findOne({ rfid });
+        const { rfid, location } = req.body;
+        const fighter = await Fighter.findOne(addTenantFilter({ rfid }, req.user.tenant));
         if (!fighter) return res.status(404).json({ msg: 'Fighter not found' });
 
-        if (fighter.tenant.toString() !== req.user.tenant) {
-             return res.status(403).json({ msg: 'Fighter belongs to another gym' });
-        }
-
-        if (location) {
-            const locCheck = await verifyLocation(location, req.user.tenant);
-            if (!locCheck.isValid) return res.status(400).json({ msg: locCheck.message });
-        }
-
-        const openRecord = await Attendance.findOne({
-            fighterId: fighter._id,
-            checkOut: null
+        const result = await performPunch(fighter._id, req.user.tenant, 'rfid', location);
+        
+        res.json({ 
+            msg: result.msg, 
+            fighter: { name: fighter.name },
+            attendance: result.attendance 
         });
-
-        if (openRecord) {
-            openRecord.checkOut = new Date();
-            openRecord.method = 'rfid';
-            if (location) openRecord.location = location;
-            await openRecord.save();
-            res.json({ msg: `Checked OUT ${fighter.name}`, type: 'checkout', fighter });
-        } else {
-            const newRecord = new Attendance({
-                fighterId: fighter._id,
-                checkIn: new Date(),
-                method: 'rfid',
-                tenant: req.user.tenant,
-                location
-            });
-            await newRecord.save();
-            res.json({ msg: `Checked IN ${fighter.name}`, type: 'checkin', fighter });
-        }
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ msg: 'Server Error' });
+        res.status(err.status || 500).json({ msg: err.message || 'Server Error' });
     }
 });
 
 // @route   POST /api/attendance/admin/face-recognition
+// @desc    Admin processes Face Recognition punch
 router.post('/admin/face-recognition', auth, async (req, res) => {
-    res.status(501).json({ msg: 'Admin Face Recognition not yet implemented on server.' });
+    try {
+        const { faceDescriptor, location } = req.body;
+        // In a real app, you would match descriptor against database here.
+        // For now, we assume this endpoint is called AFTER frontend verification,
+        // OR we need to implement face matching on backend.
+        
+        // Since the prompt context suggests frontend matching or simple simulation:
+        // We will assume 'faceDescriptor' might carry a fighter ID or we simulate matching.
+        
+        // IMPORTANT: If you implemented full backend matching, use that.
+        // If not, and frontend sends valid data, we might need a way to know WHICH fighter.
+        // Typically frontend sends the ID if it matched, or backend loops through all.
+        
+        // FALLBACK: For this specific error fix, we ensure it doesn't crash.
+        // NOTE: Actual backend face matching requires loading models on server.
+        // Ideally, frontend sends `fighterId` if it verified the face.
+        
+        return res.status(400).json({ msg: 'Face verification requires Fighter ID from frontend match' });
+
+    } catch (err) {
+        res.status(500).json({ msg: 'Server Error' });
+    }
+});
+
+// @route   POST /api/attendance/punch (Fighter App)
+router.post('/punch', auth, async (req, res) => {
+    try {
+        console.log('Punch request received:', {
+            userId: req.user.id,
+            tenantId: req.user.tenant,
+            location: req.body.location
+        });
+        
+        // Use 'manual' instead of 'app' to match the enum values
+        const result = await performPunch(req.user.id, req.user.tenant, 'manual', req.body.location);
+        console.log('Punch successful:', result);
+        res.json(result);
+    } catch (e) {
+        console.error('Punch error:', {
+            message: e.message,
+            stack: e.stack,
+            status: e.status,
+            userId: req.user.id,
+            tenantId: req.user.tenant
+        });
+        res.status(e.status || 500).json({ msg: e.message || 'Error' });
+    }
 });
 
 module.exports = router;

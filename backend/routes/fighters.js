@@ -30,23 +30,21 @@ router.post('/register', auth, async (req, res) => {
         return res.status(400).json({ msg: 'Please provide name, email, password, and RFID' });
     }
     
-    // Face encodings are recommended but not strictly required for testing
-    if (!faceEncodings || faceEncodings.length === 0) {
-        console.log('Warning: No face encodings provided - face recognition will not work');
-    }
-    
     try {
-        // Check if database is connected
-        if (mongoose.connection.readyState !== 1) {
-            console.log('Database not connected. Ready state:', mongoose.connection.readyState);
-            return res.status(500).json({ msg: 'Database connection error' });
+        // Get tenant information to use for batch number generation
+        const tenant = await Tenant.findById(req.user.tenant);
+        if (!tenant) {
+            return res.status(400).json({ msg: 'Tenant not found' });
         }
-
+        
+        // Check if fighter with this email or RFID already exists in this tenant
         let existingFighter = await Fighter.findOne(addTenantFilter({ $or: [{ email }, { rfid }] }, req.user.tenant));
         if (existingFighter) {
+            // If email matches, reject
             if (existingFighter.email === email) {
                 return res.status(400).json({ msg: 'Fighter with this email already exists' });
             }
+            // If RFID matches, suggest regenerating
             if (existingFighter.rfid === rfid) {
                 return res.status(400).json({ msg: 'This RFID is already assigned. Please regenerate.' });
             }
@@ -56,7 +54,7 @@ router.post('/register', auth, async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
         
         // Auto-generate unique batch number
-        const fighterBatchNo = generateBatchNo();
+        const fighterBatchNo = generateBatchNo(tenant.name);
         console.log('Generated batch number:', fighterBatchNo);
 
         // Create fighter object
@@ -469,9 +467,11 @@ router.get('/with-face-data', auth, async (req, res) => {
     }
 });
 
-// Utility to generate a unique batch number
-const generateBatchNo = () => {
-    return 'ASHURA-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+// Utility to generate a unique batch number using gym name prefix
+const generateBatchNo = (gymName) => {
+    // Use gym name as prefix, convert to uppercase and remove spaces
+    const gymPrefix = gymName.replace(/\s+/g, '').toUpperCase();
+    return gymPrefix + '-' + crypto.randomBytes(4).toString('hex').toUpperCase();
 };
 
 module.exports = router;

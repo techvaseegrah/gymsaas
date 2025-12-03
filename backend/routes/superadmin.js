@@ -255,25 +255,41 @@ router.get('/analytics/performance-stats', async (req, res) => {
 });
 
 // Settings
+// In-memory storage for superadmin settings (in a real app, this would be in a database)
+let superAdminSettings = {
+    platformName: 'GymRatz',
+    supportEmail: 'support@gymratz.com',
+    maintenanceMode: false,
+    autoBackup: true,
+    notificationEmails: true,
+    version: 'v2.1.4',
+    lastBackup: '2023-06-18 14:30 UTC',
+    uptime: '99.98%'
+};
+
 router.get('/settings', async (req, res) => {
     try {
-        res.json({
-            platformName: 'Mutants Academy',
-            supportEmail: 'support@mutantsacademy.com',
-            maintenanceMode: false,
-            autoBackup: true,
-            notificationEmails: true,
-            version: 'v2.1.4',
-            lastBackup: '2023-06-18 14:30 UTC',
-            uptime: '99.98%'
-        });
-    } catch (err) { res.status(500).send('Server Error'); }
+        res.json(superAdminSettings);
+    } catch (err) { 
+        res.status(500).send('Server Error'); 
+    }
 });
 
 router.post('/settings', async (req, res) => {
     try {
-        res.json({ msg: 'Settings updated successfully!' });
-    } catch (err) { res.status(500).send('Server Error'); }
+        // Update settings with provided values
+        const { platformName, supportEmail, maintenanceMode, autoBackup, notificationEmails } = req.body;
+        
+        if (platformName !== undefined) superAdminSettings.platformName = platformName;
+        if (supportEmail !== undefined) superAdminSettings.supportEmail = supportEmail;
+        if (maintenanceMode !== undefined) superAdminSettings.maintenanceMode = maintenanceMode;
+        if (autoBackup !== undefined) superAdminSettings.autoBackup = autoBackup;
+        if (notificationEmails !== undefined) superAdminSettings.notificationEmails = notificationEmails;
+        
+        res.json({ msg: 'Settings updated successfully!', settings: superAdminSettings });
+    } catch (err) { 
+        res.status(500).send('Server Error'); 
+    }
 });
 
 module.exports = router;

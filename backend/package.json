@@ -1,7 +1,7 @@
 {
-  "name": "mutants-academy-ashuras-tribe-server",
+  "name": "gymratz-server",
   "version": "1.0.0",
-  "description": "Backend for Mutants Academy & AshurasTribe application with enhanced JavaScript face recognition",
+  "description": "Backend for GymRatz application with enhanced JavaScript face recognition",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
