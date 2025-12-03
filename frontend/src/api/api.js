@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api'
+  // CORRECTED: Changed port back to 5002 to match the running backend server
+  baseURL: 'http://localhost:5002/api' 
 });
 
 // Store refresh promise to prevent multiple concurrent refreshes
@@ -15,7 +16,8 @@ const refreshToken = async () => {
       throw new Error('No token found');
     }
     
-    const response = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000/api'}/auth/refresh`, {}, {
+    // CORRECTED: Changed port back to 5002 to match the running backend server
+    const response = await axios.post('http://localhost:5002/api/auth/refresh', {}, {
       headers: {
         'x-auth-token': token
       }
@@ -37,6 +39,12 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers['x-auth-token'] = token;
   }
+  
+  // Add cache control headers to prevent caching
+  config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+  config.headers['Pragma'] = 'no-cache';
+  config.headers['Expires'] = '0';
+  
   return config;
 }, error => {
   return Promise.reject(error);

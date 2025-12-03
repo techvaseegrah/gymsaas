@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaHome, FaCalendarCheck, FaSignOutAlt, FaDumbbell, FaEnvelope } from 'react-icons/fa'; // IMPORT FaDumbbell
+import { FaHome, FaCalendarCheck, FaSignOutAlt, FaDumbbell, FaEnvelope } from 'react-icons/fa';
 import api from '../api/api';
 
 const FighterSidebar = ({ handleLogout, closeSidebar }) => {
@@ -21,17 +21,19 @@ const FighterSidebar = ({ handleLogout, closeSidebar }) => {
     return (
         <div className="flex flex-col h-full">
             <div className="p-4 mb-4 text-center">
-                <img src="/logo.png" alt="Logo" className="w-24 h-24 mx-auto mb-2 rounded-full object-cover border-2 border-gray-600" />
+                {/* REPLACED LOGO IMAGE WITH TEXT AVATAR */}
+                <div className="w-24 h-24 mx-auto mb-2 rounded-full bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center text-3xl font-bold text-white border-2 border-gray-600 shadow-lg">
+                    GR
+                </div>
                 <h1 className="text-xl font-bold text-white tracking-wider">{fighterName}</h1>
             </div>
             <nav className="flex-grow px-4 space-y-2">
-                <NavLink to="/fighter" end className={({ isActive }) => `${linkClasses} ${isActive ? activeLinkClasses : ''}`} onClick={closeSidebar}>
+                <NavLink to="/fighter" className={({ isActive }) => `${linkClasses} ${isActive ? activeLinkClasses : ''}`} onClick={closeSidebar}>
                     <FaHome className="mr-3" /> Home
                 </NavLink>
                 <NavLink to="/fighter/attendance" className={({ isActive }) => `${linkClasses} ${isActive ? activeLinkClasses : ''}`} onClick={closeSidebar}>
                     <FaCalendarCheck className="mr-3" /> My Attendance
                 </NavLink>
-                {/* UPDATED LINK */}
                 <NavLink to="/fighter/stats" className={({ isActive }) => `${linkClasses} ${isActive ? activeLinkClasses : ''}`} onClick={closeSidebar}>
                     <FaDumbbell className="mr-3" /> Gym Stats
                 </NavLink>

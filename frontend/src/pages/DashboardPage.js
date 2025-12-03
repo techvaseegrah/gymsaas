@@ -49,7 +49,7 @@ const DashboardPage = () => {
                     {/* Quick Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <StatCard
-                            title="Total Fighters"
+                            title="Total Members"
                             value={dashboardStats.totalFighters}
                             icon="👥"
                             color="blue"
@@ -80,7 +80,7 @@ const DashboardPage = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Top Fighters */}
                         <div className="bg-white rounded-lg shadow-md p-6">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4">🏆 Top Performing Fighters</h3>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-4">🏆 Top Performers</h3>
                             {dashboardStats.topFighters.length > 0 ? (
                                 <div className="space-y-3">
                                     {dashboardStats.topFighters.map((fighter, index) => (

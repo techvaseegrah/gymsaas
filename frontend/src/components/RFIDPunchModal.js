@@ -3,6 +3,7 @@ import { FaIdCard, FaTimes, FaSpinner } from 'react-icons/fa';
 
 const RFIDPunchModal = ({ isOpen, onClose, onSubmit, loading }) => {
     const [rfid, setRfid] = useState('');
+    const [location, setLocation] = useState(null);
     const [locationError, setLocationError] = useState('');
 
     if (!isOpen) return null;

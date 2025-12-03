@@ -5,6 +5,17 @@ const http = require('http');
 const socketIo = require('socket.io');
 require('dotenv').config();
 
+// Debug environment variables
+console.log('Environment variables:');
+console.log('MONGO_URI:', process.env.MONGO_URI ? 'Loaded' : 'Not found');
+console.log('PORT:', process.env.PORT || 5000);
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Loaded' : 'Not found');
+
+// Verify dotenv is working
+console.log('Full process.env.PORT:', process.env.PORT);
+console.log('Full process.env.MONGO_URI:', process.env.MONGO_URI);
+console.log('Full process.env.JWT_SECRET:', process.env.JWT_SECRET);
+
 const app = express();
 
 // Create HTTP server

@@ -35,18 +35,19 @@ const AdminSettingsPage = () => {
     useEffect(() => {
         const fetchSettings = async () => {
             try {
-                const res = await api.get('/settings');
+                // Add cache-busting timestamp to ensure fresh data
+                const res = await api.get(`/settings?t=${new Date().getTime()}`);
                 setLocation({
-                    latitude: res.data.location?.latitude !== undefined ? res.data.location.latitude : '',
-                    longitude: res.data.location?.longitude !== undefined ? res.data.location.longitude : '',
-                    radius: res.data.location?.radius || 100,
-                    enabled: res.data.location?.enabled !== undefined ? res.data.location.enabled : true
+                    latitude: res.data.location?.latitude !== undefined ? parseFloat(res.data.location.latitude) : 12.9716,
+                    longitude: res.data.location?.longitude !== undefined ? parseFloat(res.data.location.longitude) : 77.5946,
+                    radius: res.data.location?.radius ? parseInt(res.data.location.radius) : 100,
+                    enabled: res.data.location?.enabled !== undefined ? Boolean(res.data.location.enabled) : true
                 });
             } catch (err) {
                 console.error('Error fetching settings:', err);
                 setLocation({ 
-                    latitude: '', 
-                    longitude: '', 
+                    latitude: 12.9716, 
+                    longitude: 77.5946, 
                     radius: 100, 
                     enabled: true 
                 });

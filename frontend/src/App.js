@@ -179,14 +179,14 @@ const App = () => {
         return (
             <div className="relative min-h-screen bg-gray-900">
                 {isSidebarOpen && <div className="fixed inset-0 z-20 bg-black opacity-50 lg:hidden" onClick={closeSidebar}></div>}
-                <div className="lg:hidden flex justify-between items-center bg-gray-900 text-purple-400 p-4 sticky top-0 z-10 border-b border-gray-800">
+                <div className="lg:hidden flex justify-between items-center bg-gray-900 text-white p-4 sticky top-0 z-10 border-b border-gray-800">
                     <h1 className="text-xl font-bold">Super Admin</h1>
                     <button onClick={() => setSidebarOpen(!isSidebarOpen)}>
                         {isSidebarOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                     </button>
                 </div>
                 <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-900 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 border-r border-gray-800`}>
-                    <SuperAdminSidebar handleLogout={performLogout} closeSidebar={closeSidebar} />
+                    <SuperAdminSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} />
                 </aside>
                 <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-800">{children}</main>
                 <LogoutModal />
@@ -200,7 +200,7 @@ const App = () => {
             <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
                 <div className="bg-white rounded-lg p-6 w-96 text-gray-800 shadow-xl">
                     <h3 className="text-xl font-bold mb-4">Confirm Logout</h3>
-                    <p className="mb-6">Are you sure you want to secure your session?</p>
+                    <p className="mb-6">Are you sure you want to logout?</p>
                     <div className="flex justify-end space-x-4">
                         <button onClick={cancelLogout} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
                         <button onClick={performLogout} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Logout</button>
@@ -209,7 +209,7 @@ const App = () => {
             </div>
         )
     );
-    
+
     if (loading) {
         return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white"><h1 className="text-2xl animate-pulse">Initializing GymRatz...</h1></div>;
     }
@@ -277,7 +277,7 @@ const App = () => {
                 <Route path="/fighter/attendance/face" element={<ProtectedRoute role="fighter"><FighterLayout><FighterFaceRecognitionPage /></FighterLayout></ProtectedRoute>} />
                 <Route path="/fighter/ask-doubt" element={<ProtectedRoute role="fighter"><FighterLayout><AskDoubtPage /></FighterLayout></ProtectedRoute>} />
                 <Route path="/fighter/complete-profile" element={<ProtectedRoute role="fighter"><CompleteProfilePage /></ProtectedRoute>} />
-                <Route path="/fighter" element={<ProtectedRoute role="fighter"><FighterLayout><FighterHomePage user={user} /></FighterLayout></ProtectedRoute>} />
+                <Route path="/fighter" element={<ProtectedRoute role="fighter"><FighterLayout><FighterHomePage user={user} confirmLogout={confirmLogout} /></FighterLayout></ProtectedRoute>} />
                 <Route path="/fighter/attendance" element={<ProtectedRoute role="fighter"><FighterLayout><FighterAttendancePage user={user} /></FighterLayout></ProtectedRoute>} />
                 <Route path="/fighter/profile/update" element={<ProtectedRoute role="fighter"><FighterLayout><FighterProfileUpdatePage /></FighterLayout></ProtectedRoute>} />
                 <Route path="/fighter/subscription-details" element={<ProtectedRoute role="fighter"><FighterLayout><SubscriptionDetailsPage /></FighterLayout></ProtectedRoute>} />

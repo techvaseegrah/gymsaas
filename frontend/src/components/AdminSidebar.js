@@ -12,7 +12,7 @@ import {
     FaAngleUp,
     FaChartLine,
     FaEnvelope,
-    FaMoneyBillWave // Import this icon
+    FaMoneyBillWave
 } from 'react-icons/fa';
 
 const AdminSidebar = ({ handleLogout, closeSidebar }) => {
@@ -31,12 +31,10 @@ const AdminSidebar = ({ handleLogout, closeSidebar }) => {
         <div className="flex flex-col h-full bg-gray-800 border-r border-gray-700">
             {/* Logo and Title */}
             <div className="p-6 mb-2 text-center border-b border-gray-700">
-                <img
-                    src="/logo.png"
-                    alt="Logo"
-                    className="w-20 h-20 mx-auto mb-3 rounded-full object-cover border-2 border-gray-500 shadow-md"
-                    onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}
-                />
+                {/* REPLACED LOGO IMAGE WITH TEXT AVATAR */}
+                <div className="w-20 h-20 mx-auto mb-3 rounded-full bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white border-2 border-gray-500 shadow-md">
+                    GR
+                </div>
                 <h1 className="text-lg font-bold text-white tracking-wider">ADMIN PANEL</h1>
             </div>
 
@@ -86,7 +84,6 @@ const AdminSidebar = ({ handleLogout, closeSidebar }) => {
                     <FaCalendarCheck className="mr-3" /> Attendance
                 </NavLink>
 
-                {/* NEW SUBSCRIPTION LINK */}
                 <NavLink
                     to="/admin/subscriptions"
                     className={({ isActive }) => `${linkClasses} ${isActive ? activeLinkClasses : ''}`}

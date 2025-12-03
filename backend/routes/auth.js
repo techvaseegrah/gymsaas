@@ -10,68 +10,109 @@ const auth = require('../middleware/authMiddleware');
 const router = express.Router();
 
 // @route   POST api/auth/login
-// @desc    Authenticate user & get token
+// @desc    Authenticate user & get token (Admin, Fighter, SuperAdmin)
 // @access  Public
 router.post('/login', async (req, res) => {
-    const { email, password, role } = req.body;
-
-    // Basic validation
-    if (!email || !password) {
-        return res.status(400).json({ msg: 'Please enter all fields' });
-    }
+    const { email, password, role, tenantSlug } = req.body;
 
     try {
-        let user;
+        console.log('Login attempt:', { email, password, role, tenantSlug });
         
-        // Check for user based on role
+        // Validate required fields
+        if (!email || !password || !role) {
+            return res.status(400).json({ msg: 'Email, password, and role are required' });
+        }
+        
+        // Validate role
+        if (!['admin', 'fighter', 'superadmin'].includes(role)) {
+            return res.status(400).json({ msg: 'Invalid role specified' });
+        }
+
+        let user;
+
+        // Find user based on role
         if (role === 'superadmin') {
             user = await Admin.findOne({ email, role: 'superadmin' });
+            console.log('Superadmin user lookup:', user ? 'Found' : 'Not found');
         } else if (role === 'admin') {
-            user = await Admin.findOne({ email, role: 'admin' });
-        } else {
-            user = await Fighter.findOne({ email });
+            // For admin, we need to verify tenant
+            if (!tenantSlug) {
+                return res.status(400).json({ msg: 'Tenant slug is required for admin login' });
+            }
+            
+            const tenant = await Tenant.findOne({ slug: tenantSlug });
+            if (!tenant) {
+                console.log('Admin tenant not found:', tenantSlug);
+                return res.status(400).json({ msg: 'Invalid tenant' });
+            }
+            
+            user = await Admin.findOne({ email, tenant: tenant._id });
+            console.log('Admin user lookup:', user ? 'Found' : 'Not found');
+        } else if (role === 'fighter') {
+            // For fighter, we need to verify tenant
+            if (!tenantSlug) {
+                return res.status(400).json({ msg: 'Tenant slug is required for fighter login' });
+            }
+            
+            const tenant = await Tenant.findOne({ slug: tenantSlug });
+            if (!tenant) {
+                console.log('Fighter tenant not found:', tenantSlug);
+                return res.status(400).json({ msg: 'Invalid tenant' });
+            }
+            
+            user = await Fighter.findOne({ email, tenant: tenant._id });
+            console.log('Fighter user lookup:', user ? 'Found' : 'Not found', user?.email);
         }
 
+        // Check if user exists
         if (!user) {
-            return res.status(400).json({ msg: 'Invalid credentials' });
+            return res.status(400).json({ msg: 'Invalid Credentials' });
         }
 
-        // Check password
+        // Compare password
+        console.log('Comparing passwords for user:', user.email);
         const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Password match result:', isMatch);
         if (!isMatch) {
-            return res.status(400).json({ msg: 'Invalid credentials' });
+            return res.status(400).json({ msg: 'Invalid Credentials' });
         }
 
-        // Create and send token
+        // Create JWT payload
         const payload = {
             user: {
                 id: user.id,
                 role: user.role,
-                profile_completed: user.profile_completed
+                tenant: user.tenant
             }
         };
 
+        // Sign token
         jwt.sign(
             payload,
             process.env.JWT_SECRET,
-            { expiresIn: 3600 },
+            { expiresIn: '7d' },
             (err, token) => {
-                if (err) throw err;
+                if (err) {
+                    console.error('JWT signing error:', err);
+                    return res.status(500).json({ msg: 'Token generation failed' });
+                }
+                console.log('Login successful for user:', user.email);
                 res.json({
                     token,
                     user: {
                         id: user.id,
+                        name: user.name || '',
                         email: user.email,
                         role: user.role,
-                        name: user.name,
-                        profile_completed: user.profile_completed
+                        tenant: user.tenant,
+                        profile_completed: user.profile_completed || false
                     }
                 });
             }
         );
     } catch (err) {
         console.error(err.message);
-        res.status(500).send('Server Error');
+        res.status(500).send('Server error');
     }
 });
 
@@ -81,10 +122,12 @@ router.post('/login', async (req, res) => {
 router.get('/user', auth, async (req, res) => {
     try {
         let user;
-        if (req.user.role === 'admin' || req.user.role === 'superadmin') {
+        if (req.user.role === 'admin') {
             user = await Admin.findById(req.user.id).select('-password');
-        } else {
+        } else if (req.user.role === 'fighter') {
             user = await Fighter.findById(req.user.id).select('-password');
+        } else {
+            return res.status(400).json({ msg: 'Invalid user role' });
         }
         res.json(user);
     } catch (err) {
@@ -94,24 +137,29 @@ router.get('/user', auth, async (req, res) => {
 });
 
 // @route   POST api/auth/refresh
-// @desc    Refresh authentication token
-// @access  Public
+// @desc    Refresh JWT token
+// @access  Private
 router.post('/refresh', auth, async (req, res) => {
     try {
-        // Just return a new token with extended expiry
+        // Create new JWT payload
         const payload = {
             user: {
                 id: req.user.id,
-                role: req.user.role
+                role: req.user.role,
+                tenant: req.user.tenant
             }
         };
 
+        // Sign new token
         jwt.sign(
             payload,
             process.env.JWT_SECRET,
-            { expiresIn: 3600 },
+            { expiresIn: '7d' },
             (err, token) => {
-                if (err) throw err;
+                if (err) {
+                    console.error('JWT signing error:', err);
+                    return res.status(500).json({ msg: 'Token generation failed' });
+                }
                 res.json({ token });
             }
         );
@@ -210,6 +258,7 @@ router.post('/forgot-password', async (req, res) => {
             await user.save();
             return res.status(500).json({ msg: 'Email could not be sent' });
         }
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -254,6 +303,7 @@ router.post('/reset-password/:resetToken', async (req, res) => {
         await user.save();
 
         res.json({ success: true, msg: 'Password updated successfully' });
+
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
@@ -269,7 +319,7 @@ router.post('/change-password', auth, async (req, res) => {
     try {
         // 1. Determine User Model based on role
         let user;
-        if (req.user.role === 'admin' || req.user.role === 'superadmin') {
+        if (req.user.role === 'admin') {
             user = await Admin.findById(req.user.id);
         } else {
             user = await Fighter.findById(req.user.id);

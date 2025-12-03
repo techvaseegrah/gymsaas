@@ -75,12 +75,17 @@ const AskDoubtPage = () => {
             
             try {
                 setLoading(true);
+                setError('');
+                
+                console.log('[CLIENT] Initializing AskDoubtPage data...');
                 
                 const { data: user } = await api.get('/auth/user');
+                console.log('[CLIENT] User data received:', user);
                 setCurrentUser(user);
 
                 // Initialize WebSocket connection
                 const socket = initSocket(user);
+                console.log('[CLIENT] Socket initialized');
                 
                 // Listen for new messages via WebSocket
                 onNewMessage((messageData) => {
@@ -96,7 +101,8 @@ const AskDoubtPage = () => {
                         
                         if (!exists) {
                             // Filter out any temporary messages that match this one
-                            const filtered = prev.filter(msg => !msg.isTemporary || msg._id !== 'temp_' + Date.now());
+                            const filtered = prev.filter(msg => !(msg.isTemporary && msg.text === messageData.text && 
+                                msg.user?._id === messageData.user?._id));
                             return [...filtered, messageData];
                         }
                         
@@ -119,10 +125,14 @@ const AskDoubtPage = () => {
                 });
 
                 if (user?.role === 'admin') {
+                    console.log('[CLIENT] Fetching fighters roster for admin');
                     const { data: fighterList } = await api.get('/fighters/roster');
+                    console.log('[CLIENT] Fighter list received:', fighterList);
                     setFighters(fighterList || []);
                 } else {
+                    console.log('[CLIENT] Fetching admin ID for fighter');
                     const { data: { adminId } } = await api.get('/auth/admin-id');
+                    console.log('[CLIENT] Admin ID received:', adminId);
                     console.log('[CLIENT] *** CRITICAL: Fighter received admin ID:', adminId);
                     console.log('[CLIENT] *** This MUST be:', '68bc3872c7f20dc76f9da534', 'for chat to work');
                     console.log('[CLIENT] *** IDs match:', adminId === '68bc3872c7f20dc76f9da534');
@@ -130,13 +140,25 @@ const AskDoubtPage = () => {
                 }
 
                 // Fetch initial messages
+                console.log('[CLIENT] Fetching initial messages');
                 const { data: initialMessages } = await api.get('/doubts');
+                console.log('[CLIENT] Initial messages received:', initialMessages);
                 setMessages(initialMessages);
                 setLoading(false);
+                console.log('[CLIENT] Initialization complete');
             } catch (err) {
                 console.error('Failed to initialize data:', err);
-                setError('Failed to load data');
+                console.error('Error details:', {
+                    message: err.message,
+                    code: err.code,
+                    response: err.response?.data,
+                    status: err.response?.status,
+                    headers: err.response?.headers
+                });
+                setError(`Failed to load data: ${err.message}`);
                 setLoading(false);
+            } finally {
+                isInitializing.current = false;
             }
         };
 
