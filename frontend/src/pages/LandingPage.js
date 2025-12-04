@@ -440,43 +440,49 @@ const LandingPage = () => {
                         {pricingTiers.map((tier, index) => (
                             <div
                                 key={index}
-                                className={`rounded-2xl p-8 border ${tier.highlight
-                                        ? 'border-accent bg-gradient-to-b from-accent/5 to-white relative ring-1 ring-accent/20 shadow-lg shadow-accent/10'
-                                        : 'border-slate-200 bg-white'
-                                    }`}
+                                className={`rounded-2xl p-8 border flex flex-col transition-all duration-300 hover:shadow-xl ${
+                                    tier.highlight
+                                        ? 'border-accent bg-gradient-to-b from-accent/5 to-white relative ring-1 ring-accent/20 shadow-lg shadow-accent/10 transform hover:-translate-y-2 z-10 md:scale-105 md:py-10'
+                                        : 'border-slate-200 bg-white hover:border-slate-300'
+                                }`}
                             >
                                 {tier.highlight && (
-                                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-accent text-white px-4 py-1 rounded-full text-sm font-semibold">
+                                    <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-accent text-white px-4 py-1 rounded-full text-sm font-semibold shadow-md">
                                         MOST POPULAR
                                     </div>
                                 )}
-                                <h3 className={`text-xl font-semibold mb-2 ${tier.highlight ? 'text-slate-900' : 'text-slate-900'}`}>
-                                    {tier.name}
-                                </h3>
-                                <div className="mb-4">
-                                    <span className="text-4xl font-bold text-slate-900">{tier.price}</span>
-                                    {tier.cadence && <span className="text-slate-600"> {tier.cadence}</span>}
+                                <div className="flex flex-col flex-grow">
+                                    <h3 className={`text-xl font-semibold mb-2 ${tier.highlight ? 'text-slate-900' : 'text-slate-900'}`}>
+                                        {tier.name}
+                                    </h3>
+                                    <div className="mb-4">
+                                        <span className="text-4xl font-bold text-slate-900">{tier.price}</span>
+                                        {tier.cadence && <span className="text-slate-600"> {tier.cadence}</span>}
+                                    </div>
+                                    <p className={`mb-6 ${tier.highlight ? 'text-slate-700' : 'text-slate-600'}`}>
+                                        {tier.description}
+                                    </p>
+                                    <ul className="mb-8 space-y-3 flex-grow">
+                                        {tier.features.map((feature, idx) => (
+                                            <li key={idx} className="flex items-center">
+                                                <FiCheckCircle className={`mr-2 flex-shrink-0 ${tier.highlight ? 'text-accent' : 'text-slate-400'}`} />
+                                                <span className={tier.highlight ? 'text-slate-700' : 'text-slate-600'}>{feature}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
-                                <p className={`mb-6 ${tier.highlight ? 'text-slate-700' : 'text-slate-600'}`}>
-                                    {tier.description}
-                                </p>
-                                <ul className="mb-8 space-y-3">
-                                    {tier.features.map((feature, idx) => (
-                                        <li key={idx} className="flex items-center">
-                                            <FiCheckCircle className={`mr-2 ${tier.highlight ? 'text-accent' : 'text-slate-400'}`} />
-                                            <span className={tier.highlight ? 'text-slate-700' : 'text-slate-600'}>{feature}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                                <Link
-                                    to="/signup"
-                                    className={`w-full py-3 rounded-lg font-semibold text-center transition ${tier.highlight
-                                            ? 'bg-accent text-white hover:bg-accent/90 shadow-md shadow-accent/20'
-                                            : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
+                                <div className="pt-4">
+                                    <Link
+                                        to="/signup"
+                                        className={`w-full py-3 rounded-lg font-semibold text-center transition-all duration-300 block ${
+                                            tier.highlight
+                                                ? 'bg-accent text-white hover:bg-accent/90 shadow-md shadow-accent/20 hover:shadow-lg'
+                                                : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
                                         }`}
-                                >
-                                    {tier.cta}
-                                </Link>
+                                    >
+                                        {tier.cta}
+                                    </Link>
+                                </div>
                             </div>
                         ))}
                     </div>
