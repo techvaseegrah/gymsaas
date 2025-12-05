@@ -27,9 +27,15 @@ const refreshToken = async () => {
     localStorage.setItem('token', newToken);
     return newToken;
   } catch (error) {
-    // If refresh fails, remove token and redirect to login
+    // If refresh fails, remove token and redirect to appropriate login page
     localStorage.removeItem('token');
-    window.location.href = '/superadmin/login';
+    // Check current path to determine where to redirect
+    const currentPath = window.location.pathname;
+    if (currentPath.startsWith('/superadmin')) {
+      window.location.href = '/superadmin/login';
+    } else {
+      window.location.href = '/login';
+    }
     throw error;
   }
 };
@@ -88,9 +94,16 @@ api.interceptors.response.use(
     // For other 401 errors, redirect to login
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      // Only redirect if we're not already on login page
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/superadmin/login';
+      // Only redirect if we're not already on a login page
+      const currentPath = window.location.pathname;
+      const isOnLoginPage = currentPath.includes('/login') || currentPath.includes('/superadmin/login');
+      if (!isOnLoginPage) {
+        // Check if we're trying to access super admin routes
+        if (currentPath.startsWith('/superadmin')) {
+          window.location.href = '/superadmin/login';
+        } else {
+          window.location.href = '/login';
+        }
       }
     }
     

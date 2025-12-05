@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import api from '../api/api';
 import { FaLock, FaUserShield } from 'react-icons/fa';
 
@@ -20,8 +21,17 @@ const SuperAdminLoginPage = ({ setUser }) => {
             const token = localStorage.getItem('token');
             if (token) {
                 try {
+                    // Create a new instance of axios without interceptors for this specific call
+                    // to prevent automatic redirects
+                    const apiWithoutInterceptors = axios.create({
+                        baseURL: 'http://localhost:5002/api'
+                    });
+                    
+                    // Add the token to headers manually
+                    apiWithoutInterceptors.defaults.headers.common['x-auth-token'] = token;
+                    
                     // Try to get user data with current token
-                    const res = await api.get('/auth/user');
+                    const res = await apiWithoutInterceptors.get('/auth/user');
                     setUser(res.data);
                     navigate('/superadmin/dashboard');
                 } catch (err) {

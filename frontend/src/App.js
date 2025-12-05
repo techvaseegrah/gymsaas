@@ -101,7 +101,15 @@ const App = () => {
             // Try to refresh token if it exists
             const token = localStorage.getItem('token');
             if (token) {
-                // Redirect to a token refresh page or handle it automatically
+                // Check if we're trying to access super admin routes
+                if (location.pathname.startsWith('/superadmin')) {
+                    return <Navigate to="/superadmin/login" replace />;
+                }
+                // For all other routes, redirect to regular login
+                return <Navigate to="/login" replace />;
+            }
+            // No token, redirect to appropriate login based on path
+            if (location.pathname.startsWith('/superadmin')) {
                 return <Navigate to="/superadmin/login" replace />;
             }
             return <Navigate to="/login" replace />;
