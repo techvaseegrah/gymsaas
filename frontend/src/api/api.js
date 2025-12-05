@@ -4,6 +4,23 @@ const api = axios.create({
   baseURL: 'http://localhost:5002/api'
 });
 
+// Create a separate instance for public endpoints (like contact form)
+export const publicApi = axios.create({
+  baseURL: 'http://localhost:5002/api'
+});
+
+// Add request interceptor to publicApi to prevent caching
+publicApi.interceptors.request.use(config => {
+  // Add cache control headers to prevent caching
+  config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+  config.headers['Pragma'] = 'no-cache';
+  config.headers['Expires'] = '0';
+  
+  return config;
+}, error => {
+  return Promise.reject(error);
+});
+
 // Store refresh promise to prevent multiple concurrent refreshes
 let refreshTokenPromise = null;
 

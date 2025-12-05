@@ -126,24 +126,38 @@ const AskDoubtPage = () => {
 
                 if (user?.role === 'admin') {
                     console.log('[CLIENT] Fetching fighters roster for admin');
-                    const { data: fighterList } = await api.get('/fighters/roster');
-                    console.log('[CLIENT] Fighter list received:', fighterList);
-                    setFighters(fighterList || []);
+                    try {
+                        const { data: fighterList } = await api.get('/fighters/roster');
+                        console.log('[CLIENT] Fighter list received:', fighterList);
+                        setFighters(fighterList || []);
+                    } catch (err) {
+                        console.error('[CLIENT] Error fetching fighter list:', err);
+                        setFighters([]);
+                    }
                 } else {
                     console.log('[CLIENT] Fetching admin ID for fighter');
-                    const { data: { adminId } } = await api.get('/auth/admin-id');
-                    console.log('[CLIENT] Admin ID received:', adminId);
-                    console.log('[CLIENT] *** CRITICAL: Fighter received admin ID:', adminId);
-                    console.log('[CLIENT] *** This MUST be:', '68bc3872c7f20dc76f9da534', 'for chat to work');
-                    console.log('[CLIENT] *** IDs match:', adminId === '68bc3872c7f20dc76f9da534');
-                    setAdminId(adminId);
+                    try {
+                        const { data: { adminId } } = await api.get('/auth/admin-id');
+                        console.log('[CLIENT] Admin ID received:', adminId);
+                        console.log('[CLIENT] *** CRITICAL: Fighter received admin ID:', adminId);
+                        setAdminId(adminId);
+                    } catch (err) {
+                        console.error('[CLIENT] Error fetching admin ID:', err);
+                        setAdminId(null);
+                    }
                 }
 
                 // Fetch initial messages
                 console.log('[CLIENT] Fetching initial messages');
-                const { data: initialMessages } = await api.get('/doubts');
-                console.log('[CLIENT] Initial messages received:', initialMessages);
-                setMessages(initialMessages);
+                try {
+                    const { data: initialMessages } = await api.get('/doubts');
+                    console.log('[CLIENT] Initial messages received:', initialMessages);
+                    setMessages(initialMessages || []);
+                } catch (err) {
+                    console.error('[CLIENT] Error fetching initial messages:', err);
+                    setError(`Failed to load messages: ${err.message}`);
+                    setMessages([]);
+                }
                 setLoading(false);
                 console.log('[CLIENT] Initialization complete');
             } catch (err) {
@@ -226,10 +240,10 @@ const AskDoubtPage = () => {
                 
                 // Check if we're currently viewing the chat where this message was sent
                 let isActiveChat = false;
-                if (activeChat?.type === 'private' && lastMessage.recipientId) {
+                if (activeChat && activeChat.type === 'private' && lastMessage.recipientId) {
                     // For private chats, check if we're chatting with the sender
-                    isActiveChat = activeChat?.peer?._id?.toString() === lastMessage.user?._id?.toString();
-                } else if (activeChat?.type === 'common' && !lastMessage.recipientId) {
+                    isActiveChat = activeChat.peer?._id?.toString() === lastMessage.user?._id?.toString();
+                } else if (activeChat && activeChat.type === 'common' && !lastMessage.recipientId) {
                     // For common chat, check if we're viewing the common chat
                     isActiveChat = true;
                 }
@@ -339,21 +353,21 @@ const AskDoubtPage = () => {
 
     // Filter messages callback - MOVED UP to avoid initialization issues
     const getFilteredMessages = useCallback(() => {
-        if (!currentUser || !messages.length) {
+        if (!currentUser || !messages || !messages.length || !activeChat) {
             return [];
         }
 
         const currentUserId = currentUser._id;
 
-        if (activeChat?.type === 'common') {
+        if (activeChat.type === 'common') {
             const commonMessages = messages
                 .filter(msg => !msg.recipient && !msg.recipientId && msg.isVisible)
                 .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
             return commonMessages;
         }
 
-        if (activeChat?.type === 'private') {
-            const peerId = activeChat?.peer?._id;
+        if (activeChat.type === 'private') {
+            const peerId = activeChat.peer?._id;
             if (!peerId) {
                 return [];
             }
@@ -384,7 +398,7 @@ const AskDoubtPage = () => {
     }, [messages, activeChat, currentUser]);
 
     const getNextMessageType = useCallback(() => {
-        if (activeChat?.type === 'common') {
+        if (!activeChat || activeChat.type === 'common') {
             return 'doubt'; // Common group chat messages should be 'doubt' type
         }
         
@@ -429,7 +443,7 @@ const AskDoubtPage = () => {
             }
 
             // Add recipient for private chats
-            if (activeChat?.type === 'private' && activeChat?.peer?._id) {
+            if (activeChat && activeChat.type === 'private' && activeChat.peer?._id) {
                 payload.recipientId = activeChat.peer._id;
                 
                 // Log the proper message flow
