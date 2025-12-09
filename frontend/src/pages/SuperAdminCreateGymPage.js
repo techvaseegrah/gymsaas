@@ -11,14 +11,15 @@ const SuperAdminCreateGymPage = () => {
         email: '',
         password: '',
         phone: '',
-        address: ''
+        address: '',
+        plan: 'trial' // Default to Trial
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const navigate = useNavigate();
 
-    const { gymName, gymSlug, email, password, phone, address } = formData;
+    const { gymName, gymSlug, email, password, phone, address, plan } = formData;
 
     const onChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -70,7 +71,8 @@ const SuperAdminCreateGymPage = () => {
                 email: '',
                 password: '',
                 phone: '',
-                address: ''
+                address: '',
+                plan: 'trial'
             });
             
             // Redirect to gyms list after 2 seconds
@@ -87,7 +89,7 @@ const SuperAdminCreateGymPage = () => {
     return (
         <SuperAdminPageTemplate 
             title="Create New Gym" 
-            subtitle="Add a new gym to the platform"
+            subtitle="Manually onboard a new gym to the platform"
             icon={FaBuilding}
         >
             <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 max-w-2xl mx-auto">
@@ -135,6 +137,26 @@ const SuperAdminCreateGymPage = () => {
                             />
                             <p className="text-xs text-gray-500 mt-1">Lowercase letters, numbers, and hyphens only</p>
                         </div>
+                    </div>
+
+                    {/* NEW PLAN SELECTION DROPDOWN */}
+                    <div>
+                        <label className="block text-gray-300 text-sm font-medium mb-2">
+                            Assign Plan <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                            name="plan"
+                            value={plan}
+                            onChange={onChange}
+                            className="w-full px-4 py-3 bg-gray-900 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        >
+                            <option value="trial">Free Trial (30 Days - Full Access)</option>
+                            <option value="basic">Base Plan (Active)</option>
+                            <option value="enterprise">Enterprise Plan (Active)</option>
+                        </select>
+                        <p className="text-xs text-gray-500 mt-1">
+                            "Active" plans will not expire automatically. "Trial" expires in 30 days.
+                        </p>
                     </div>
                     
                     <div>

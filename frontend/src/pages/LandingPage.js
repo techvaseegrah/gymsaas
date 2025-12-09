@@ -2,24 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { default as api, publicApi } from '../api/api';
 import {
-    FiMenu,
-    FiX,
-    FiArrowRight,
-    FiShield,
-    FiTrendingUp,
-    FiZap,
-    FiCheckCircle,
-    FiPlayCircle,
-    FiUsers,
-    FiClock,
-    FiCpu,
-    FiInstagram,
-    FiYoutube,
-    FiMail,
-    FiCamera,
-    FiDollarSign,
-    FiMessageSquare,
-    FiStar
+    FiMenu, FiX, FiArrowRight, FiTrendingUp, FiCheckCircle, FiPlayCircle,
+    FiInstagram, FiYoutube, FiMail, FiCamera, FiDollarSign, FiMessageSquare, FiStar
 } from 'react-icons/fi';
 
 const navItems = [
@@ -69,32 +53,59 @@ const benefits = [
     },
 ];
 
+// --- UPDATED PRICING TIERS ---
 const pricingTiers = [
     {
-        name: 'Starter',
-        price: '₹3,999',
-        cadence: 'per month',
-        description: 'Perfect for boutique academies getting started with digital ops.',
-        features: ['30 fighters included', 'Attendance automation', '1 admin seat', 'Email support'],
-        cta: 'Launch Starter',
+        name: 'Free Trial',
+        price: '₹0',
+        cadence: 'for 10 days', // 10 Days Text
+        description: 'Experience the full power of Enterprise risk-free.',
+        features: [
+            'Unlimited Fighters',
+            'Full AI Face Recognition',
+            'GPS Location Tracking',
+            'Doubt Chat Access',
+            'No Credit Card Required'
+        ],
+        cta: 'Start Free Trial',
+        link: '/signup?plan=trial',
+        highlight: false,
+        color: 'green'
     },
     {
-        name: 'Growth',
+        name: 'Base Plan',
+        price: '₹999',
+        cadence: 'per month',
+        description: 'Essential management for growing academies.',
+        features: [
+            'Up to 75 Fighters',
+            'RFID Attendance',
+            'Manual Attendance',
+            'Doubt Chat Access',
+            'Basic Reports'
+        ],
+        cta: 'Choose Base',
+        link: '/signup?plan=basic',
+        highlight: false,
+        color: 'blue'
+    },
+    {
+        name: 'Enterprise',
+        price: '₹1,999',
+        cadence: 'per month',
+        description: 'Full automation with AI & GPS tracking.',
+        features: [
+            'Unlimited Fighters',
+            'AI Face Recognition',
+            'GPS Location Attendance',
+            'Priority Support',
+            'Everything in Base'
+        ],
+        cta: 'Go Enterprise',
+        link: '/signup?plan=enterprise',
         highlight: true,
-        price: '₹9,999',
-        cadence: 'per month',
-        description: 'Everything you need to run a multi-location combat program.',
-        features: ['120 fighters included', 'Advanced analytics', '3 admin seats', 'Priority support'],
-        cta: 'Scale with Growth',
-    },
-    {
-        name: 'Elite',
-        price: 'Custom',
-        cadence: 'engagement',
-        description: 'White-glove enablement for franchises and enterprise training orgs.',
-        features: ['Unlimited fighters', 'Dedicated CSM', 'Custom integrations', 'On-site onboarding'],
-        cta: 'Talk to Sales',
-    },
+        color: 'purple'
+    }
 ];
 
 const testimonials = [
@@ -146,7 +157,6 @@ const LandingPage = () => {
     const [openFaqIndex, setOpenFaqIndex] = useState(0);
     const [scrollProgress, setScrollProgress] = useState(0);
     
-    // Form State
     const [formData, setFormData] = useState({
         name: '',
         company: '',
@@ -158,7 +168,6 @@ const LandingPage = () => {
     const [submitSuccess, setSubmitSuccess] = useState(false);
     const [submitError, setSubmitError] = useState('');
 
-    // Quick Templates
     const templates = [
         "I'd like to book a demo.",
         "Question about Enterprise pricing.",
@@ -166,7 +175,6 @@ const LandingPage = () => {
         "Do you support custom API access?"
     ];
 
-    // --- SCROLL PROGRESS LOGIC ---
     useEffect(() => {
         const handleScroll = () => {
             const totalScroll = document.documentElement.scrollTop;
@@ -190,31 +198,22 @@ const LandingPage = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleTemplateClick = (text) => {
-        setFormData(prev => ({
-            ...prev,
-            message: text
-        }));
+        setFormData(prev => ({ ...prev, message: text }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
         if (formData.phone && !/^\+91\s?[6-9]\d{9}$/.test(formData.phone.replace(/\s/g, ''))) {
             setSubmitError('Please enter a valid Indian phone number (+91 followed by 10 digits)');
             return;
         }
-        
         setIsSubmitting(true);
         setSubmitError('');
         setSubmitSuccess(false);
-
         try {
             await publicApi.post('/contact', formData);
             setFormData({ name: '', company: '', email: '', phone: '', message: '' });
@@ -230,7 +229,6 @@ const LandingPage = () => {
     return (
         <div className="bg-slate-950 text-slate-300 min-h-screen relative font-sans selection:bg-accent selection:text-white">
             
-            {/* --- FIXED HEADER --- */}
             <header className="fixed top-0 w-full z-40 bg-slate-950/80 backdrop-blur-md border-b border-white/5 transition-all duration-300">
                 <div className="mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -276,7 +274,6 @@ const LandingPage = () => {
                 )}
             </header>
 
-            {/* --- HERO SECTION --- */}
             <div className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none">
                     <div className="absolute top-20 left-1/4 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] mix-blend-screen animate-blob" />
@@ -322,11 +319,9 @@ const LandingPage = () => {
                 </div>
             </div>
 
-            {/* --- FEATURES SECTION --- */}
             <section id="features" className="py-24 bg-slate-900 relative overflow-hidden">
                 <div className="absolute top-0 left-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
                 <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
-                
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl relative z-10">
                     <div className="max-w-3xl mb-16 text-center mx-auto">
                         <h2 className="text-3xl lg:text-5xl font-bold text-white mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
@@ -360,7 +355,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* --- BENEFITS SECTION --- */}
             <section id="benefits" className="py-24 bg-slate-950">
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -412,7 +406,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* --- PRICING SECTION --- */}
             <section id="pricing" className="py-24 bg-slate-900">
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl">
                     <div className="text-center max-w-3xl mx-auto mb-16">
@@ -420,12 +413,16 @@ const LandingPage = () => {
                             Simple, transparent pricing
                         </h2>
                         <p className="text-lg text-slate-400">
-                            No hidden fees. Upgrade or cancel anytime.
+                            Start with a free trial. No hidden fees. Upgrade anytime.
                         </p>
                     </div>
                     <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
                         {pricingTiers.map((tier, index) => (
-                            <div key={index} className={`relative rounded-2xl p-8 border transition-all duration-300 ${tier.highlight ? 'bg-white/5 border-accent shadow-2xl shadow-accent/10 scale-105 z-10' : 'bg-slate-950/50 border-white/5 hover:border-white/10'}`}>
+                            <div key={index} className={`relative rounded-2xl p-8 border transition-all duration-300 flex flex-col ${
+                                tier.highlight 
+                                ? 'bg-white/5 border-accent shadow-2xl shadow-accent/10 scale-105 z-10' 
+                                : 'bg-slate-950/50 border-white/5 hover:border-white/10'
+                            }`}>
                                 {tier.highlight && (
                                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-accent text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg">Most Popular</div>
                                 )}
@@ -435,7 +432,7 @@ const LandingPage = () => {
                                     {tier.cadence && <span className="text-slate-500 text-sm"> / {tier.cadence}</span>}
                                 </div>
                                 <p className="text-slate-400 mb-8 h-12 text-sm leading-relaxed">{tier.description}</p>
-                                <ul className="space-y-4 mb-8">
+                                <ul className="space-y-4 mb-8 flex-grow">
                                     {tier.features.map((feature, idx) => (
                                         <li key={idx} className="flex items-start">
                                             <FiCheckCircle className={`mt-1 mr-3 flex-shrink-0 ${tier.highlight ? 'text-accent' : 'text-slate-600'}`} />
@@ -443,7 +440,11 @@ const LandingPage = () => {
                                         </li>
                                     ))}
                                 </ul>
-                                <Link to="/signup" className={`block w-full py-3 rounded-lg font-bold text-center transition-all ${tier.highlight ? 'bg-accent hover:bg-blue-600 text-white shadow-lg shadow-accent/25' : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'}`}>
+                                <Link to={tier.link} className={`block w-full py-3 rounded-lg font-bold text-center transition-all ${
+                                    tier.highlight 
+                                    ? 'bg-accent hover:bg-blue-600 text-white shadow-lg shadow-accent/25' 
+                                    : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
+                                }`}>
                                     {tier.cta}
                                 </Link>
                             </div>
@@ -452,7 +453,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* --- TESTIMONIALS --- */}
             <section id="testimonials" className="py-24 bg-slate-950 border-t border-white/5">
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl">
                     <h2 className="text-3xl font-bold text-white text-center mb-16">Trusted by the best</h2>
@@ -478,16 +478,12 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* --- REDESIGNED CONTACT FORM SECTION (With Liquid Glass & Templates) --- */}
             <section className="py-24 bg-slate-950 relative overflow-hidden">
-                {/* Background Decor */}
                 <div className="absolute -left-20 top-20 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px] pointer-events-none"></div>
                 <div className="absolute -right-20 bottom-20 w-96 h-96 bg-accent/10 rounded-full blur-[100px] pointer-events-none"></div>
 
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl relative z-10">
                     <div className="grid lg:grid-cols-2 gap-16 items-center">
-                        
-                        {/* LEFT COLUMN: Text & Quote */}
                         <div className="space-y-10">
                             <div>
                                 <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -498,8 +494,6 @@ const LandingPage = () => {
                                     Every gym is unique. Whether you are running a boutique dojo or a franchise empire, tell us your needs and we will customize the GymRatz OS for you.
                                 </p>
                             </div>
-
-                            {/* Trust Badge Grid */}
                             <div className="grid grid-cols-2 gap-4">
                                 {['24/7 Priority Support', 'Secure Data Migration', 'Custom Branding', 'On-Site Setup'].map((item, i) => (
                                     <div key={i} className="flex items-center space-x-3 text-slate-300">
@@ -508,31 +502,9 @@ const LandingPage = () => {
                                     </div>
                                 ))}
                             </div>
-
-                            {/* Floating Glass Testimonial Card */}
-                            <div className="relative p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl mt-8">
-                                <div className="absolute -top-4 -right-4 w-12 h-12 bg-accent rounded-full flex items-center justify-center text-white shadow-lg">
-                                    <FiMessageSquare size={20} />
-                                </div>
-                                <div className="flex text-yellow-400 mb-4 gap-1">
-                                    {[...Array(5)].map((_, i) => <FiStar key={i} fill="currentColor" />)}
-                                </div>
-                                <p className="text-slate-200 italic mb-4">
-                                    "I requested a custom feature for my Jiu-Jitsu belt tracking, and the team shipped it in 48 hours. Unreal support."
-                                </p>
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-bold text-white">M</div>
-                                    <div>
-                                        <p className="text-white font-bold text-sm">Mike T.</p>
-                                        <p className="text-slate-500 text-xs uppercase">Owner, Mat Savage MMA</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
-                        {/* RIGHT COLUMN: Liquid Glass Form */}
                         <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 lg:p-10 shadow-[0_0_40px_rgba(0,0,0,0.3)] relative group">
-                            {/* Hover Glow Effect */}
                             <div className="absolute -inset-1 bg-gradient-to-r from-accent/20 to-purple-600/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition duration-700"></div>
                             
                             <form className="space-y-6 relative z-10" onSubmit={handleSubmit}>
@@ -594,8 +566,6 @@ const LandingPage = () => {
                                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Message</label>
                                         <span className="text-[10px] text-slate-500">Quick Templates:</span>
                                     </div>
-                                    
-                                    {/* Quick Templates Pills */}
                                     <div className="flex flex-wrap gap-2 mb-2">
                                         {templates.map((t, i) => (
                                             <button
@@ -608,7 +578,6 @@ const LandingPage = () => {
                                             </button>
                                         ))}
                                     </div>
-
                                     <textarea
                                         name="message"
                                         rows={4}
@@ -652,38 +621,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* --- FAQ SECTION --- */}
-            <section id="faq" className="py-24 bg-slate-900">
-                <div className="mx-auto px-6 lg:px-8 max-w-3xl">
-                    <h2 className="text-3xl font-bold text-white text-center mb-12">FAQ</h2>
-                    <div className="space-y-4">
-                        {faqs.map((faq, index) => (
-                            <div
-                                key={index}
-                                className="bg-white/5 rounded-xl border border-white/5 overflow-hidden transition-colors hover:border-white/10"
-                            >
-                                <button
-                                    className="w-full flex justify-between items-center p-6 text-left"
-                                    onClick={() => toggleFaq(index)}
-                                >
-                                    <span className="font-medium text-white">{faq.question}</span>
-                                    <FiArrowRight
-                                        className={`text-slate-500 transform transition-transform duration-300 ${openFaqIndex === index ? 'rotate-90 text-accent' : ''
-                                            }`}
-                                    />
-                                </button>
-                                <div 
-                                    className={`px-6 text-slate-400 overflow-hidden transition-all duration-300 ease-in-out ${openFaqIndex === index ? 'max-h-48 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}
-                                >
-                                    {faq.answer}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* --- FOOTER --- */}
             <footer className="bg-slate-950 border-t border-white/10 pt-20 pb-10">
                 <div className="mx-auto px-6 lg:px-8 max-w-7xl">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
@@ -704,7 +641,6 @@ const LandingPage = () => {
                                 </a>
                             </div>
                         </div>
-                        {/* Footer Links (simplified for layout) */}
                         <div>
                             <h4 className="text-white font-bold mb-6">Product</h4>
                             <ul className="space-y-3 text-sm text-slate-500">
