@@ -7,7 +7,8 @@ import {
     FaMoneyBillWave,
     FaCogs,
     FaSignOutAlt,
-    FaUserShield
+    FaUserShield,
+    FaEnvelope
 } from 'react-icons/fa';
 
 const SuperAdminSidebar = ({ handleLogout, closeSidebar }) => {
@@ -61,6 +62,14 @@ const SuperAdminSidebar = ({ handleLogout, closeSidebar }) => {
                     onClick={handleLinkClick}
                 >
                     <FaMoneyBillWave className="mr-4 text-lg" /> Billing
+                </NavLink>
+
+                <NavLink 
+                    to="/superadmin/contact-messages" 
+                    className={({ isActive }) => isActive ? `${linkClasses} ${activeLinkClasses}` : linkClasses} 
+                    onClick={handleLinkClick}
+                >
+                    <FaEnvelope className="mr-4 text-lg" /> Contact Messages
                 </NavLink>
 
                 <NavLink 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/api';
-import { FiArrowRight, FiUser, FiMail, FiPhone, FiLock, FiMapPin, FiHome, FiGlobe } from 'react-icons/fi';
 
 const TenantSignupPage = () => {
     const navigate = useNavigate();
@@ -17,7 +16,7 @@ const TenantSignupPage = () => {
         city: '',
         state: '',
         zipCode: '',
-        country: 'India'
+        country: ''
     });
     
     const [loading, setLoading] = useState(false);
@@ -91,6 +90,7 @@ const TenantSignupPage = () => {
             
             // Redirect to tenant login page after a short delay
             setTimeout(() => {
+                // Redirect to the tenant's login page using the slug
                 navigate(`/login?gym=${res.data.tenant.slug}`);
             }, 2000);
         } catch (err) {
@@ -102,285 +102,251 @@ const TenantSignupPage = () => {
     
     return (
         <div className="min-h-screen bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-            <div className="w-full max-w-2xl">
-                {/* Card */}
-                <div className="bg-gray-800 rounded-lg shadow-lg p-8">
-                    {/* Header */}
-                    <div className="mb-8 text-center">
-                        <div className="flex items-center justify-center mb-4">
-                            <div className="h-12 w-12 rounded-2xl bg-accent/20 border border-white/20 flex items-center justify-center font-bold text-white">
-                                GR
-                            </div>
-                        </div>
-                        <h1 className="text-3xl font-bold text-white mb-2">Create Your Gym</h1>
-                        <p className="text-gray-300">Set up your gym management system</p>
+            <div className="max-w-2xl w-full space-y-8">
+                <div>
+                    <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
+                        Create Your Gym
+                    </h2>
+                    <p className="mt-2 text-center text-sm text-gray-400">
+                        Set up your gym management system
+                    </p>
+                </div>
+                
+                {error && (
+                    <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded relative" role="alert">
+                        <span className="block sm:inline">{error}</span>
                     </div>
-
-                    {/* Error Message */}
-                    {error && (
-                        <div className="mb-6 bg-red-900/30 border border-red-700 rounded px-4 py-3 text-sm text-red-200">
-                            {error}
+                )}
+                
+                {success && (
+                    <div className="bg-green-900 border border-green-700 text-green-200 px-4 py-3 rounded relative" role="alert">
+                        <span className="block sm:inline">Gym created successfully! Redirecting to login page...</span>
+                    </div>
+                )}
+                
+                <form className="mt-8 space-y-6" onSubmit={onSubmit}>
+                    <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                        {/* Gym Information */}
+                        <div className="sm:col-span-6">
+                            <h3 className="text-lg font-medium text-white mb-4">Gym Information</h3>
                         </div>
-                    )}
-
-                    {/* Success Message */}
-                    {success && (
-                        <div className="mb-6 bg-green-900/30 border border-green-700 rounded px-4 py-3 text-sm text-green-200">
-                            Gym created successfully! Redirecting to login page...
-                        </div>
-                    )}
-
-                    <form onSubmit={onSubmit} className="space-y-6">
-                        {/* Gym Information Section */}
-                        <div className="space-y-4">
-                            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                                <FiGlobe className="text-accent" /> Gym Information
-                            </h2>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="gymName" className="block text-sm font-medium text-gray-300 mb-2">
-                                        Gym Name
-                                    </label>
-                                    <div className="relative">
-                                        <FiHome className="absolute left-3 top-3.5 text-gray-400" />
-                                        <input
-                                            type="text"
-                                            id="gymName"
-                                            name="gymName"
-                                            value={gymName}
-                                            onChange={onChange}
-                                            required
-                                            className="w-full pl-10 pr-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                            placeholder="Enter your gym name"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="gymSlug" className="block text-sm font-medium text-gray-300 mb-2">
-                                        Gym URL Slug
-                                    </label>
-                                    <div className="relative">
-                                        <FiGlobe className="absolute left-3 top-3.5 text-gray-400" />
-                                        <input
-                                            type="text"
-                                            id="gymSlug"
-                                            name="gymSlug"
-                                            value={gymSlug}
-                                            onChange={onChange}
-                                            required
-                                            className="w-full pl-10 pr-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                            placeholder="your-gym-name"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Admin Account Section */}
-                        <div className="space-y-4 pt-4 border-t border-gray-700">
-                            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                                <FiUser className="text-accent" /> Admin Account
-                            </h2>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                                        Admin Email
-                                    </label>
-                                    <div className="relative">
-                                        <FiMail className="absolute left-3 top-3.5 text-gray-400" />
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            value={email}
-                                            onChange={onChange}
-                                            required
-                                            className="w-full pl-10 pr-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                            placeholder="admin@yourgym.com"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
-                                        Phone Number
-                                    </label>
-                                    <div className="relative">
-                                        <FiPhone className="absolute left-3 top-3.5 text-gray-400" />
-                                        <input
-                                            type="tel"
-                                            id="phone"
-                                            name="phone"
-                                            value={phone}
-                                            onChange={onChange}
-                                            className="w-full pl-10 pr-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                            placeholder="+91 9876543210"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                                        Password
-                                    </label>
-                                    <div className="relative">
-                                        <FiLock className="absolute left-3 top-3.5 text-gray-400" />
-                                        <input
-                                            type="password"
-                                            id="password"
-                                            name="password"
-                                            value={password}
-                                            onChange={onChange}
-                                            required
-                                            className="w-full pl-10 pr-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                            placeholder="Create a strong password"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300 mb-2">
-                                        Confirm Password
-                                    </label>
-                                    <div className="relative">
-                                        <FiLock className="absolute left-3 top-3.5 text-gray-400" />
-                                        <input
-                                            type="password"
-                                            id="confirmPassword"
-                                            name="confirmPassword"
-                                            value={confirmPassword}
-                                            onChange={onChange}
-                                            required
-                                            className="w-full pl-10 pr-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                            placeholder="Confirm your password"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Gym Address Section */}
-                        <div className="space-y-4 pt-4 border-t border-gray-700">
-                            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                                <FiMapPin className="text-accent" /> Gym Address
-                            </h2>
-                            
-                            <div>
-                                <label htmlFor="street" className="block text-sm font-medium text-gray-300 mb-2">
-                                    Street Address
-                                </label>
-                                <div className="relative">
-                                    <FiMapPin className="absolute left-3 top-3.5 text-gray-400" />
-                                    <input
-                                        type="text"
-                                        id="street"
-                                        name="street"
-                                        value={street}
-                                        onChange={onChange}
-                                        className="w-full pl-10 pr-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                        placeholder="123 Main Street"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label htmlFor="city" className="block text-sm font-medium text-gray-300 mb-2">
-                                        City
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="city"
-                                        name="city"
-                                        value={city}
-                                        onChange={onChange}
-                                        className="w-full px-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                        placeholder="City"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="state" className="block text-sm font-medium text-gray-300 mb-2">
-                                        State / Province
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="state"
-                                        name="state"
-                                        value={state}
-                                        onChange={onChange}
-                                        className="w-full px-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                        placeholder="State"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="zipCode" className="block text-sm font-medium text-gray-300 mb-2">
-                                        ZIP / Postal Code
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="zipCode"
-                                        name="zipCode"
-                                        value={zipCode}
-                                        onChange={onChange}
-                                        className="w-full px-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                        placeholder="ZIP Code"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label htmlFor="country" className="block text-sm font-medium text-gray-300 mb-2">
-                                    Country
-                                </label>
+                        
+                        <div className="sm:col-span-3">
+                            <label htmlFor="gymName" className="block text-sm font-medium text-gray-300">
+                                Gym Name
+                            </label>
+                            <div className="mt-1">
                                 <input
+                                    id="gymName"
+                                    name="gymName"
                                     type="text"
-                                    id="country"
-                                    name="country"
-                                    value={country}
+                                    required
+                                    value={gymName}
                                     onChange={onChange}
-                                    className="w-full px-3 py-3 border border-gray-600 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:border-accent focus:ring-1 focus:ring-accent"
-                                    placeholder="Country"
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
                                 />
                             </div>
                         </div>
-
-                        {/* Submit Section */}
-                        <div className="pt-6 border-t border-gray-700">
-                            <div className="mb-4 text-center">
-                                <Link 
-                                    to="/login" 
-                                    className="text-sm text-accent hover:text-accent/80 font-medium"
-                                >
-                                    Already have an account?
-                                </Link>
+                        
+                        <div className="sm:col-span-3">
+                            <label htmlFor="gymSlug" className="block text-sm font-medium text-gray-300">
+                                Gym URL Slug
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="gymSlug"
+                                    name="gymSlug"
+                                    type="text"
+                                    required
+                                    value={gymSlug}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                                <p className="mt-1 text-sm text-gray-500">
+                                    This will be your gym's unique identifier in the URL
+                                </p>
                             </div>
-                            <button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full py-3 bg-accent hover:bg-accent/90 text-white rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                            >
-                                {loading ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                        Creating Gym...
-                                    </>
-                                ) : (
-                                    <>
-                                        Create Gym
-                                        <FiArrowRight />
-                                    </>
-                                )}
-                            </button>
                         </div>
-                    </form>
-                </div>
+                        
+                        {/* Admin Credentials */}
+                        <div className="sm:col-span-6">
+                            <h3 className="text-lg font-medium text-white mb-4 mt-6">Admin Credentials</h3>
+                        </div>
+                        
+                        <div className="sm:col-span-3">
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+                                Admin Email
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    autoComplete="email"
+                                    required
+                                    value={email}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="sm:col-span-3">
+                            <label htmlFor="phone" className="block text-sm font-medium text-gray-300">
+                                Phone Number
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="phone"
+                                    name="phone"
+                                    type="tel"
+                                    value={phone}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="sm:col-span-3">
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+                                Password
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    required
+                                    value={password}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="sm:col-span-3">
+                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-300">
+                                Confirm Password
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    required
+                                    value={confirmPassword}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        
+                        {/* Address Information */}
+                        <div className="sm:col-span-6">
+                            <h3 className="text-lg font-medium text-white mb-4 mt-6">Gym Address</h3>
+                        </div>
+                        
+                        <div className="sm:col-span-6">
+                            <label htmlFor="street" className="block text-sm font-medium text-gray-300">
+                                Street Address
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="street"
+                                    name="street"
+                                    type="text"
+                                    value={street}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="sm:col-span-2">
+                            <label htmlFor="city" className="block text-sm font-medium text-gray-300">
+                                City
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="city"
+                                    name="city"
+                                    type="text"
+                                    value={city}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="sm:col-span-2">
+                            <label htmlFor="state" className="block text-sm font-medium text-gray-300">
+                                State / Province
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="state"
+                                    name="state"
+                                    type="text"
+                                    value={state}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="sm:col-span-2">
+                            <label htmlFor="zipCode" className="block text-sm font-medium text-gray-300">
+                                ZIP / Postal Code
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="zipCode"
+                                    name="zipCode"
+                                    type="text"
+                                    value={zipCode}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                        
+                        <div className="sm:col-span-6">
+                            <label htmlFor="country" className="block text-sm font-medium text-gray-300">
+                                Country
+                            </label>
+                            <div className="mt-1">
+                                <input
+                                    id="country"
+                                    name="country"
+                                    type="text"
+                                    value={country}
+                                    onChange={onChange}
+                                    className="appearance-none block w-full px-3 py-2 border border-gray-700 rounded-md shadow-sm placeholder-gray-500 bg-gray-800 text-white focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                        <div className="text-sm">
+                            <Link to="/login" className="font-medium text-red-600 hover:text-red-500">
+                                Already have an account?
+                            </Link>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                        >
+                            {loading ? 'Creating Gym...' : 'Create Gym'}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     );

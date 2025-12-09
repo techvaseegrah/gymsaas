@@ -72,8 +72,8 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
     };
 
     const captureFaceEncoding = async () => {
-        if (faceEncodings.length >= 4) { // Increased to 4 captures for better accuracy
-            setCaptureMessage('Maximum of 4 photos reached for high accuracy.');
+        if (faceEncodings.length >= 5) { // Changed to 5 captures for better accuracy
+            setCaptureMessage('Maximum of 5 photos reached for high accuracy.');
             return;
         }
         
@@ -82,34 +82,53 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
         if (webcamRef.current && modelsLoaded) {
             const imageSrc = webcamRef.current.getScreenshot();
             if (imageSrc) {
-                const img = await faceapi.fetchImage(imageSrc);
+                // Create image element from base64 data
+                const img = new Image();
+                img.src = imageSrc;
                 
-                // Use higher accuracy detection settings
-                const detections = await faceapi.detectSingleFace(img, new faceapi.SsdMobilenetv1Options({
-                    minConfidence: 0.9 // Higher confidence requirement
-                }))
-                .withFaceLandmarks()
-                .withFaceDescriptor();
+                // Wait for image to load
+                img.onload = async () => {
+                    try {
+                        // Use higher accuracy detection settings
+                        const detections = await faceapi.detectSingleFace(img, new faceapi.SsdMobilenetv1Options({
+                            minConfidence: 0.9 // Higher confidence requirement
+                        }))
+                        .withFaceLandmarks()
+                        .withFaceDescriptor();
 
-                if (detections) {
-                    const faceEncoding = {
-                        encoding: Array.from(detections.descriptor),
-                        angle: `capture_${faceEncodings.length + 1}`,
-                        timestamp: new Date().toISOString()
-                    };
-                    setFaceEncodings(prev => [...prev, faceEncoding]);
-                    setCaptureMessage(`Capture ${faceEncodings.length + 1} successful!`);
-                    
-                    // Show progress
-                    if (faceEncodings.length + 1 >= 4) {
-                        setCaptureMessage('Maximum captures reached. Face registration complete for high accuracy.');
+                        if (detections) {
+                            const faceEncoding = {
+                                encoding: Array.from(detections.descriptor),
+                                angle: `capture_${faceEncodings.length + 1}`,
+                                timestamp: new Date().toISOString()
+                            };
+                            setFaceEncodings(prev => [...prev, faceEncoding]);
+                            setCaptureMessage(`Capture ${faceEncodings.length + 1} successful!`);
+                            
+                            // Show progress
+                            if (faceEncodings.length + 1 >= 5) {
+                                setCaptureMessage('Maximum captures reached. Face registration complete for high accuracy.');
+                            }
+                        } else {
+                            setCaptureMessage('No face detected. Ensure good lighting and try again.');
+                        }
+                    } catch (error) {
+                        console.error('Face detection error:', error);
+                        setCaptureMessage('Error detecting face. Please try again.');
+                    } finally {
+                        setLoading(false);
                     }
-                } else {
-                    setCaptureMessage('No face detected. Ensure good lighting and try again.');
-                }
+                };
+                
+                img.onerror = () => {
+                    setCaptureMessage('Error loading image. Please try again.');
+                    setLoading(false);
+                };
             }
+        } else {
+            setCaptureMessage('Webcam not ready or models not loaded.');
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const removeFaceEncoding = (index) => {
@@ -121,8 +140,8 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
         setLoading(true);
 
         // Enhanced validation for face encodings
-        if (faceEncodings.length > 0 && faceEncodings.length < 3) {
-            setMessage('For high accuracy, please capture at least 3 face photos or remove all to skip face registration.');
+        if (faceEncodings.length > 0 && faceEncodings.length < 5) {
+            setMessage('For high accuracy, please capture at least 5 face photos or remove all to skip face registration.');
             setIsError(true);
             setLoading(false);
             return;

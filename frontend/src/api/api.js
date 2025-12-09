@@ -1,8 +1,24 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // CORRECTED: Changed port back to 5002 to match the running backend server
-  baseURL: 'http://localhost:5002/api' 
+  baseURL: 'http://localhost:5002/api'
+});
+
+// Create a separate instance for public endpoints (like contact form)
+export const publicApi = axios.create({
+  baseURL: 'http://localhost:5002/api'
+});
+
+// Add request interceptor to publicApi to prevent caching
+publicApi.interceptors.request.use(config => {
+  // Add cache control headers to prevent caching
+  config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+  config.headers['Pragma'] = 'no-cache';
+  config.headers['Expires'] = '0';
+  
+  return config;
+}, error => {
+  return Promise.reject(error);
 });
 
 // Store refresh promise to prevent multiple concurrent refreshes
@@ -16,7 +32,6 @@ const refreshToken = async () => {
       throw new Error('No token found');
     }
     
-    // CORRECTED: Changed port back to 5002 to match the running backend server
     const response = await axios.post('http://localhost:5002/api/auth/refresh', {}, {
       headers: {
         'x-auth-token': token
@@ -27,15 +42,9 @@ const refreshToken = async () => {
     localStorage.setItem('token', newToken);
     return newToken;
   } catch (error) {
-    // If refresh fails, remove token and redirect to appropriate login page
+    // If refresh fails, remove token and redirect to login
     localStorage.removeItem('token');
-    // Check current path to determine where to redirect
-    const currentPath = window.location.pathname;
-    if (currentPath.startsWith('/superadmin')) {
-      window.location.href = '/superadmin/login';
-    } else {
-      window.location.href = '/login';
-    }
+    window.location.href = '/superadmin/login';
     throw error;
   }
 };
@@ -94,16 +103,9 @@ api.interceptors.response.use(
     // For other 401 errors, redirect to login
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      // Only redirect if we're not already on a login page
-      const currentPath = window.location.pathname;
-      const isOnLoginPage = currentPath.includes('/login') || currentPath.includes('/superadmin/login');
-      if (!isOnLoginPage) {
-        // Check if we're trying to access super admin routes
-        if (currentPath.startsWith('/superadmin')) {
-          window.location.href = '/superadmin/login';
-        } else {
-          window.location.href = '/login';
-        }
+      // Only redirect if we're not already on login page
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/superadmin/login';
       }
     }
     

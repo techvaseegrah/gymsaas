@@ -27,7 +27,7 @@ import FighterProfileUpdatePage from './pages/FighterProfileUpdatePage';
 import SubscriptionDetailsPage from './pages/SubscriptionDetailsPage';
 import GymStatsPage from './pages/GymStatsPage';
 
-// --- SUPER ADMIN PAGES (New Imports) ---
+// --- SUPER ADMIN PAGES ---
 import SuperAdminDashboardPage from './pages/SuperAdminDashboardPage';
 import SuperAdminLoginPage from './pages/SuperAdminLoginPage';
 import SuperAdminGymsPage from './pages/SuperAdminGymsPage';
@@ -36,6 +36,7 @@ import SuperAdminUsersPage from './pages/SuperAdminUsersPage';
 import SuperAdminBillingPage from './pages/SuperAdminBillingPage';
 import SuperAdminAnalyticsPage from './pages/SuperAdminAnalyticsPage';
 import SuperAdminSettingsPage from './pages/SuperAdminSettingsPage';
+import SuperAdminContactMessagesPage from './pages/SuperAdminContactMessagesPage';
 
 // Password Reset Pages
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -62,10 +63,8 @@ const App = () => {
                     setUser(data);
                 } catch (error) {
                     console.error("Session expired or token is invalid.");
-                    // Try to refresh the token
                     try {
                         await api.post('/auth/refresh');
-                        // If successful, try to get user data again
                         const { data } = await api.get('/auth/user');
                         setUser(data);
                     } catch (refreshError) {
@@ -94,33 +93,20 @@ const App = () => {
     const ProtectedRoute = ({ children, role }) => {
         const location = useLocation();
 
-        if (loading) return null; // Wait for user check
+        if (loading) return null;
 
-        // 1. If not logged in -> Login Page
         if (!user) {
-            // Try to refresh token if it exists
             const token = localStorage.getItem('token');
             if (token) {
-                // Check if we're trying to access super admin routes
-                if (location.pathname.startsWith('/superadmin')) {
-                    return <Navigate to="/superadmin/login" replace />;
-                }
-                // For all other routes, redirect to regular login
-                return <Navigate to="/login" replace />;
-            }
-            // No token, redirect to appropriate login based on path
-            if (location.pathname.startsWith('/superadmin')) {
                 return <Navigate to="/superadmin/login" replace />;
             }
             return <Navigate to="/login" replace />;
         }
         
-        // 2. If role doesn't match -> Kick out
         if (role && user.role !== role) {
             return <Navigate to="/" replace />;
         }
 
-        // 3. Fighter Specific Checks
         if (user.role === 'fighter' && !user.profile_completed) {
             if (location.pathname !== '/fighter/complete-profile') {
                 return <Navigate to="/fighter/complete-profile" replace />;
@@ -134,25 +120,34 @@ const App = () => {
         return children;
     };
 
-    // --- LAYOUTS ---
+    // --- LAYOUTS (UPDATED FOR DARK THEME) ---
 
     // 1. Regular Admin Layout (Gym Owners)
     const AdminLayout = ({ children }) => {
         const [isSidebarOpen, setSidebarOpen] = useState(false);
         const closeSidebar = () => setSidebarOpen(false);
         return (
-            <div className="relative min-h-screen bg-gray-100">
-                {isSidebarOpen && <div className="fixed inset-0 z-20 bg-black opacity-50 lg:hidden" onClick={closeSidebar}></div>}
-                <div className="lg:hidden flex justify-between items-center bg-gray-800 text-white p-4 sticky top-0 z-10">
-                    <h1 className="text-xl font-bold">Admin Panel</h1>
-                    <button onClick={() => setSidebarOpen(!isSidebarOpen)}>
+            // CHANGED: bg-gray-100 -> bg-[#0a0a0a]
+            <div className="relative min-h-screen bg-[#0a0a0a]">
+                {isSidebarOpen && <div className="fixed inset-0 z-20 bg-black/80 backdrop-blur-sm lg:hidden" onClick={closeSidebar}></div>}
+                
+                {/* Mobile Header */}
+                <div className="lg:hidden flex justify-between items-center bg-[#0a0a0a]/90 backdrop-blur-md text-white p-4 sticky top-0 z-10 border-b border-white/10">
+                    <h1 className="text-xl font-bold text-cyan-400">Combat OS</h1>
+                    <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="text-slate-300">
                         {isSidebarOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                     </button>
                 </div>
-                <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0`}>
+
+                <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-transparent text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0`}>
                     <AdminSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} user={user} />
                 </aside>
-                <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen">{children}</main>
+                
+                {/* Main Content Area */}
+                <main className="lg:ml-64 min-h-screen relative">
+                    {/* Optional: Add global background blobs here if needed for consistency */}
+                    {children}
+                </main>
                 <LogoutModal />
             </div>
         );
@@ -163,15 +158,16 @@ const App = () => {
         const [isSidebarOpen, setSidebarOpen] = useState(false);
         const closeSidebar = () => setSidebarOpen(false);
         return (
-            <div className="relative min-h-screen bg-gray-900">
-                {isSidebarOpen && <div className="fixed inset-0 z-20 bg-black opacity-50 lg:hidden" onClick={closeSidebar}></div>}
-                <div className="lg:hidden flex justify-between items-center bg-gray-800 text-white p-4 sticky top-0 z-10 border-b border-gray-700">
-                    <h1 className="text-xl font-bold">Fighter Portal</h1>
-                    <button onClick={() => setSidebarOpen(!isSidebarOpen)}>
+            // CHANGED: bg-gray-900 -> bg-[#0a0a0a]
+            <div className="relative min-h-screen bg-[#0a0a0a]">
+                {isSidebarOpen && <div className="fixed inset-0 z-20 bg-black/80 backdrop-blur-sm lg:hidden" onClick={closeSidebar}></div>}
+                <div className="lg:hidden flex justify-between items-center bg-[#0a0a0a]/90 backdrop-blur-md text-white p-4 sticky top-0 z-10 border-b border-white/10">
+                    <h1 className="text-xl font-bold text-cyan-400">Fighter Portal</h1>
+                    <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="text-slate-300">
                         {isSidebarOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                     </button>
                 </div>
-                <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-800 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 border-r border-gray-700`}>
+                <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-[#0a0a0a] text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 border-r border-white/10`}>
                     <FighterSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} user={user} />
                 </aside>
                 <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen">{children}</main>
@@ -185,33 +181,34 @@ const App = () => {
         const [isSidebarOpen, setSidebarOpen] = useState(false);
         const closeSidebar = () => setSidebarOpen(false);
         return (
-            <div className="relative min-h-screen bg-gray-900">
-                {isSidebarOpen && <div className="fixed inset-0 z-20 bg-black opacity-50 lg:hidden" onClick={closeSidebar}></div>}
-                <div className="lg:hidden flex justify-between items-center bg-gray-900 text-white p-4 sticky top-0 z-10 border-b border-gray-800">
-                    <h1 className="text-xl font-bold">Super Admin</h1>
-                    <button onClick={() => setSidebarOpen(!isSidebarOpen)}>
+            // CHANGED: bg-gray-900 -> bg-[#0a0a0a]
+            <div className="relative min-h-screen bg-[#0a0a0a]">
+                {isSidebarOpen && <div className="fixed inset-0 z-20 bg-black/80 backdrop-blur-sm lg:hidden" onClick={closeSidebar}></div>}
+                <div className="lg:hidden flex justify-between items-center bg-[#0a0a0a]/90 backdrop-blur-md text-white p-4 sticky top-0 z-10 border-b border-white/10">
+                    <h1 className="text-xl font-bold text-cyan-400">Super Admin</h1>
+                    <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="text-slate-300">
                         {isSidebarOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
                     </button>
                 </div>
-                <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-gray-900 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 border-r border-gray-800`}>
+                <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-[#0a0a0a] text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 border-r border-white/10`}>
                     <SuperAdminSidebar handleLogout={confirmLogout} closeSidebar={closeSidebar} />
                 </aside>
-                <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-800">{children}</main>
+                <main className="lg:ml-64 p-4 sm:p-6 lg:p-8 min-h-screen">{children}</main>
                 <LogoutModal />
             </div>
         );
     };
 
-    // Helper Component for Logout Modal
+    // Helper Component for Logout Modal (Dark Themed)
     const LogoutModal = () => (
         showLogoutConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-                <div className="bg-white rounded-lg p-6 w-96 text-gray-800 shadow-xl">
-                    <h3 className="text-xl font-bold mb-4">Confirm Logout</h3>
-                    <p className="mb-6">Are you sure you want to logout?</p>
-                    <div className="flex justify-end space-x-4">
-                        <button onClick={cancelLogout} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Cancel</button>
-                        <button onClick={performLogout} className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">Logout</button>
+            <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
+                <div className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-6 w-80 sm:w-96 text-white shadow-2xl">
+                    <h3 className="text-xl font-bold mb-4 text-white">Disconnect?</h3>
+                    <p className="mb-8 text-slate-400">Are you sure you want to log out of Combat OS?</p>
+                    <div className="flex justify-end space-x-3">
+                        <button onClick={cancelLogout} className="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 rounded-lg transition-colors">Cancel</button>
+                        <button onClick={performLogout} className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg transition-colors font-medium">Logout</button>
                     </div>
                 </div>
             </div>
@@ -219,7 +216,7 @@ const App = () => {
     );
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white"><h1 className="text-2xl animate-pulse">Initializing GymRatz...</h1></div>;
+        return <div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white"><div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div></div>;
     }
 
     return (
@@ -241,26 +238,14 @@ const App = () => {
                         <ProtectedRoute role="superadmin">
                             <SuperAdminLayout>
                                 <Routes>
-                                    {/* 1. Dashboard */}
                                     <Route path="dashboard" element={<SuperAdminDashboardPage />} />
-                                    
-                                    {/* 2. Gyms */}
                                     <Route path="gyms" element={<SuperAdminGymsPage />} />
                                     <Route path="gyms/create" element={<SuperAdminCreateGymPage />} />
-                                    
-                                    {/* 3. Users */}
                                     <Route path="users" element={<SuperAdminUsersPage />} />
-                                    
-                                    {/* 4. Billing */}
                                     <Route path="billing" element={<SuperAdminBillingPage />} />
-                                    
-                                    {/* 5. Settings */}
                                     <Route path="settings" element={<SuperAdminSettingsPage />} />
-                                    
-                                    {/* Analytics */}
+                                    <Route path="contact-messages" element={<SuperAdminContactMessagesPage />} />
                                     <Route path="analytics" element={<SuperAdminAnalyticsPage />} />
-                                    
-                                    {/* Redirects for legacy links or root */}
                                     <Route path="tenants*" element={<Navigate to="/superadmin/gyms" replace />} />
                                     <Route path="*" element={<Navigate to="/superadmin/dashboard" />} />
                                 </Routes>
@@ -270,7 +255,7 @@ const App = () => {
                 />
 
                 {/* --- ADMIN ROUTES --- */}
-                <Route path="/admin/dashboard" element={<ProtectedRoute role="admin"><AdminLayout><DashboardPage /></AdminLayout></ProtectedRoute>} />
+                <Route path="/admin/dashboard" element={<ProtectedRoute role="admin"><AdminLayout><AdminDashboardPage /></AdminLayout></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute role="admin"><AdminLayout><AdminDashboardPage /></AdminLayout></ProtectedRoute>} />
                 <Route path="/admin/add-fighter" element={<ProtectedRoute role="admin"><AdminLayout><AddFighterPage /></AdminLayout></ProtectedRoute>} />
                 <Route path="/admin/edit-fighter/:id" element={<ProtectedRoute role="admin"><AdminLayout><EditFighterPage /></AdminLayout></ProtectedRoute>} />

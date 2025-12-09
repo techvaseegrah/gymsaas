@@ -6,11 +6,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'primary': '#1a202c',
-        'secondary': '#2d3748',
-        'accent': '#3b82f6',
-        'neutral': '#f7fafc',
-        'base-100': '#ffffff',
+        // Updated for Dark Theme
+        'primary': '#0f172a',   // Slate-900 (Deep Dark Background) - formerly #1a202c
+        'secondary': '#1e293b', // Slate-800 (Card/Section Background) - formerly #2d3748
+        'accent': '#3b82f6',    // Blue-500 (Kept same for brand consistency)
+        'neutral': '#f7fafc',   // Slate-50 (Kept for light text/accents)
+        'base-100': '#ffffff',  // White
       },
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
