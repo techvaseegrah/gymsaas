@@ -206,10 +206,10 @@ const SuperAdminDashboardPage = () => {
         },
     };
 
-    if (loading) return <div className="min-h-screen bg-gray-900 flex items-center justify-center text-white"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div></div>;
+    if (loading) return <div className="min-h-screen flex items-center justify-center text-white"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div></div>;
 
     return (
-        <div className="min-h-screen bg-gray-900 p-6 text-white font-sans">
+        <div className="min-h-screen text-white font-sans">
             
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-gray-800 pb-6">

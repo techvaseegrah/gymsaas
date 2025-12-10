@@ -7,7 +7,7 @@ import {
 
 const SuperAdminPageTemplate = ({ title, subtitle, icon: Icon, children }) => {
     return (
-        <div className="min-h-screen bg-gray-900 p-6 text-white font-sans">
+        <div className="min-h-screen text-white font-sans">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-center mb-8">
                 <div className="flex items-center mb-4 md:mb-0">
