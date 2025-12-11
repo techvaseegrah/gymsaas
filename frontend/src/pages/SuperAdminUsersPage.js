@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SuperAdminPageTemplate from '../components/SuperAdminPageTemplate';
-import { FaUsers, FaUserShield, FaUserFriends } from 'react-icons/fa';
+import { FaUsers, FaUserShield, FaUserFriends, FaFileExcel } from 'react-icons/fa';
 import api from '../api/api';
+import { exportToExcel } from '../utils/exportUtils';
 
 const SuperAdminUsersPage = () => {
     const [admins, setAdmins] = useState([]);
@@ -51,6 +52,24 @@ const SuperAdminUsersPage = () => {
         }
     };
 
+    // --- Export Functionality ---
+    const exportUsersToExcel = () => {
+        const currentUsers = getCurrentUsers();
+        const userType = getCurrentTitle();
+        
+        const exportData = currentUsers.map(user => ({
+            'Name': user.name || 'N/A',
+            'Email': user.email,
+            'Role': user.role === 'admin' ? 'Admin' : 
+                   user.role === 'fighter' ? 'Fighter' : 'Super Admin',
+            'Gym': user.tenant?.name || 'N/A',
+            'Status': 'Active',
+            'Created At': user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'
+        }));
+        
+        exportToExcel(exportData, `${userType.toLowerCase()}-report`, `${userType} Report`);
+    };
+
     const filteredUsers = getCurrentUsers().filter(user => 
         (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -62,6 +81,7 @@ const SuperAdminUsersPage = () => {
                 title="User Management" 
                 subtitle="Manage all users across the platform"
                 icon={FaUsers}
+                onExport={exportUsersToExcel}
             >
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -75,6 +95,7 @@ const SuperAdminUsersPage = () => {
             title="User Management" 
             subtitle="Manage all users across the platform"
             icon={FaUsers}
+            onExport={exportUsersToExcel}
         >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-gradient-to-br from-purple-900/50 to-gray-800 border border-purple-500/30 p-6 rounded-2xl">
@@ -136,17 +157,25 @@ const SuperAdminUsersPage = () => {
                                 Super Admins
                             </button>
                         </div>
-                        <div className="relative w-full md:w-auto">
-                            <input 
-                                type="text" 
-                                placeholder={`Search ${getCurrentTitle()}...`} 
-                                className="bg-gray-900 border border-gray-600 text-white pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:border-purple-500 w-full"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                            <svg className="absolute left-3 top-2.5 text-gray-500" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                            </svg>
+                        <div className="flex gap-2">
+                            <button 
+                                onClick={exportUsersToExcel}
+                                className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
+                            >
+                                <FaFileExcel className="mr-2" /> Export
+                            </button>
+                            <div className="relative w-full md:w-auto">
+                                <input 
+                                    type="text" 
+                                    placeholder={`Search ${getCurrentTitle()}...`} 
+                                    className="bg-gray-900 border border-gray-600 text-white pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:border-purple-500 w-full"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                                <svg className="absolute left-3 top-2.5 text-gray-500" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>

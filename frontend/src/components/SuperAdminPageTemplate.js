@@ -5,7 +5,7 @@ import {
     FaReceipt, FaUserFriends, FaPlus, FaBan, FaCheckCircle 
 } from 'react-icons/fa';
 
-const SuperAdminPageTemplate = ({ title, subtitle, icon: Icon, children }) => {
+const SuperAdminPageTemplate = ({ title, subtitle, icon: Icon, children, onExport, exportLabel = 'Export Data' }) => {
     return (
         <div className="min-h-screen text-white font-sans">
             {/* Header */}
@@ -23,9 +23,14 @@ const SuperAdminPageTemplate = ({ title, subtitle, icon: Icon, children }) => {
                     <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors flex items-center">
                         <FaPlus className="mr-2" /> Add New
                     </button>
-                    <button className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
-                        Export Data
-                    </button>
+                    {onExport && (
+                        <button 
+                            onClick={onExport}
+                            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+                        >
+                            {exportLabel}
+                        </button>
+                    )}
                 </div>
             </div>
 

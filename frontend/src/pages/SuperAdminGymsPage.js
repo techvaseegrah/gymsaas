@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import SuperAdminPageTemplate from '../components/SuperAdminPageTemplate';
-import { FaBuilding, FaCheckCircle, FaBan, FaPlus, FaEdit, FaTimes } from 'react-icons/fa';
+import { FaBuilding, FaCheckCircle, FaBan, FaPlus, FaEdit, FaTimes, FaFileExcel } from 'react-icons/fa';
 import api from '../api/api';
 import { useNavigate } from 'react-router-dom';
+import { exportToExcel } from '../utils/exportUtils';
 
 const SuperAdminGymsPage = () => {
     const [gyms, setGyms] = useState([]);
@@ -54,6 +55,22 @@ const SuperAdminGymsPage = () => {
         }
     };
 
+    // --- Export Functionality ---
+    const exportGymsToExcel = () => {
+        const exportData = gyms.map(gym => ({
+            'Gym Name': gym.name,
+            'Slug': gym.slug,
+            'Members': gym.memberCount || 0,
+            'Email': gym.email,
+            'Phone': gym.phone || '',
+            'Plan': gym.subscriptionPlan,
+            'Status': gym.isActive ? 'Active' : 'Suspended',
+            'Created At': new Date(gym.createdAt).toLocaleDateString()
+        }));
+        
+        exportToExcel(exportData, 'gyms-report', 'Gyms');
+    };
+
     // --- Edit Functions ---
     const handleEditClick = (gym) => {
         setSelectedGym(gym);
@@ -98,7 +115,7 @@ const SuperAdminGymsPage = () => {
 
     if (loading) {
         return (
-            <SuperAdminPageTemplate title="Gym Management" subtitle="Manage all gyms" icon={FaBuilding}>
+            <SuperAdminPageTemplate title="Gym Management" subtitle="Manage all gyms" icon={FaBuilding} onExport={exportGymsToExcel}>
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
                 </div>
@@ -107,7 +124,7 @@ const SuperAdminGymsPage = () => {
     }
 
     return (
-        <SuperAdminPageTemplate title="Gym Management" subtitle="Manage all gyms in the platform" icon={FaBuilding}>
+        <SuperAdminPageTemplate title="Gym Management" subtitle="Manage all gyms in the platform" icon={FaBuilding} onExport={exportGymsToExcel}>
             
             {/* Top Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -148,6 +165,12 @@ const SuperAdminGymsPage = () => {
                                 <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
                             </svg>
                         </div>
+                        <button 
+                            onClick={exportGymsToExcel}
+                            className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
+                        >
+                            <FaFileExcel className="mr-2" /> Export
+                        </button>
                         <button 
                             onClick={() => navigate('/superadmin/gyms/create')}
                             className="flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold transition-colors shadow-lg shadow-purple-900/50"

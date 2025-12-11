@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import SuperAdminPageTemplate from '../components/SuperAdminPageTemplate';
-import { FaMoneyBillWave, FaCreditCard, FaReceipt, FaEye, FaFileInvoice, FaTimes, FaSearch, FaCalendarAlt } from 'react-icons/fa';
+import { FaMoneyBillWave, FaCreditCard, FaReceipt, FaEye, FaFileInvoice, FaTimes, FaSearch, FaCalendarAlt, FaFileExcel } from 'react-icons/fa';
 import api from '../api/api';
+import { exportToExcel } from '../utils/exportUtils';
 
 const SuperAdminBillingPage = () => {
     const [subscriptions, setSubscriptions] = useState([]);
@@ -31,6 +32,21 @@ const SuperAdminBillingPage = () => {
         }
     };
 
+    // --- Export Functionality ---
+    const exportBillingToExcel = () => {
+        const exportData = subscriptions.map(sub => ({
+            'Gym Name': sub.tenant?.name || 'Unknown Gym',
+            'Plan': sub.planName,
+            'Amount': `₹${sub.amount}`,
+            'Start Date': new Date(sub.startDate).toLocaleDateString(),
+            'End Date': new Date(sub.endDate).toLocaleDateString(),
+            'Status': sub.status,
+            'Transaction ID': sub.transactionId || 'N/A'
+        }));
+        
+        exportToExcel(exportData, 'billing-report', 'Billing Report');
+    };
+
     // --- Fetch History for a specific Tenant ---
     const handleViewHistory = async (tenantId, gymName) => {
         setSelectedGymName(gymName);
@@ -58,7 +74,7 @@ const SuperAdminBillingPage = () => {
 
     if (loading) {
         return (
-            <SuperAdminPageTemplate title="Billing & Revenue" subtitle="Manage subscriptions" icon={FaMoneyBillWave}>
+            <SuperAdminPageTemplate title="Billing & Revenue" subtitle="Manage subscriptions" icon={FaMoneyBillWave} onExport={exportBillingToExcel}>
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
                 </div>
@@ -71,6 +87,7 @@ const SuperAdminBillingPage = () => {
             title="Billing & Revenue" 
             subtitle="Manage subscriptions and payments across all gyms"
             icon={FaMoneyBillWave}
+            onExport={exportBillingToExcel}
         >
             {/* Top Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -113,15 +130,23 @@ const SuperAdminBillingPage = () => {
             <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
                 <div className="p-6 border-b border-gray-700 flex flex-col md:flex-row justify-between items-center gap-4">
                     <h2 className="text-xl font-bold text-gray-200">Recent Transactions</h2>
-                    <div className="relative w-full md:w-auto">
-                        <input 
-                            type="text" 
-                            placeholder="Search gym or plan..." 
-                            className="w-full md:w-64 bg-gray-900 border border-gray-600 text-white pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:border-purple-500"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                        <FaSearch className="absolute left-3 top-3 text-gray-500" />
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={exportBillingToExcel}
+                            className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
+                        >
+                            <FaFileExcel className="mr-2" /> Export
+                        </button>
+                        <div className="relative w-full md:w-auto">
+                            <input 
+                                type="text" 
+                                placeholder="Search gym or plan..." 
+                                className="w-full md:w-64 bg-gray-900 border border-gray-600 text-white pl-10 pr-4 py-2 rounded-lg focus:outline-none focus:border-purple-500"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <FaSearch className="absolute left-3 top-3 text-gray-500" />
+                        </div>
                     </div>
                 </div>
                 

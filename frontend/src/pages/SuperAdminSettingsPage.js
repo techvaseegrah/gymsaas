@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import SuperAdminPageTemplate from '../components/SuperAdminPageTemplate';
 import { FaCogs } from 'react-icons/fa';
 import api from '../api/api';
+import { exportToExcel } from '../utils/exportUtils';
 
 const SuperAdminSettingsPage = () => {
     const [settings, setSettings] = useState({
@@ -62,12 +63,28 @@ const SuperAdminSettingsPage = () => {
         }
     };
 
+    const handleExportSettings = () => {
+        const exportData = [{
+            'Platform Name': settings.platformName,
+            'Support Email': settings.supportEmail,
+            'Maintenance Mode': settings.maintenanceMode ? 'On' : 'Off',
+            'Automatic Backups': settings.autoBackup ? 'On' : 'Off',
+            'Notification Emails': settings.notificationEmails ? 'On' : 'Off',
+            'Version': settings.version,
+            'Last Backup': settings.lastBackup,
+            'Uptime': settings.uptime
+        }];
+
+        exportToExcel(exportData, 'system-settings', 'Settings');
+    };
+
     if (loading) {
         return (
             <SuperAdminPageTemplate 
                 title="System Settings" 
                 subtitle="Configure platform-wide settings"
                 icon={FaCogs}
+                onExport={handleExportSettings}
             >
                 <div className="flex justify-center items-center h-64">
                     <div className="text-gray-400">Loading settings...</div>
@@ -81,6 +98,7 @@ const SuperAdminSettingsPage = () => {
             title="System Settings" 
             subtitle="Configure platform-wide settings"
             icon={FaCogs}
+            onExport={handleExportSettings}
         >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">

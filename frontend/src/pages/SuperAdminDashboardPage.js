@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/api';
+import { exportToExcel } from '../utils/exportUtils';
 import { 
     FaBuilding, FaUsers, FaChartLine, FaBan, FaCheckCircle, 
     FaMoneyBillWave, FaCogs, FaSearch, FaFileInvoiceDollar 
@@ -77,6 +78,17 @@ const SuperAdminDashboardPage = () => {
     const filteredTenants = tenants.filter(t => 
         t.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const handleExportDashboard = () => {
+        const summary = [
+            { Metric: 'Total Gyms', Value: stats?.totalTenants ?? 0 },
+            { Metric: 'Total Fighters', Value: stats?.totalFighters ?? 0 },
+            { Metric: 'Monthly Revenue (MRR)', Value: stats?.mmr ?? 0 },
+            { Metric: 'Active Subscriptions', Value: subscriptions?.length ?? 0 }
+        ];
+
+        exportToExcel(summary, 'superadmin-dashboard', 'Overview');
+    };
 
     // Process revenue trends data for the chart
     const processRevenueTrendsData = () => {
@@ -212,7 +224,7 @@ const SuperAdminDashboardPage = () => {
         <div className="min-h-screen text-white font-sans">
             
             {/* Header */}
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-gray-800 pb-6">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-3 mb-8 border-b border-gray-800 pb-6">
                 <div>
                     <h1 className="text-3xl font-bold tracking-wide flex items-center gap-3">
                         <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center text-sm">GR</div>
@@ -220,10 +232,19 @@ const SuperAdminDashboardPage = () => {
                     </h1>
                     <p className="text-gray-400 text-sm mt-1">Platform Overview & Management</p>
                 </div>
-                <div className="flex gap-2 bg-gray-800 p-1 rounded-lg mt-4 md:mt-0">
-                    <button type="button" onClick={() => setActiveTab('overview')} className={`px-4 py-2 rounded-md text-sm font-bold transition ${activeTab === 'overview' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}>Overview</button>
-                    <button type="button" onClick={() => setActiveTab('tenants')} className={`px-4 py-2 rounded-md text-sm font-bold transition ${activeTab === 'tenants' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}>Gyms</button>
-                    <button type="button" onClick={() => setActiveTab('subscriptions')} className={`px-4 py-2 rounded-md text-sm font-bold transition ${activeTab === 'subscriptions' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}>Revenue</button>
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-2 md:gap-3 mt-4 md:mt-0">
+                    <button
+                        type="button"
+                        onClick={handleExportDashboard}
+                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold transition-colors"
+                    >
+                        Export Data
+                    </button>
+                    <div className="flex gap-2 bg-gray-800 p-1 rounded-lg">
+                        <button type="button" onClick={() => setActiveTab('overview')} className={`px-4 py-2 rounded-md text-sm font-bold transition ${activeTab === 'overview' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}>Overview</button>
+                        <button type="button" onClick={() => setActiveTab('tenants')} className={`px-4 py-2 rounded-md text-sm font-bold transition ${activeTab === 'tenants' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}>Gyms</button>
+                        <button type="button" onClick={() => setActiveTab('subscriptions')} className={`px-4 py-2 rounded-md text-sm font-bold transition ${activeTab === 'subscriptions' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}>Revenue</button>
+                    </div>
                 </div>
             </div>
 
