@@ -65,7 +65,7 @@ const SuperAdminGymsPage = () => {
             'Phone': gym.phone || '',
             'Plan': gym.subscriptionPlan,
             'Status': gym.isActive ? 'Active' : 'Suspended',
-            'Created At': new Date(gym.createdAt).toLocaleDateString()
+            'Created At': gym.createdAt ? new Date(gym.createdAt).toLocaleDateString() : 'N/A'
         }));
         
         exportToExcel(exportData, 'gyms-report', 'Gyms');
@@ -115,7 +115,7 @@ const SuperAdminGymsPage = () => {
 
     if (loading) {
         return (
-            <SuperAdminPageTemplate title="Gym Management" subtitle="Manage all gyms" icon={FaBuilding} onExport={exportGymsToExcel}>
+            <SuperAdminPageTemplate title="Gym Management" subtitle="Manage all gyms" icon={FaBuilding} showAddNew={false}>
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
                 </div>
@@ -124,7 +124,7 @@ const SuperAdminGymsPage = () => {
     }
 
     return (
-        <SuperAdminPageTemplate title="Gym Management" subtitle="Manage all gyms in the platform" icon={FaBuilding} onExport={exportGymsToExcel}>
+        <SuperAdminPageTemplate title="Gym Management" subtitle="Manage all gyms in the platform" icon={FaBuilding} showAddNew={false}>
             
             {/* Top Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

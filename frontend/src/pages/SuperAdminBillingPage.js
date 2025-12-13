@@ -41,6 +41,7 @@ const SuperAdminBillingPage = () => {
             'Start Date': new Date(sub.startDate).toLocaleDateString(),
             'End Date': new Date(sub.endDate).toLocaleDateString(),
             'Status': sub.status,
+            'Created At': sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : 'N/A',
             'Transaction ID': sub.transactionId || 'N/A'
         }));
         
@@ -74,7 +75,12 @@ const SuperAdminBillingPage = () => {
 
     if (loading) {
         return (
-            <SuperAdminPageTemplate title="Billing & Revenue" subtitle="Manage subscriptions" icon={FaMoneyBillWave} onExport={exportBillingToExcel}>
+            <SuperAdminPageTemplate 
+                title="Billing & Revenue" 
+                subtitle="Manage subscriptions"
+                icon={FaMoneyBillWave}
+                showAddNew={false}
+            >
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
                 </div>
@@ -87,7 +93,7 @@ const SuperAdminBillingPage = () => {
             title="Billing & Revenue" 
             subtitle="Manage subscriptions and payments across all gyms"
             icon={FaMoneyBillWave}
-            onExport={exportBillingToExcel}
+            showAddNew={false}
         >
             {/* Top Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

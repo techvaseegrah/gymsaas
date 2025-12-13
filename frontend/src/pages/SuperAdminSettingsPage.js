@@ -63,46 +63,53 @@ const SuperAdminSettingsPage = () => {
         }
     };
 
-    const handleExportSettings = () => {
-        const exportData = [{
-            'Platform Name': settings.platformName,
-            'Support Email': settings.supportEmail,
-            'Maintenance Mode': settings.maintenanceMode ? 'On' : 'Off',
-            'Automatic Backups': settings.autoBackup ? 'On' : 'Off',
-            'Notification Emails': settings.notificationEmails ? 'On' : 'Off',
-            'Version': settings.version,
-            'Last Backup': settings.lastBackup,
-            'Uptime': settings.uptime
-        }];
-
-        exportToExcel(exportData, 'system-settings', 'Settings');
-    };
+    // Remove the handleExportSettings function since we're removing export option
 
     if (loading) {
         return (
-            <SuperAdminPageTemplate 
-                title="System Settings" 
-                subtitle="Configure platform-wide settings"
-                icon={FaCogs}
-                onExport={handleExportSettings}
-            >
-                <div className="flex justify-center items-center h-64">
-                    <div className="text-gray-400">Loading settings...</div>
+            <div className="min-h-screen text-white font-sans p-6">
+                {/* Custom Header without Add New and Export buttons */}
+                <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+                    <div className="flex items-center mb-4 md:mb-0">
+                        <div className="p-3 bg-purple-600 rounded-lg mr-4">
+                            <FaCogs size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold tracking-wide">System Settings</h1>
+                            <p className="text-purple-400 text-sm">Configure platform-wide settings</p>
+                        </div>
+                    </div>
+                    {/* Removed Add New and Export buttons */}
                 </div>
-            </SuperAdminPageTemplate>
+                
+                <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                    <div className="flex justify-center items-center h-64">
+                        <div className="text-gray-400">Loading settings...</div>
+                    </div>
+                </div>
+            </div>
         );
     }
 
     return (
-        <SuperAdminPageTemplate 
-            title="System Settings" 
-            subtitle="Configure platform-wide settings"
-            icon={FaCogs}
-            onExport={handleExportSettings}
-        >
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2">
-                    <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+        <div className="min-h-screen text-white font-sans p-6">
+            {/* Custom Header without Add New and Export buttons */}
+            <div className="flex flex-col md:flex-row justify-between items-center mb-8">
+                <div className="flex items-center mb-4 md:mb-0">
+                    <div className="p-3 bg-purple-600 rounded-lg mr-4">
+                        <FaCogs size={24} />
+                    </div>
+                    <div>
+                        <h1 className="text-3xl font-bold tracking-wide">System Settings</h1>
+                        <p className="text-purple-400 text-sm">Configure platform-wide settings</p>
+                    </div>
+                </div>
+                {/* Removed Add New and Export buttons */}
+            </div>
+            
+            <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
                         <h3 className="text-lg font-bold mb-6 text-gray-200">General Settings</h3>
                         {message && (
                             <div className={`mb-4 p-3 rounded-lg ${message.includes('Failed') ? 'bg-red-900/30 text-red-200' : 'bg-green-900/30 text-green-200'}`}>
@@ -188,44 +195,44 @@ const SuperAdminSettingsPage = () => {
                             </div>
                         </form>
                     </div>
-                </div>
-                
-                <div>
-                    <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 mb-6">
-                        <h3 className="text-lg font-bold mb-4 text-gray-200">System Info</h3>
-                        <div className="space-y-4">
-                            <div>
-                                <p className="text-gray-400 text-sm">Version</p>
-                                <p className="text-white font-medium">{settings.version}</p>
-                            </div>
-                            <div>
-                                <p className="text-gray-400 text-sm">Last Backup</p>
-                                <p className="text-white font-medium">{settings.lastBackup}</p>
-                            </div>
-                            <div>
-                                <p className="text-gray-400 text-sm">Uptime</p>
-                                <p className="text-green-400 font-medium">{settings.uptime}</p>
+                    
+                    <div>
+                        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6 mb-6">
+                            <h3 className="text-lg font-bold mb-4 text-gray-200">System Info</h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <p className="text-gray-400 text-sm">Version</p>
+                                    <p className="text-white font-medium">{settings.version}</p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-400 text-sm">Last Backup</p>
+                                    <p className="text-white font-medium">{settings.lastBackup}</p>
+                                </div>
+                                <div>
+                                    <p className="text-gray-400 text-sm">Uptime</p>
+                                    <p className="text-green-400 font-medium">{settings.uptime}</p>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
-                        <h3 className="text-lg font-bold mb-4 text-gray-200">Quick Actions</h3>
-                        <div className="space-y-3">
-                            <button className="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-left">
-                                Clear Cache
-                            </button>
-                            <button className="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-left">
-                                Run Diagnostics
-                            </button>
-                            <button className="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-left">
-                                Restart Services
-                            </button>
+                        
+                        <div className="bg-gray-800 rounded-xl border border-gray-700 p-6">
+                            <h3 className="text-lg font-bold mb-4 text-gray-200">Quick Actions</h3>
+                            <div className="space-y-3">
+                                <button className="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-left">
+                                    Clear Cache
+                                </button>
+                                <button className="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-left">
+                                    Run Diagnostics
+                                </button>
+                                <button className="w-full px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors text-left">
+                                    Restart Services
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </SuperAdminPageTemplate>
+        </div>
     );
 };
 

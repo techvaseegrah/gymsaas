@@ -273,7 +273,7 @@ const AdminAttendancePage = () => {
                             <span>-</span>
                             <input type="date" value={dateFilter.endDate} onChange={e=>setDateFilter({...dateFilter, endDate:e.target.value})} className="border p-1 rounded" />
                             <div className="flex gap-2 ml-auto">
-                                <button onClick={() => exportToExcel(formatAttendanceDataForExport(fighterAttendance), 'report')} className="bg-green-100 text-green-700 px-3 py-1 rounded font-bold text-sm"><FaFileExcel /> Excel</button>
+                                <button onClick={() => exportToExcel(formatAttendanceDataForExport(fighterAttendance), 'report')} className="bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"><FaFileExcel /> Excel</button>
                                 <button onClick={() => exportToPDF(formatAttendanceDataForExport(fighterAttendance), [], 'report')} className="bg-red-100 text-red-700 px-3 py-1 rounded font-bold text-sm"><FaFilePdf /> PDF</button>
                             </div>
                         </div>

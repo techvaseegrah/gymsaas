@@ -3,7 +3,8 @@ import api from '../api/api';
 import { exportToExcel } from '../utils/exportUtils';
 import { 
     FaBuilding, FaUsers, FaChartLine, FaBan, FaCheckCircle, 
-    FaMoneyBillWave, FaCogs, FaSearch, FaFileInvoiceDollar 
+    FaMoneyBillWave, FaCogs, FaSearch, FaFileInvoiceDollar,
+    FaFileExcel
 } from 'react-icons/fa';
 
 // --- CHART IMPORTS ---
@@ -236,9 +237,9 @@ const SuperAdminDashboardPage = () => {
                     <button
                         type="button"
                         onClick={handleExportDashboard}
-                        className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-bold transition-colors"
+                        className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"
                     >
-                        Export Data
+                        <FaFileExcel className="mr-2" /> Export
                     </button>
                     <div className="flex gap-2 bg-gray-800 p-1 rounded-lg">
                         <button type="button" onClick={() => setActiveTab('overview')} className={`px-4 py-2 rounded-md text-sm font-bold transition ${activeTab === 'overview' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'}`}>Overview</button>

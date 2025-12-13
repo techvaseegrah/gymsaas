@@ -81,7 +81,7 @@ const SuperAdminUsersPage = () => {
                 title="User Management" 
                 subtitle="Manage all users across the platform"
                 icon={FaUsers}
-                onExport={exportUsersToExcel}
+                showAddNew={false}
             >
                 <div className="flex justify-center items-center h-64">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -95,7 +95,7 @@ const SuperAdminUsersPage = () => {
             title="User Management" 
             subtitle="Manage all users across the platform"
             icon={FaUsers}
-            onExport={exportUsersToExcel}
+            showAddNew={false}
         >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-gradient-to-br from-purple-900/50 to-gray-800 border border-purple-500/30 p-6 rounded-2xl">
