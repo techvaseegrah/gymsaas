@@ -67,6 +67,8 @@ app.use('/api/superadmin', require('./routes/superadmin'));
 // NEW: Gym Stats Route
 app.use('/api/gym-stats', require('./routes/gymStats'));
 
+// Contact Form Route
+app.use('/api/contact', require('./routes/contact'));
 // Global error handler
 app.use((err, req, res, next) => {
   console.error('Global error:', err.stack);

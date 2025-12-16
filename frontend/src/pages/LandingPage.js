@@ -207,9 +207,13 @@ const LandingPage = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.phone && !/^\+91\s?[6-9]\d{9}$/.test(formData.phone.replace(/\s/g, ''))) {
-            setSubmitError('Please enter a valid Indian phone number (+91 followed by 10 digits)');
-            return;
+        if (formData.phone) {
+            // More flexible phone number validation
+            const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+            if (!phoneRegex.test(formData.phone.replace(/[\s\-\(\)]/g, ''))) {
+                setSubmitError('Please enter a valid phone number (up to 15 digits, optional + prefix)');
+                return;
+            }
         }
         setIsSubmitting(true);
         setSubmitError('');
@@ -225,7 +229,6 @@ const LandingPage = () => {
             setIsSubmitting(false);
         }
     };
-
     return (
         <div className="bg-slate-950 text-slate-300 min-h-screen relative font-sans selection:bg-accent selection:text-white">
             
