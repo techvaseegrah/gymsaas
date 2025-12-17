@@ -57,20 +57,27 @@ const SuperAdminUsersPage = () => {
         const currentUsers = getCurrentUsers();
         const userType = getCurrentTitle();
         
-        const exportData = currentUsers.map(user => ({
-            'Name': user.name || 'N/A',
-            'Email': user.email,
-            'Role': user.role === 'admin' ? 'Admin' : 
-                   user.role === 'fighter' ? 'Fighter' : 'Super Admin',
-            'Gym': user.tenant?.name || 'N/A',
-            'Status': 'Active',
-            'Created At': user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'
-        }));
+        const exportData = currentUsers.map(user => {
+            const baseData = {
+                'Name': user.name || 'N/A',
+                'Email': user.email,
+                'Role': user.role === 'admin' ? 'Admin' : 
+                       user.role === 'fighter' ? 'Fighter' : 'Super Admin',
+                'Gym': user.tenant?.name || 'N/A',
+                'Status': 'Active',
+                'Created At': user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'
+            };
+            
+            // Add RFID for fighters
+            if (user.role === 'fighter') {
+                baseData['RFID'] = user.rfid || 'N/A';
+            }
+            
+            return baseData;
+        });
         
         exportToExcel(exportData, `${userType.toLowerCase()}-report`, `${userType} Report`);
-    };
-
-    const filteredUsers = getCurrentUsers().filter(user => 
+    };    const filteredUsers = getCurrentUsers().filter(user => 
         (user.name && user.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
         (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()))
     );
@@ -186,6 +193,7 @@ const SuperAdminUsersPage = () => {
                             <th className="p-4">Email</th>
                             <th className="p-4">Role</th>
                             <th className="p-4">Gym</th>
+                            {activeTab === 'fighters' && <th className="p-4">RFID</th>}
                             <th className="p-4">Status</th>
                             <th className="p-4 text-right">Actions</th>
                         </tr>
@@ -206,6 +214,7 @@ const SuperAdminUsersPage = () => {
                                     </span>
                                 </td>
                                 <td className="p-4">{user.tenant?.name || 'N/A'}</td>
+                                {activeTab === 'fighters' && <td className="p-4 font-mono text-sm">{user.rfid || 'N/A'}</td>}
                                 <td className="p-4">
                                     <span className="px-2 py-1 rounded text-xs font-bold bg-green-900/50 text-green-400">
                                         Active
