@@ -171,34 +171,34 @@ const EditFighter = () => {
     };
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading fighter data for editing...</div>;
+        return <div className="p-8 text-center text-slate-400">Loading fighter data for editing...</div>;
     }
 
     return (
-        <div className="p-4 md:p-8 max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold mb-6 text-center text-red-600">Edit Fighter</h2>
-            <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-6">
+        <div className="p-4 md:p-8 max-w-3xl mx-auto bg-[#0a0a0a] min-h-screen">
+            <h2 className="text-3xl font-bold mb-6 text-center text-white">Edit Fighter</h2>
+            <form onSubmit={handleSubmit} className="bg-[#1a1a1a] p-6 rounded-lg border border-white/10 space-y-6">
                 {message && (
-                    <div className={`p-3 rounded-md text-sm ${isError ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                    <div className={`p-3 rounded-md text-sm ${isError ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-green-500/10 text-green-400 border border-green-500/20'}`}>
                         {message}
                     </div>
                 )}
                 <div>
-                    <label className="block text-gray-700">Fighter Name</label>
-                    <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                    <label className="block text-slate-400">Fighter Name</label>
+                    <input type="text" name="name" value={formData.name} onChange={handleChange} className="w-full px-3 py-2 border border-white/10 bg-[#222222] text-white rounded-md" required />
                 </div>
                 <div>
-                    <label className="block text-gray-700">Batch Number</label>
-                    <input type="text" name="fighterBatchNo" value={formData.fighterBatchNo} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                    <label className="block text-slate-400">Batch Number</label>
+                    <input type="text" name="fighterBatchNo" value={formData.fighterBatchNo} onChange={handleChange} className="w-full px-3 py-2 border border-white/10 bg-[#222222] text-white rounded-md" required />
                 </div>
                 <div>
-                    <label className="block text-gray-700">Email (for login)</label>
-                    <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required />
+                    <label className="block text-slate-400">Email (for login)</label>
+                    <input type="email" name="email" value={formData.email} onChange={handleChange} className="w-full px-3 py-2 border border-white/10 bg-[#222222] text-white rounded-md" required />
                 </div>
                 
                 {/* Profile Photo Upload */}
                 <div>
-                    <label className="block text-gray-700 mb-2">Profile Photo</label>
+                    <label className="block text-slate-400 mb-2">Profile Photo</label>
                     {(existingProfilePhoto || profilePhoto) && (
                         <div className="mb-2">
                             <img 
@@ -218,25 +218,25 @@ const EditFighter = () => {
                             name="profilePhoto" 
                             accept=".jpg,.jpeg,.png"
                             onChange={handleProfilePhotoChange}
-                            className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                            className="w-full pl-10 pr-4 py-2 border border-white/10 bg-[#222222] text-white rounded-md focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-500/10 file:text-red-400 hover:file:bg-red-500/20"
                         />
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">JPG, JPEG, or PNG format</p>
+                    <p className="text-sm text-slate-400 mt-1">JPG, JPEG, or PNG format</p>
                 </div>
                 
                 {/* Face Recognition Section */}
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <div className="bg-[#1a1a1a] rounded-xl p-6 border border-white/10">
                     <div className="flex items-center mb-4">
-                        <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                            <FaUserCircle className="text-blue-600" />
+                        <div className="bg-blue-500/10 p-2 rounded-lg mr-3">
+                            <FaUserCircle className="text-blue-400" />
                         </div>
-                        <h3 className="text-xl font-bold text-gray-800">Face Recognition Setup</h3>
-                        <span className="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                        <h3 className="text-xl font-bold text-white">Face Recognition Setup</h3>
+                        <span className="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
                             {existingFaceEncodings.length > 0 ? 'Enrolled' : 'Optional'}
                         </span>
                     </div>
                     
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-slate-400 mb-4">
                         {existingFaceEncodings.length > 0 
                             ? `This fighter currently has ${existingFaceEncodings.length} face photos enrolled. You can update these by capturing new photos below.`
                             : "Capture clear images of the fighter's face for attendance recognition. This will enable face recognition for attendance tracking."}
@@ -244,7 +244,7 @@ const EditFighter = () => {
                     
                     <div className="flex flex-col lg:flex-row items-center gap-6 mb-4">
                         <div className="w-full lg:w-64">
-                            <div className="rounded-xl overflow-hidden border-2 border-gray-300 shadow-md">
+                            <div className="rounded-xl overflow-hidden border-2 border-white/10 bg-black">
                                 <Webcam
                                     audio={false}
                                     ref={webcamRef}
@@ -255,7 +255,7 @@ const EditFighter = () => {
                                 />
                             </div>
                             <div className="mt-2 text-center">
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-slate-400">
                                     Position face in the center of the frame
                                 </p>
                             </div>
@@ -265,7 +265,7 @@ const EditFighter = () => {
                             <button
                                 type="button"
                                 onClick={captureFaceEncoding}
-                                className="w-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-300 disabled:opacity-50 shadow-md"
+                                className="w-full flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-2 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-300 disabled:opacity-50 shadow-md shadow-blue-500/20"
                                 disabled={loading || !modelsLoaded || faceEncodings.length >= 5}
                             >
                                 <FaCamera className="mr-2" />
@@ -273,20 +273,20 @@ const EditFighter = () => {
                             </button>
                             
                             <div className="mt-3">
-                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                <div className="w-full bg-[#222222] rounded-full h-2">
                                     <div 
-                                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                                        className="bg-blue-500 h-2 rounded-full transition-all duration-300" 
                                         style={{ width: `${(faceEncodings.length / 5) * 100}%` }}
                                     ></div>
                                 </div>
-                                <div className="flex justify-between text-sm text-gray-600 mt-1">
+                                <div className="flex justify-between text-sm text-slate-400 mt-1">
                                     <span>Progress</span>
                                     <span>{faceEncodings.length}/5 captures</span>
                                 </div>
                             </div>
                             
                             <div className="mt-2 text-center">
-                                <p className={`text-sm ${captureMessage.includes('successful') ? 'text-green-600' : captureMessage.includes('No face') ? 'text-red-600' : 'text-gray-600'}`}>
+                                <p className={`text-sm ${captureMessage.includes('successful') ? 'text-green-400' : captureMessage.includes('No face') ? 'text-red-400' : 'text-slate-400'}`}>
                                     {captureMessage || "Position face in the center and capture."}
                                 </p>
                             </div>
@@ -296,12 +296,12 @@ const EditFighter = () => {
                     {/* Display captured face encodings */}
                     {faceEncodings.length > 0 && (
                         <div className="mt-4">
-                            <h4 className="font-medium text-gray-700 mb-2">Captured Photos:</h4>
+                            <h4 className="font-medium text-slate-400 mb-2">Captured Photos:</h4>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
                                 {faceEncodings.map((encoding, index) => (
                                     <div key={index} className="relative group">
-                                        <div className="bg-gradient-to-br from-blue-100 to-blue-200 border-2 border-dashed border-blue-300 rounded-lg w-14 h-14 flex items-center justify-center shadow-sm">
-                                            <span className="text-md font-bold text-blue-700">{index + 1}</span>
+                                        <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-2 border-dashed border-blue-500/30 rounded-lg w-14 h-14 flex items-center justify-center shadow-sm">
+                                            <span className="text-md font-bold text-blue-400">{index + 1}</span>
                                         </div>
                                         <button
                                             type="button"
@@ -318,7 +318,7 @@ const EditFighter = () => {
                     )}
                 </div>
                 
-                <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300">Save Changes</button>
+                <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition duration-300 shadow-sm shadow-blue-500/20">Save Changes</button>
             </form>
         </div>
     );

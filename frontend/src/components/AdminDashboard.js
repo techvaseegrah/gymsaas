@@ -48,16 +48,16 @@ const AdminDashboard = () => {
     };
 
     if (loading) {
-        return <div className="p-8 text-center text-gray-500">Loading fighter roster...</div>;
+        return <div className="p-8 text-center text-slate-400">Loading fighter roster...</div>;
     }
 
     return (
-        <div className="p-4 md:p-8">
+        <div className="p-4 md:p-8 bg-[#0a0a0a] min-h-screen">
             <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">View Fighters</h2>
+                <h2 className="text-2xl font-bold text-white">View Fighters</h2>
                 <button 
                     onClick={() => setShowAddModal(true)}
-                    className="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition flex items-center"
+                    className="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition flex items-center shadow-sm shadow-red-500/20"
                 >
                     <FaUserPlus className="mr-2" />
                     Add Fighter
@@ -65,12 +65,12 @@ const AdminDashboard = () => {
             </div>
             
             {fighters.length === 0 ? (
-                <p className="text-gray-600 text-center">No fighters registered yet. Add a new fighter to get started.</p>
+                <p className="text-slate-400 text-center">No fighters registered yet. Add a new fighter to get started.</p>
             ) : (
-                <div className="overflow-x-auto bg-white rounded-lg shadow">
+                <div className="overflow-x-auto bg-[#1a1a1a] rounded-lg border border-white/10">
                     <table className="min-w-full">
                         <thead>
-                            <tr className="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                            <tr className="bg-[#222222] text-slate-400 uppercase text-sm leading-normal">
                                 <th className="py-3 px-6 text-left">Name</th>
                                 <th className="py-3 px-6 text-left">Batch No.</th>
                                 {/* --- Start of New Code --- */}
@@ -81,29 +81,29 @@ const AdminDashboard = () => {
                                 <th className="py-3 px-6 text-center">Actions</th>
                             </tr>
                         </thead>
-                        <tbody className="text-gray-700 text-sm font-light">
+                        <tbody className="text-slate-300 text-sm font-light">
                             {fighters.map(fighter => (
-                                <tr key={fighter._id} className="border-b border-gray-200 hover:bg-gray-100">
-                                    <td className="py-3 px-6 whitespace-nowrap">{fighter.name}</td>
-                                    <td className="py-3 px-6">{fighter.fighterBatchNo}</td>
+                                <tr key={fighter._id} className="border-b border-white/10 hover:bg-white/5">
+                                    <td className="py-3 px-6 whitespace-nowrap text-white">{fighter.name}</td>
+                                    <td className="py-3 px-6 text-white">{fighter.fighterBatchNo}</td>
                                     {/* --- Start of New Code --- */}
-                                    <td className="py-3 px-6">{fighter.rfid}</td>
+                                    <td className="py-3 px-6 text-slate-400">{fighter.rfid}</td>
                                     {/* --- End of New Code --- */}
-                                    <td className="py-3 px-6">{fighter.email}</td>
+                                    <td className="py-3 px-6 text-slate-400">{fighter.email}</td>
                                     <td className="py-3 px-6 text-center">
-                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${fighter.profile_completed ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'}`}>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${fighter.profile_completed ? 'bg-green-500/20 text-green-400 border border-green-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}>
                                             {fighter.profile_completed ? 'Completed' : 'Pending'}
                                         </span>
                                     </td>
                                     <td className="py-3 px-6 text-center whitespace-nowrap">
                                         <div className="flex item-center justify-center space-x-4">
-                                            <Link to={`/admin/fighter/${fighter._id}`} className="text-blue-500 hover:text-blue-700" title="View">
+                                            <Link to={`/admin/fighter/${fighter._id}`} className="text-cyan-400 hover:text-cyan-300" title="View">
                                                 <FaEye size={18} />
                                             </Link>
-                                            <Link to={`/admin/edit-fighter/${fighter._id}`} className="text-green-500 hover:text-green-700" title="Edit">
+                                            <Link to={`/admin/edit-fighter/${fighter._id}`} className="text-green-400 hover:text-green-300" title="Edit">
                                                 <FaEdit size={18} />
                                             </Link>
-                                            <button onClick={() => handleDelete(fighter._id)} className="text-red-500 hover:text-red-700" title="Delete">
+                                            <button onClick={() => handleDelete(fighter._id)} className="text-red-400 hover:text-red-300" title="Delete">
                                                 <FaTrash size={18} />
                                             </button>
                                         </div>
@@ -117,8 +117,8 @@ const AdminDashboard = () => {
 
             {/* Modal for adding a new fighter */}
             {showAddModal && (
-                <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4">
-                    <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+                    <div className="bg-[#1a1a1a] p-8 rounded-xl border border-white/10 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
                         <AddFighter 
                             onAddSuccess={handleAddSuccess} 
                             onCancel={() => setShowAddModal(false)} 

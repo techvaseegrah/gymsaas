@@ -29,7 +29,8 @@ const AskDoubtPageDesktop = (props) => {
     // Theme state - initialize from localStorage or default to 'dark'
     const [theme, setTheme] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
-        return savedTheme || 'dark';
+        // Always use dark theme for consistency with admin pages
+        return 'dark';
     });
 
     // Active section state
@@ -38,31 +39,28 @@ const AskDoubtPageDesktop = (props) => {
     // Effect to save theme preference to localStorage
     useEffect(() => {
         localStorage.setItem('theme', theme);
-        // Apply theme to document root for any global styling
-        document.documentElement.classList.toggle('dark', theme === 'dark');
+        // Always apply dark class for consistency
+        document.documentElement.classList.add('dark');
     }, [theme]);
 
     // Toggle theme function
     const toggleTheme = () => {
-        setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+        // Theme toggle is disabled to maintain consistency with admin pages
+        // setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
     };
 
     // Render chat list
     const renderChatList = () => {
         return (
-            <div className={`p-4 ${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'} rounded-lg`}>
-                <h3 className={`text-lg font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Chat Rooms</h3>
+            <div className="p-4 bg-[#1a1a1a] rounded-lg border border-white/10">
+                <h3 className="text-lg font-bold mb-4 text-white">Chat Rooms</h3>
                 <div className="space-y-2">
                     <button
                         onClick={() => setActiveChat({ type: 'common', peer: { _id: null, name: 'Common Group' } })}
                         className={`w-full text-left p-3 rounded-lg transition-colors ${
                             activeChat?.type === 'common'
-                                ? theme === 'dark'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-blue-500 text-white'
-                                : theme === 'dark'
-                                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                                    : 'bg-white text-gray-800 hover:bg-gray-200'
+                                ? 'bg-cyan-600 text-white'
+                                : 'bg-[#222222] text-slate-300 hover:bg-white/10 border border-white/10'
                         }`}
                     >
                         <div className="flex items-center">
@@ -77,7 +75,7 @@ const AskDoubtPageDesktop = (props) => {
                     </button>
                     
                     <div className="mt-4">
-                        <h4 className={`font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Private Chats</h4>
+                        <h4 className="font-medium mb-2 text-slate-400">Private Chats</h4>
                         {currentUser?.role === 'admin' ? (
                             fighters.map(fighter => (
                                 <button
@@ -85,12 +83,8 @@ const AskDoubtPageDesktop = (props) => {
                                     onClick={() => setActiveChat({ type: 'private', peer: fighter })}
                                     className={`w-full text-left p-3 rounded-lg transition-colors mb-1 ${
                                         activeChat?.type === 'private' && activeChat?.peer?._id === fighter._id
-                                            ? theme === 'dark'
-                                                ? 'bg-blue-600 text-white'
-                                                : 'bg-blue-500 text-white'
-                                            : theme === 'dark'
-                                                ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                                                : 'bg-white text-gray-800 hover:bg-gray-200'
+                                            ? 'bg-cyan-600 text-white'
+                                            : 'bg-[#222222] text-slate-300 hover:bg-white/10 border border-white/10'
                                     }`}
                                 >
                                     <div className="flex items-center">
@@ -109,12 +103,8 @@ const AskDoubtPageDesktop = (props) => {
                                 onClick={() => setActiveChat({ type: 'private', peer: { _id: adminId, name: 'Admin' } })}
                                 className={`w-full text-left p-3 rounded-lg transition-colors ${
                                     activeChat?.type === 'private' && activeChat?.peer?._id === adminId
-                                        ? theme === 'dark'
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-blue-500 text-white'
-                                        : theme === 'dark'
-                                            ? 'bg-gray-700 text-gray-200 hover:bg-gray-600'
-                                            : 'bg-white text-gray-800 hover:bg-gray-200'
+                                        ? 'bg-cyan-600 text-white'
+                                        : 'bg-[#222222] text-slate-300 hover:bg-white/10 border border-white/10'
                                 }`}
                             >
                                 <div className="flex items-center">
@@ -141,47 +131,44 @@ const AskDoubtPageDesktop = (props) => {
         return (
             <div className="flex flex-col h-full">
                 {/* Chat header */}
-                <div className={`p-4 border-b ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div className="p-4 border-b border-white/10 bg-[#1a1a1a]">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center">
                             {activeChat?.type === 'private' && (
                                 <button 
                                     onClick={() => setActiveChat({ type: 'common', peer: { _id: null, name: 'Common Group' } })}
-                                    className={`mr-3 p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                                    className="mr-3 p-2 rounded-lg hover:bg-white/10"
                                 >
                                     <FaChevronLeft />
                                 </button>
                             )}
-                            <h3 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                            <h3 className="text-xl font-bold text-white">
                                 {activeChat?.peer?.name || 'Common Group'}
                             </h3>
                         </div>
                         <button
                             onClick={toggleTheme}
-                            className={`p-2 rounded-full transition-colors ${
-                                theme === 'dark' 
-                                    ? 'text-yellow-400 bg-gray-700 hover:bg-gray-600' 
-                                    : 'text-gray-700 bg-gray-200 hover:bg-gray-300'
-                            }`}
-                            title={theme === 'dark' ? "Switch to light mode" : "Switch to dark mode"}
+                            className="p-2 rounded-full transition-colors text-slate-400 bg-[#222222] cursor-not-allowed opacity-50"
+                            title="Theme toggle disabled for consistency"
+                            disabled
                         >
-                            {theme === 'dark' ? <FaSun className="text-lg" /> : <FaMoon className="text-lg" />}
+                            <FaMoon className="text-lg" />
                         </button>
                     </div>
                 </div>
                 
                 {/* Messages container */}
-                <div className={`flex-grow overflow-y-auto p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                <div className="flex-grow overflow-y-auto p-4 bg-[#0a0a0a]">
                     {loading ? (
                         <div className="flex justify-center items-center h-full">
                             <div className="text-center">
-                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
-                                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading messages...</p>
+                                <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-500 mb-2"></div>
+                                <p className="text-slate-400">Loading messages...</p>
                             </div>
                         </div>
                     ) : error ? (
                         <div className="flex justify-center items-center h-full">
-                            <div className="text-center p-4 rounded-lg bg-red-100 text-red-700">
+                            <div className="text-center p-4 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20">
                                 <p>Error: {error}</p>
                                 <button 
                                     onClick={() => window.location.reload()} 
@@ -193,7 +180,7 @@ const AskDoubtPageDesktop = (props) => {
                         </div>
                     ) : filteredMessages.length === 0 ? (
                         <div className="flex justify-center items-center h-full">
-                            <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                            <p className="text-slate-400">
                                 {activeChat?.type === 'common' 
                                     ? 'No messages yet. Start a conversation!' 
                                     : 'No messages yet. Send a message to start chatting!'}
@@ -206,26 +193,20 @@ const AskDoubtPageDesktop = (props) => {
                                     key={message._id} 
                                     className={`p-4 rounded-lg max-w-3/4 ${
                                         message.user?._id === currentUser?._id
-                                            ? theme === 'dark'
-                                                ? 'bg-blue-600 text-white ml-auto'
-                                                : 'bg-blue-500 text-white ml-auto'
-                                            : theme === 'dark'
-                                                ? 'bg-gray-800 text-white'
-                                                : 'bg-white text-gray-800'
+                                            ? 'bg-cyan-600 text-white ml-auto'
+                                            : 'bg-[#1a1a1a] text-white border border-white/10'
                                     }`}
                                 >
                                     {message.user?._id !== currentUser?._id && (
-                                        <p className={`text-sm font-semibold mb-1 ${
-                                            theme === 'dark' ? 'text-blue-300' : 'text-blue-600'
-                                        }`}>
+                                        <p className="text-sm font-semibold mb-1 text-cyan-400">
                                             {message.user?.name}
                                         </p>
                                     )}
                                     <p className="whitespace-pre-wrap">{message.text}</p>
                                     <p className={`text-xs mt-2 ${
                                         message.user?._id === currentUser?._id
-                                            ? theme === 'dark' ? 'text-blue-200' : 'text-blue-100'
-                                            : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                                            ? 'text-cyan-200' 
+                                            : 'text-slate-400'
                                     }`}>
                                         {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </p>
@@ -233,11 +214,7 @@ const AskDoubtPageDesktop = (props) => {
                                         <div className="mt-2 flex space-x-2">
                                             <button
                                                 onClick={() => handleDeleteMessage(message._id)}
-                                                className={`text-xs px-2 py-1 rounded ${
-                                                    theme === 'dark'
-                                                        ? 'bg-red-700 hover:bg-red-600 text-white'
-                                                        : 'bg-red-500 hover:bg-red-600 text-white'
-                                                }`}
+                                                className="text-xs px-2 py-1 rounded bg-red-600 hover:bg-red-700 text-white"
                                             >
                                                 Delete
                                             </button>
@@ -250,7 +227,7 @@ const AskDoubtPageDesktop = (props) => {
                 </div>
                 
                 {/* Message input */}
-                <div className={`p-4 border-t ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div className="p-4 border-t border-white/10 bg-[#1a1a1a]">
                     <div className="flex">
                         <input
                             type="text"
@@ -266,11 +243,7 @@ const AskDoubtPageDesktop = (props) => {
                                 }
                             }}
                             placeholder={activeChat?.type === 'common' ? "Type a message to the group..." : "Type a message..."}
-                            className={`flex-grow p-3 rounded-l-lg border ${
-                                theme === 'dark'
-                                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                    : 'bg-white border-gray-300 text-gray-800 placeholder-gray-500'
-                            }`}
+                            className="flex-grow p-3 rounded-l-lg border border-white/10 bg-[#222222] text-white placeholder-slate-400"
                         />
                         <button
                             onClick={() => {
@@ -285,12 +258,8 @@ const AskDoubtPageDesktop = (props) => {
                             disabled={!newMessage.trim()}
                             className={`px-6 py-3 rounded-r-lg font-medium transition-colors ${
                                 newMessage.trim()
-                                    ? theme === 'dark'
-                                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                        : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                    : theme === 'dark'
-                                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                    ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
+                                    : 'bg-slate-700 text-slate-400 cursor-not-allowed'
                             }`}
                         >
                             Send
@@ -306,11 +275,11 @@ const AskDoubtPageDesktop = (props) => {
         return (
             <div className="p-4">
                 <div className="flex justify-between items-center mb-4">
-                    <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Notifications</h3>
+                    <h3 className="text-lg font-bold text-white">Notifications</h3>
                     {notifications.length > 0 && (
                         <button 
                             onClick={() => setNotifications([])}
-                            className={`text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+                            className="text-sm text-cyan-400 hover:text-cyan-300"
                         >
                             Clear All
                         </button>
@@ -319,29 +288,25 @@ const AskDoubtPageDesktop = (props) => {
                 
                 {notifications.length === 0 ? (
                     <div className="text-center py-8">
-                        <FaBell className={`text-4xl mx-auto mb-2 ${theme === 'dark' ? 'text-gray-600' : 'text-gray-400'}`} />
-                        <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>No notifications yet</p>
+                        <FaBell className="text-4xl mx-auto mb-2 text-slate-600" />
+                        <p className="text-slate-400">No notifications yet</p>
                     </div>
                 ) : (
                     <div className="space-y-3">
                         {notifications.map((notif) => (
                             <div 
                                 key={notif.id} 
-                                className={`p-4 rounded-lg border ${
-                                    theme === 'dark' 
-                                        ? 'bg-gray-800 border-gray-700' 
-                                        : 'bg-white border-gray-200'
-                                }`}
+                                className="p-4 rounded-lg border border-white/10 bg-[#1a1a1a]"
                             >
                                 <div className="flex justify-between">
-                                    <h4 className={`font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                                    <h4 className="font-bold text-white">
                                         {notif.senderName}
                                     </h4>
-                                    <span className={`text-xs ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <span className="text-xs text-slate-400">
                                         {new Date(notif.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                     </span>
                                 </div>
-                                <p className={`mt-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                                <p className="mt-2 text-slate-300">
                                     {notif.text}
                                 </p>
                                 <div className="mt-3 flex space-x-2">
@@ -356,11 +321,7 @@ const AskDoubtPageDesktop = (props) => {
                                                 }
                                             }
                                         }}
-                                        className={`text-sm px-3 py-1 rounded ${
-                                            theme === 'dark'
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                                : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                        }`}
+                                        className="text-sm px-3 py-1 rounded bg-cyan-600 hover:bg-cyan-700 text-white"
                                     >
                                         View Chat
                                     </button>
@@ -374,41 +335,34 @@ const AskDoubtPageDesktop = (props) => {
     };
 
     return (
-        <div className={`flex h-screen ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+        <div className="flex h-screen bg-[#0a0a0a]">
             {/* Sidebar */}
-            <div className={`w-80 border-r ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className="w-80 border-r bg-[#1a1a1a] border-white/10">
                 {/* Header with theme toggle */}
-                <div className={`p-4 border-b ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                <div className="p-4 border-b bg-[#1a1a1a] border-white/10">
                     <div className="flex items-center justify-between">
-                        <h2 className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                        <h2 className="text-xl font-bold text-white">
                             Ask Doubt
                         </h2>
                         <button
                             onClick={toggleTheme}
-                            className={`p-2 rounded-full transition-colors ${
-                                theme === 'dark' 
-                                    ? 'text-yellow-400 bg-gray-700 hover:bg-gray-600' 
-                                    : 'text-gray-700 bg-gray-200 hover:bg-gray-300'
-                            }`}
-                            title={theme === 'dark' ? "Switch to light mode" : "Switch to dark mode"}
+                            className="p-2 rounded-full transition-colors text-slate-400 bg-[#222222] cursor-not-allowed opacity-50"
+                            title="Theme toggle disabled for consistency"
+                            disabled
                         >
-                            {theme === 'dark' ? <FaSun className="text-lg" /> : <FaMoon className="text-lg" />}
+                            <FaMoon className="text-lg" />
                         </button>
                     </div>
                 </div>
                 
                 {/* Navigation tabs */}
-                <div className={`flex border-b ${theme === 'dark' ? 'border-gray-700' : 'border-gray-200'}`}>
+                <div className="flex border-b border-white/10">
                     <button
                         onClick={() => setActiveSection('chats')}
                         className={`flex-1 py-3 text-center font-medium ${
                             activeSection === 'chats'
-                                ? theme === 'dark'
-                                    ? 'text-blue-400 border-b-2 border-blue-400'
-                                    : 'text-blue-600 border-b-2 border-blue-600'
-                                : theme === 'dark'
-                                    ? 'text-gray-400 hover:text-gray-300'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'text-cyan-400 border-b-2 border-cyan-400'
+                                : 'text-slate-400 hover:text-slate-300'
                         }`}
                     >
                         Chats
@@ -417,12 +371,8 @@ const AskDoubtPageDesktop = (props) => {
                         onClick={() => setActiveSection('notifications')}
                         className={`flex-1 py-3 text-center font-medium relative ${
                             activeSection === 'notifications'
-                                ? theme === 'dark'
-                                    ? 'text-blue-400 border-b-2 border-blue-400'
-                                    : 'text-blue-600 border-b-2 border-blue-600'
-                                : theme === 'dark'
-                                    ? 'text-gray-400 hover:text-gray-300'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'text-cyan-400 border-b-2 border-cyan-400'
+                                : 'text-slate-400 hover:text-slate-300'
                         }`}
                     >
                         Notifications

@@ -221,39 +221,39 @@ const AdminAttendancePage = () => {
     useEffect(() => { if(showFighterReport && selectedFighter) fetchFighterAttendance(selectedFighter.id); }, [dateFilter, showFighterReport, selectedFighter]);
 
     return (
-        <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
+        <div className="p-4 md:p-8 bg-[#0a0a0a] min-h-screen">
             <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-                <h2 className="text-3xl font-bold text-gray-800">Attendance Management</h2>
-                <div className="flex items-center gap-3 bg-white px-4 py-2 rounded-lg shadow-sm border border-gray-200">
-                    <span className="text-gray-500 text-sm font-medium"><FaCalendarAlt className="inline mr-1"/> Date:</span>
-                    <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="outline-none text-gray-700 font-bold bg-transparent cursor-pointer" />
-                    <button onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])} className="ml-2 text-xs bg-blue-100 hover:bg-blue-200 text-blue-700 px-3 py-1 rounded-full transition font-semibold">Today</button>
+                <h2 className="text-3xl font-bold text-white">Attendance Management</h2>
+                <div className="flex items-center gap-3 bg-[#1a1a1a] px-4 py-2 rounded-lg border border-white/10 text-white">
+                    <span className="text-slate-400 text-sm font-medium"><FaCalendarAlt className="inline mr-1"/> Date:</span>
+                    <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="outline-none text-white font-bold bg-transparent cursor-pointer" />
+                    <button onClick={() => setSelectedDate(new Date().toISOString().split('T')[0])} className="ml-2 text-xs bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 px-3 py-1 rounded-full transition font-semibold border border-cyan-500/30">Today</button>
                 </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="p-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-gray-100">
-                    <h3 className="text-xl font-semibold text-gray-700">{selectedDate === new Date().toISOString().split('T')[0] ? "Today's Attendance" : `Attendance for ${selectedDate}`}</h3>
+            <div className="bg-[#1a1a1a] rounded-lg border border-white/10 overflow-hidden">
+                <div className="p-6 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-white/10">
+                    <h3 className="text-xl font-semibold text-white">{selectedDate === new Date().toISOString().split('T')[0] ? "Today's Attendance" : `Attendance for ${selectedDate}`}</h3>
                     <div className="flex gap-4">
-                        <button onClick={() => openModal('rfid')} className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition shadow-sm"><FaUserTag /> RFID</button>
-                        <button onClick={() => openModal('face')} className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition shadow-sm ${modelsLoaded ? 'bg-teal-500 hover:bg-teal-600 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`} disabled={!modelsLoaded}><FaCamera /> {modelsLoaded ? 'Face ID' : 'Loading...'}</button>
+                        <button onClick={() => openModal('rfid')} className="flex items-center gap-2 bg-cyan-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-cyan-700 transition shadow-sm shadow-cyan-500/20"><FaUserTag /> RFID</button>
+                        <button onClick={() => openModal('face')} className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition shadow-sm ${modelsLoaded ? 'bg-teal-600 hover:bg-teal-700 text-white shadow-teal-500/20' : 'bg-slate-700 text-slate-400 cursor-not-allowed'}`} disabled={!modelsLoaded}><FaCamera /> {modelsLoaded ? 'Face ID' : 'Loading...'}</button>
                     </div>
                 </div>
                 <div className="overflow-x-auto">
-                    {recordsLoading ? <div className="text-center p-12 text-gray-500">Loading...</div> : 
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50"><tr><th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Fighter</th><th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">RFID</th><th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Date</th><th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">In</th><th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Out</th><th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Total</th></tr></thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
+                    {recordsLoading ? <div className="text-center p-12 text-slate-400">Loading...</div> : 
+                    <table className="min-w-full divide-y divide-white/10">
+                        <thead className="bg-[#222222]"><tr><th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase">Fighter</th><th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase">RFID</th><th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase">Date</th><th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase">In</th><th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase">Out</th><th className="px-6 py-3 text-left text-xs font-bold text-slate-400 uppercase">Total</th></tr></thead>
+                        <tbody className="bg-[#1a1a1a] divide-y divide-white/10">
                             {records.length > 0 ? records.map(r => (
-                                <tr key={r.id} className="hover:bg-blue-50">
-                                    <td className="px-6 py-4 text-sm font-bold"><button onClick={() => openFighterReport(r.fighterName, r)} className="text-blue-600 hover:underline">{r.fighterName}</button></td>
-                                    <td className="px-6 py-4 text-sm font-mono text-gray-500">{r.rfid}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">{new Date(r.date).toLocaleDateString()}</td>
-                                    <td className="px-6 py-4 text-sm">{r.checkIns.map((p,i)=><div key={i} className="text-green-600 font-bold">{new Date(p.time).toLocaleTimeString()}</div>)}</td>
-                                    <td className="px-6 py-4 text-sm">{r.checkOuts.map((p,i)=><div key={i} className="text-red-600 font-bold">{new Date(p.time).toLocaleTimeString()}</div>)}</td>
-                                    <td className="px-6 py-4 text-sm font-bold text-gray-700">{r.duration}</td>
+                                <tr key={r.id} className="hover:bg-white/5">
+                                    <td className="px-6 py-4 text-sm font-bold"><button onClick={() => openFighterReport(r.fighterName, r)} className="text-cyan-400 hover:underline hover:text-cyan-300">{r.fighterName}</button></td>
+                                    <td className="px-6 py-4 text-sm font-mono text-slate-400">{r.rfid}</td>
+                                    <td className="px-6 py-4 text-sm text-slate-400">{new Date(r.date).toLocaleDateString()}</td>
+                                    <td className="px-6 py-4 text-sm">{r.checkIns.map((p,i)=><div key={i} className="text-green-400 font-bold">{new Date(p.time).toLocaleTimeString()}</div>)}</td>
+                                    <td className="px-6 py-4 text-sm">{r.checkOuts.map((p,i)=><div key={i} className="text-red-400 font-bold">{new Date(p.time).toLocaleTimeString()}</div>)}</td>
+                                    <td className="px-6 py-4 text-sm font-bold text-white">{r.duration}</td>
                                 </tr>
-                            )) : <tr><td colSpan="6" className="px-6 py-12 text-center text-gray-500">No records found.</td></tr>}
+                            )) : <tr><td colSpan="6" className="px-6 py-12 text-center text-slate-400">No records found.</td></tr>}
                         </tbody>
                     </table>}
                 </div>
@@ -261,31 +261,31 @@ const AdminAttendancePage = () => {
 
             {/* Fighter Report Modal */}
             {showFighterReport && selectedFighter && (
-                <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
-                        <div className="flex justify-between items-center p-6 border-b bg-gray-50">
-                            <h3 className="text-xl font-bold text-gray-800">{selectedFighter.name}</h3>
-                            <button onClick={() => setShowFighterReport(false)}><FaTimes className="text-gray-500 hover:text-gray-800" /></button>
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-[#1a1a1a] rounded-xl border border-white/10 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+                        <div className="flex justify-between items-center p-6 border-b border-white/10 bg-[#222222]">
+                            <h3 className="text-xl font-bold text-white">{selectedFighter.name}</h3>
+                            <button onClick={() => setShowFighterReport(false)}><FaTimes className="text-slate-400 hover:text-white" /></button>
                         </div>
-                        <div className="p-4 border-b bg-white flex gap-4 items-center">
-                            <span className="font-medium text-gray-700">Filter:</span>
-                            <input type="date" value={dateFilter.startDate} onChange={e=>setDateFilter({...dateFilter, startDate:e.target.value})} className="border p-1 rounded" />
-                            <span>-</span>
-                            <input type="date" value={dateFilter.endDate} onChange={e=>setDateFilter({...dateFilter, endDate:e.target.value})} className="border p-1 rounded" />
+                        <div className="p-4 border-b border-white/10 bg-[#1a1a1a] flex gap-4 items-center">
+                            <span className="font-medium text-white">Filter:</span>
+                            <input type="date" value={dateFilter.startDate} onChange={e=>setDateFilter({...dateFilter, startDate:e.target.value})} className="border border-white/10 bg-[#222222] text-white p-1 rounded" />
+                            <span className="text-slate-400">-</span>
+                            <input type="date" value={dateFilter.endDate} onChange={e=>setDateFilter({...dateFilter, endDate:e.target.value})} className="border border-white/10 bg-[#222222] text-white p-1 rounded" />
                             <div className="flex gap-2 ml-auto">
-                                <button onClick={() => exportToExcel(formatAttendanceDataForExport(fighterAttendance), 'report')} className="bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors"><FaFileExcel /> Excel</button>
-                                <button onClick={() => exportToPDF(formatAttendanceDataForExport(fighterAttendance), [], 'report')} className="bg-red-100 text-red-700 px-3 py-1 rounded font-bold text-sm"><FaFilePdf /> PDF</button>
+                                <button onClick={() => exportToExcel(formatAttendanceDataForExport(fighterAttendance), 'report')} className="bg-green-600 hover:bg-green-700 text-white rounded-lg font-bold transition-colors px-3 py-1 text-sm"><FaFileExcel /> Excel</button>
+                                <button onClick={() => exportToPDF(formatAttendanceDataForExport(fighterAttendance), [], 'report')} className="bg-red-600/20 hover:bg-red-600/30 text-red-400 px-3 py-1 rounded font-bold text-sm border border-red-600/30"><FaFilePdf /> PDF</button>
                             </div>
                         </div>
                         <div className="flex-grow overflow-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50 sticky top-0"><tr><th className="px-6 py-3 text-left text-xs font-bold text-gray-500">Date</th><th className="px-6 py-3 text-left text-xs font-bold text-gray-500">Details</th><th className="px-6 py-3 text-left text-xs font-bold text-gray-500">Duration</th></tr></thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                            <table className="min-w-full divide-y divide-white/10">
+                                <thead className="bg-[#222222] sticky top-0"><tr><th className="px-6 py-3 text-left text-xs font-bold text-slate-400">Date</th><th className="px-6 py-3 text-left text-xs font-bold text-slate-400">Details</th><th className="px-6 py-3 text-left text-xs font-bold text-slate-400">Duration</th></tr></thead>
+                                <tbody className="bg-[#1a1a1a] divide-y divide-white/10">
                                     {fighterAttendance.map((day,i) => (
-                                        <tr key={i} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 text-sm">{new Date(day.date).toLocaleDateString()}</td>
-                                            <td className="px-6 py-4 text-sm"><span className="text-green-600">In: {day.checkIns?.map(p=>new Date(p.time).toLocaleTimeString()).join(', ')}</span> <br/> <span className="text-red-600">Out: {day.checkOuts?.map(p=>new Date(p.time).toLocaleTimeString()).join(', ')}</span></td>
-                                            <td className="px-6 py-4 text-sm font-bold">{day.duration}</td>
+                                        <tr key={i} className="hover:bg-white/5">
+                                            <td className="px-6 py-4 text-sm text-white">{new Date(day.date).toLocaleDateString()}</td>
+                                            <td className="px-6 py-4 text-sm"><span className="text-green-400">In: {day.checkIns?.map(p=>new Date(p.time).toLocaleTimeString()).join(', ')}</span> <br/> <span className="text-red-400">Out: {day.checkOuts?.map(p=>new Date(p.time).toLocaleTimeString()).join(', ')}</span></td>
+                                            <td className="px-6 py-4 text-sm font-bold text-white">{day.duration}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -297,24 +297,24 @@ const AdminAttendancePage = () => {
 
             {/* Attendance Modal */}
             {attendanceMethod && (
-                <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md relative">
-                        <button onClick={closeModal} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800"><FaTimes size={20}/></button>
-                        <h3 className="text-xl font-bold text-gray-800 mb-6 text-center border-b pb-4">{attendanceMethod==='rfid'?'RFID Punch':'Face Recognition'}</h3>
+                <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-[#1a1a1a] rounded-xl border border-white/10 p-6 w-full max-w-md relative">
+                        <button onClick={closeModal} className="absolute top-4 right-4 text-slate-400 hover:text-white"><FaTimes size={20}/></button>
+                        <h3 className="text-xl font-bold text-white mb-6 text-center border-b border-white/10 pb-4">{attendanceMethod==='rfid'?'RFID Punch':'Face Recognition'}</h3>
                         
                         {/* CONDITIONAL RENDERING BASED ON METHOD */}
                         {attendanceMethod === 'rfid' ? (
                             // --- RFID FLOW ---
                             !fighterForPunch ? (
                                 <form onSubmit={handleFindFighterByRfid} className="flex flex-col gap-4">
-                                    <div className="relative"><FaIdCard className="absolute top-3.5 left-4 text-gray-400"/><input value={rfid} onChange={e=>setRfid(e.target.value)} placeholder="Scan RFID..." className="w-full pl-12 pr-4 py-3 border rounded-lg outline-none" autoFocus/></div>
-                                    <button type="submit" className="bg-blue-600 text-white py-3 rounded-lg font-bold" disabled={punchLoading}>Find Fighter</button>
+                                    <div className="relative"><FaIdCard className="absolute top-3.5 left-4 text-slate-400"/><input value={rfid} onChange={e=>setRfid(e.target.value)} placeholder="Scan RFID..." className="w-full pl-12 pr-4 py-3 border border-white/10 bg-[#222222] text-white rounded-lg outline-none" autoFocus/></div>
+                                    <button type="submit" className="bg-cyan-600 text-white py-3 rounded-lg font-bold hover:bg-cyan-700" disabled={punchLoading}>Find Fighter</button>
                                 </form>
                             ) : (
                                 <div className="text-center">
                                     {/* SAFELY ACCESS fighter name with optional chaining and fallback */}
-                                    <p className="text-xl font-bold mb-4">{fighterForPunch?.fighter?.name || 'Unknown Fighter'}</p>
-                                    <button onClick={handlePunchConfirmation} className={`w-full py-3 rounded-lg font-bold text-white ${fighterForPunch?.nextAction==='in'?'bg-green-600':'bg-red-600'}`} disabled={punchLoading}>
+                                    <p className="text-xl font-bold mb-4 text-white">{fighterForPunch?.fighter?.name || 'Unknown Fighter'}</p>
+                                    <button onClick={handlePunchConfirmation} className={`w-full py-3 rounded-lg font-bold text-white ${fighterForPunch?.nextAction==='in'?'bg-green-600 hover:bg-green-700':'bg-red-600 hover:bg-red-700'}`} disabled={punchLoading}>
                                         {/* SAFETY CHECK: Use ? to avoid undefined error if data is slow */}
                                         Confirm {fighterForPunch?.nextAction?.toUpperCase() || 'PUNCH'}
                                     </button>
@@ -323,16 +323,16 @@ const AdminAttendancePage = () => {
                         ) : (
                             // --- FACE RECOGNITION FLOW ---
                             <div className="text-center">
-                                <div className="relative rounded-lg overflow-hidden border-4 border-gray-200 mb-4 bg-black">
+                                <div className="relative rounded-lg overflow-hidden border-4 border-white/10 mb-4 bg-black">
                                     <Webcam ref={webcamRef} className="w-full" screenshotFormat="image/jpeg" />
                                     {punchLoading && <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold animate-pulse">Processing...</div>}
                                 </div>
-                                <p className="text-sm text-gray-500">Scanning Face... Auto-confirmation active.</p>
+                                <p className="text-sm text-slate-400">Scanning Face... Auto-confirmation active.</p>
                                 {/* REMOVED CONFIRM BUTTON HERE TO FIX THE ERROR */}
                             </div>
                         )}
 
-                        {punchStatus && <div className={`mt-4 p-4 rounded-lg flex items-center gap-3 text-sm font-medium ${punchStatus.type==='success'?'bg-green-100 text-green-800':'bg-red-100 text-red-800'}`}>{punchStatus.type==='success'?<FaCheckCircle/>:<FaExclamationTriangle/>}<div>{punchStatus.message}</div></div>}
+                        {punchStatus && <div className={`mt-4 p-4 rounded-lg flex items-center gap-3 text-sm font-medium ${punchStatus.type==='success'?'bg-green-500/10 text-green-400 border border-green-500/20':'bg-red-500/10 text-red-400 border border-red-500/20'}`}>{punchStatus.type==='success'?<FaCheckCircle/>:<FaExclamationTriangle/>}<div>{punchStatus.message}</div></div>}
                     </div>
                 </div>
             )}

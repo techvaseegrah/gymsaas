@@ -179,29 +179,29 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
     return (
         <form onSubmit={handleSubmit} className="space-y-8">
             {message && (
-                <div className={`p-4 rounded-xl flex items-center ${isError ? 'bg-red-50 border border-red-200 text-red-800' : 'bg-green-50 border border-green-200 text-green-800'}`}>
-                    {isError ? <FaExclamationTriangle className="mr-3 text-red-500" /> : <FaCheckCircle className="mr-3 text-green-500" />}
+                <div className={`p-4 rounded-xl flex items-center ${isError ? 'bg-red-500/10 border border-red-500/20 text-red-400' : 'bg-green-500/10 border border-green-500/20 text-green-400'}`}>
+                    {isError ? <FaExclamationTriangle className="mr-3 text-red-400" /> : <FaCheckCircle className="mr-3 text-green-400" />}
                     <span className="font-medium">{message}</span>
                 </div>
             )}
             
             {/* Personal Information Section */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <div className="bg-[#1a1a1a] rounded-xl p-6 border border-white/10">
                 <div className="flex items-center mb-6">
-                    <div className="bg-red-100 p-2 rounded-lg mr-3">
-                        <FaUser className="text-red-600" />
+                    <div className="bg-red-500/10 p-2 rounded-lg mr-3">
+                        <FaUser className="text-red-400" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800">Personal Information</h3>
+                    <h3 className="text-xl font-bold text-white">Personal Information</h3>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="name">
-                            Full Name <span className="text-red-500">*</span>
+                        <label className="block text-sm font-medium text-slate-400 mb-2" htmlFor="name">
+                            Full Name <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FaUser className="text-gray-400" />
+                                <FaUser className="text-slate-400" />
                             </div>
                             <input 
                                 type="text" 
@@ -209,7 +209,7 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                                 name="name" 
                                 value={formData.name} 
                                 onChange={handleChange} 
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" 
+                                className="w-full pl-10 pr-4 py-3 border border-white/10 bg-[#222222] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition" 
                                 required 
                                 placeholder="Enter full name"
                             />
@@ -217,12 +217,12 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                     </div>
                     
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">
-                            Email Address <span className="text-red-500">*</span>
+                        <label className="block text-sm font-medium text-slate-400 mb-2" htmlFor="email">
+                            Email Address <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FaEnvelope className="text-gray-400" />
+                                <FaEnvelope className="text-slate-400" />
                             </div>
                             <input 
                                 type="email" 
@@ -230,7 +230,7 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                                 name="email" 
                                 value={formData.email} 
                                 onChange={handleChange} 
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" 
+                                className="w-full pl-10 pr-4 py-3 border border-white/10 bg-[#222222] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition" 
                                 required 
                                 placeholder="Enter email address"
                             />
@@ -238,12 +238,12 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                     </div>
                     
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="password">
-                            Password <span className="text-red-500">*</span>
+                        <label className="block text-sm font-medium text-slate-400 mb-2" htmlFor="password">
+                            Password <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FaLock className="text-gray-400" />
+                                <FaLock className="text-slate-400" />
                             </div>
                             <input 
                                 type="password" 
@@ -251,7 +251,7 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                                 name="password" 
                                 value={formData.password} 
                                 onChange={handleChange} 
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" 
+                                className="w-full pl-10 pr-4 py-3 border border-white/10 bg-[#222222] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition" 
                                 required 
                                 placeholder="Create a strong password"
                             />
@@ -260,20 +260,20 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
 
                     {/* Profile Photo Upload */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="profilePhoto">
+                        <label className="block text-sm font-medium text-slate-400 mb-2" htmlFor="profilePhoto">
                             Profile Photo
                         </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FaUpload className="text-gray-400" />
+                                <FaUpload className="text-slate-400" />
                             </div>
                             <input 
                                 type="file" 
-                                id="profilePhoto"
+                                id="profilePhoto" 
                                 name="profilePhoto" 
                                 accept=".jpg,.jpeg,.png"
                                 onChange={handleProfilePhotoChange}
-                                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-50 file:text-red-700 hover:file:bg-red-100"
+                                className="w-full pl-10 pr-4 py-3 border border-white/10 bg-[#222222] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/50 focus:border-red-500/50 transition file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-red-500/10 file:text-red-400 hover:file:bg-red-500/20"
                             />
                         </div>
                         {profilePhoto && (
@@ -284,12 +284,12 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="rfid">
-                            RFID <span className="text-red-500">*</span>
+                        <label className="block text-sm font-medium text-slate-400 mb-2" htmlFor="rfid">
+                            RFID <span className="text-red-400">*</span>
                         </label>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FaIdCard className="text-gray-400" />
+                                <FaIdCard className="text-slate-400" />
                             </div>
                             <input 
                                 type="text" 
@@ -297,13 +297,13 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                                 name="rfid" 
                                 value={formData.rfid} 
                                 readOnly 
-                                className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg bg-gray-100 text-gray-600 cursor-not-allowed"
+                                className="w-full pl-10 pr-12 py-3 border border-white/10 rounded-lg bg-[#222222] text-slate-400 cursor-not-allowed"
                                 placeholder="RFID will be generated"
                             />
                             <button 
                                 type="button" 
                                 onClick={() => setFormData(prev => ({ ...prev, rfid: generateRfid() }))}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-white"
                                 title="Regenerate RFID"
                             >
                                 <FaSyncAlt />
@@ -314,25 +314,25 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
             </div>
 
             {/* Face Recognition Section */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+            <div className="bg-[#1a1a1a] rounded-xl p-6 border border-white/10">
                 <div className="flex items-center mb-6">
-                    <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                        <FaUserCircle className="text-blue-600" />
+                    <div className="bg-blue-500/10 p-2 rounded-lg mr-3">
+                        <FaUserCircle className="text-blue-400" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-800">Face Recognition Setup</h3>
-                    <span className="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                    <h3 className="text-xl font-bold text-white">Face Recognition Setup</h3>
+                    <span className="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">
                         Optional
                     </span>
                 </div>
                 
-                <p className="text-gray-600 mb-6">
+                <p className="text-slate-400 mb-6">
                     Capture 5 clear images of the fighter's face from different angles for better attendance recognition. 
                     This will enable face recognition for attendance tracking.
                 </p>
                 
                 <div className="flex flex-col lg:flex-row items-center gap-8 mb-6">
                     <div className="w-full lg:w-72">
-                        <div className="rounded-xl overflow-hidden border-2 border-gray-300 shadow-md">
+                        <div className="rounded-xl overflow-hidden border-2 border-white/10 bg-black">
                             <Webcam
                                 audio={false}
                                 ref={webcamRef}
@@ -343,7 +343,7 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                             />
                         </div>
                         <div className="mt-3 text-center">
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-slate-400">
                                 Position face in the center of the frame
                             </p>
                         </div>
@@ -353,7 +353,7 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                         <button
                             type="button"
                             onClick={captureFaceEncoding}
-                            className="w-full flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition duration-300 disabled:opacity-50 shadow-md"
+                            className="w-full flex items-center justify-center bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-300 disabled:opacity-50 shadow-md shadow-blue-500/20"
                             disabled={loading || !modelsLoaded || faceEncodings.length >= 5}
                         >
                             <FaCamera className="mr-2" />
@@ -361,29 +361,29 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                         </button>
                         
                         <div className="mt-4">
-                            <div className="w-full bg-gray-200 rounded-full h-2.5">
+                            <div className="w-full bg-[#222222] rounded-full h-2.5">
                                 <div 
-                                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
+                                    className="bg-blue-500 h-2.5 rounded-full transition-all duration-300" 
                                     style={{ width: `${(faceEncodings.length / 5) * 100}%` }}
                                 ></div>
                             </div>
-                            <div className="flex justify-between text-sm text-gray-600 mt-1">
+                            <div className="flex justify-between text-sm text-slate-400 mt-1">
                                 <span>Progress</span>
                                 <span>{faceEncodings.length}/5 captures</span>
                             </div>
                         </div>
                         
                         <div className="mt-3 text-center">
-                            <p className={`text-sm ${captureMessage.includes('successful') ? 'text-green-600' : captureMessage.includes('No face') ? 'text-red-600' : 'text-gray-600'}`}>
+                            <p className={`text-sm ${captureMessage.includes('successful') ? 'text-green-400' : captureMessage.includes('No face') ? 'text-red-400' : 'text-slate-400'}`}>
                                 {captureMessage || "Position face in the center and capture."}
                             </p>
                             {faceEncodings.length === 0 && (
-                                <p className="text-orange-600 mt-2 font-medium">
+                                <p className="text-orange-400 mt-2 font-medium">
                                     Face recognition is recommended for attendance.
                                 </p>
                             )}
                             {faceEncodings.length >= 5 && (
-                                <p className="text-green-600 mt-2 font-medium">
+                                <p className="text-green-400 mt-2 font-medium">
                                     Maximum of 5 photos captured.
                                 </p>
                             )}
@@ -394,12 +394,12 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                 {/* Display captured face encodings */}
                 {faceEncodings.length > 0 && (
                     <div className="mt-6">
-                        <h4 className="font-medium text-gray-700 mb-3">Captured Photos:</h4>
+                        <h4 className="font-medium text-slate-400 mb-3">Captured Photos:</h4>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                             {faceEncodings.map((encoding, index) => (
                                 <div key={index} className="relative group">
-                                    <div className="bg-gradient-to-br from-blue-100 to-blue-200 border-2 border-dashed border-blue-300 rounded-xl w-16 h-16 flex items-center justify-center shadow-sm">
-                                        <span className="text-lg font-bold text-blue-700">{index + 1}</span>
+                                    <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 border-2 border-dashed border-blue-500/30 rounded-xl w-16 h-16 flex items-center justify-center shadow-sm">
+                                        <span className="text-lg font-bold text-blue-400">{index + 1}</span>
                                     </div>
                                     <button
                                         type="button"
@@ -421,13 +421,13 @@ const AddFighter = ({ onAddSuccess, onCancel }) => {
                 <button 
                     type="button" 
                     onClick={onCancel} 
-                    className="w-full sm:w-auto bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg hover:bg-gray-300 transition duration-300"
+                    className="w-full sm:w-auto bg-white/10 text-white font-bold py-3 px-6 rounded-lg hover:bg-white/20 transition duration-300 border border-white/10"
                 >
                     Cancel
                 </button>
                 <button
                     type="submit"
-                    className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-lg hover:from-red-700 hover:to-red-800 transition duration-300 disabled:opacity-50 shadow-md"
+                    className="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-lg hover:from-red-700 hover:to-red-800 transition duration-300 disabled:opacity-50 shadow-md shadow-red-500/20"
                     disabled={loading}
                 >
                     {loading ? (

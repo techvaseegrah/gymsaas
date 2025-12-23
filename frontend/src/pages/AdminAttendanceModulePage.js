@@ -148,12 +148,12 @@ const AdminAttendanceModulePage = () => {
     };
 
     return (
-        <div className="p-4 md:p-8 bg-gray-50">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">Attendance Module</h2>
+        <div className="p-4 md:p-8 bg-[#0a0a0a] min-h-screen">
+            <h2 className="text-3xl font-bold text-white mb-6">Attendance Module</h2>
             
             {/* RFID Punch In/Out Section */}
-            <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
-                <h3 className="text-xl font-semibold text-gray-700 mb-4">RFID Punch In / Out</h3>
+            <div className="mb-8 bg-[#1a1a1a] p-6 rounded-lg border border-white/10">
+                <h3 className="text-xl font-semibold text-white mb-4">RFID Punch In / Out</h3>
                 <form onSubmit={handleRfidSubmit} className="flex flex-col sm:flex-row items-start gap-4">
                     <div className="relative flex-grow w-full">
                         <FaIdCard className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
@@ -162,13 +162,13 @@ const AdminAttendanceModulePage = () => {
                             value={rfid}
                             onChange={(e) => setRfid(e.target.value)}
                             placeholder="Enter Fighter RFID"
-                            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                            className="w-full pl-10 pr-4 py-2 border border-white/10 bg-[#222222] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500/50"
                             disabled={punchLoading}
                         />
                     </div>
                     <button
                         type="submit"
-                        className="w-full sm:w-auto bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:bg-gray-400"
+                        className="w-full sm:w-auto bg-red-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition duration-300 flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:bg-gray-400 shadow-red-500/20"
                         disabled={punchLoading}
                     >
                         {punchLoading ? 'Processing...' : 'Submit'}
@@ -176,8 +176,8 @@ const AdminAttendanceModulePage = () => {
                 </form>
 
                 {punchStatus && (
-                    <div className={`mt-4 p-4 rounded-lg flex items-start gap-3 ${punchStatus.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                        <FaCheckCircle className={`text-2xl ${punchStatus.type === 'success' ? 'text-green-500' : 'text-red-500'}`} />
+                    <div className={`mt-4 p-4 rounded-lg flex items-start gap-3 ${punchStatus.type === 'success' ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                        <FaCheckCircle className={`text-2xl ${punchStatus.type === 'success' ? 'text-green-400' : 'text-red-400'}`} />
                         <div>
                             <p className="font-semibold">{punchStatus.message}</p>
                             {punchStatus.fighter && <p className="text-sm">{`Fighter: ${punchStatus.fighter.name} (${punchStatus.fighter.fighterBatchNo})`}</p>}
@@ -187,44 +187,44 @@ const AdminAttendanceModulePage = () => {
             </div>
 
             {/* Attendance Log Section */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                <h3 className="text-xl font-semibold text-gray-700 p-6">Today's Attendance Log</h3>
+            <div className="bg-[#1a1a1a] rounded-lg border border-white/10 overflow-hidden">
+                <h3 className="text-xl font-semibold text-white p-6">Today's Attendance Log</h3>
                 <div className="overflow-x-auto">
                     {loading ? (
                         <div className="text-center p-8">Loading records...</div>
                     ) : error ? (
-                        <div className="text-center p-8 text-red-500">{error}</div>
+                        <div className="text-center p-8 text-red-400">{error}</div>
                     ) : (
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
+                        <table className="min-w-full divide-y divide-white/10">
+                            <thead className="bg-[#222222]">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fighter</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check In</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check Out</th>
-                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Fighter</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Check In</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Check Out</th>
+                                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Method</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="bg-[#1a1a1a] divide-y divide-white/10">
                                 {records.length > 0 ? (
                                     records.map(record => (
-                                        <tr key={record._id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                        <tr key={record._id} className="hover:bg-white/5">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                                                 {record.fighterId ? record.fighterId.name : 'N/A'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
                                                 {new Date(record.checkIn).toLocaleString()}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {record.checkOut ? new Date(record.checkOut).toLocaleString() : <span className="text-gray-400 italic">Not checked out</span>}
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
+                                                {record.checkOut ? new Date(record.checkOut).toLocaleString() : <span className="text-slate-500 italic">Not checked out</span>}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 capitalize">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400 capitalize">
                                                 {record.method}
                                             </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
+                                        <td colSpan="4" className="px-6 py-4 text-center text-sm text-slate-400">
                                             No attendance records found for today.
                                         </td>
                                     </tr>

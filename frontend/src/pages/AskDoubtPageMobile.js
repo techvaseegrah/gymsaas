@@ -29,7 +29,8 @@ const AskDoubtPageMobile = (props) => {
     // Theme state - initialize from localStorage or default to 'dark'
     const [theme, setTheme] = useState(() => {
         const savedTheme = localStorage.getItem('theme');
-        return savedTheme || 'dark';
+        // Always use dark theme for consistency with admin pages
+        return 'dark';
     });
 
     // Active tab state
@@ -38,12 +39,14 @@ const AskDoubtPageMobile = (props) => {
     // Effect to save theme preference to localStorage
     useEffect(() => {
         localStorage.setItem('theme', theme);
-        document.documentElement.classList.toggle('dark', theme === 'dark');
+        // Always apply dark class for consistency
+        document.documentElement.classList.add('dark');
     }, [theme]);
 
     // Toggle theme function
     const toggleTheme = () => {
-        setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
+        // Theme toggle is disabled to maintain consistency with admin pages
+        // setTheme(prevTheme => prevTheme === 'dark' ? 'light' : 'dark');
     };
 
     // Show back button logic
@@ -70,17 +73,17 @@ const AskDoubtPageMobile = (props) => {
             return (
                 <div className="flex flex-col h-full w-full">
                     {/* Messages container */}
-                    <div className={`flex-1 overflow-y-auto p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                    <div className={`flex-1 overflow-y-auto p-4 bg-[#0a0a0a]`}>
                         {loading ? (
                             <div className="flex justify-center items-center h-full">
                                 <div className="text-center">
-                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mb-2"></div>
-                                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading messages...</p>
+                                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cyan-500 mb-2"></div>
+                                    <p className="text-slate-400">Loading messages...</p>
                                 </div>
                             </div>
                         ) : error ? (
                             <div className="flex justify-center items-center h-full">
-                                <div className="text-center p-4 rounded-lg bg-red-100 text-red-700">
+                                <div className="text-center p-4 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20">
                                     <p>Error: {error}</p>
                                     <button 
                                         onClick={() => window.location.reload()} 
@@ -92,7 +95,7 @@ const AskDoubtPageMobile = (props) => {
                             </div>
                         ) : filteredMessages.length === 0 ? (
                             <div className="flex justify-center items-center h-full">
-                                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                                <p className="text-slate-400">
                                     No messages yet. Start a conversation!
                                 </p>
                             </div>
@@ -103,26 +106,20 @@ const AskDoubtPageMobile = (props) => {
                                         key={message._id} 
                                         className={`p-3 rounded-lg max-w-[85%] ${
                                             message.user?._id === currentUser?._id
-                                                ? theme === 'dark'
-                                                    ? 'bg-blue-600 text-white ml-auto'
-                                                    : 'bg-blue-500 text-white ml-auto'
-                                                : theme === 'dark'
-                                                    ? 'bg-gray-800 text-white'
-                                                    : 'bg-white text-gray-800'
+                                                ? 'bg-cyan-600 text-white ml-auto'
+                                                : 'bg-[#1a1a1a] text-white border border-white/10'
                                         }`}
                                     >
                                         {message.user?._id !== currentUser?._id && (
-                                            <p className={`text-sm font-semibold mb-1 ${
-                                                theme === 'dark' ? 'text-blue-300' : 'text-blue-600'
-                                            }`}>
+                                            <p className={`text-sm font-semibold mb-1 text-cyan-400`}>
                                                 {message.user?.name}
                                             </p>
                                         )}
                                         <p className="whitespace-pre-wrap text-sm">{message.text}</p>
                                         <p className={`text-xs mt-1 ${
                                             message.user?._id === currentUser?._id
-                                                ? theme === 'dark' ? 'text-blue-200' : 'text-blue-100'
-                                                : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                                                ? 'text-cyan-200' 
+                                                : 'text-slate-400'
                                         }`}>
                                             {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </p>
@@ -133,7 +130,7 @@ const AskDoubtPageMobile = (props) => {
                     </div>
                     
                     {/* Message input */}
-                    <div className={`p-3 border-t shrink-0 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                    <div className="p-3 border-t shrink-0 bg-[#1a1a1a] border-white/10">
                         <div className="flex gap-2">
                             <input
                                 type="text"
@@ -149,11 +146,7 @@ const AskDoubtPageMobile = (props) => {
                                     }
                                 }}
                                 placeholder="Type a message..."
-                                className={`flex-grow p-2 rounded-lg border text-sm ${
-                                    theme === 'dark'
-                                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                        : 'bg-white border-gray-300 text-gray-800 placeholder-gray-500'
-                                }`}
+                                className="flex-grow p-2 rounded-lg border border-white/10 bg-[#222222] text-white placeholder-slate-400 text-sm"
                             />
                             <button
                                 onClick={() => {
@@ -168,12 +161,8 @@ const AskDoubtPageMobile = (props) => {
                                 disabled={!newMessage.trim()}
                                 className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${
                                     newMessage.trim()
-                                        ? theme === 'dark'
-                                            ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                            : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                        : theme === 'dark'
-                                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                        ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
+                                        : 'bg-slate-700 text-slate-400 cursor-not-allowed'
                                 }`}
                             >
                                 Send
@@ -195,34 +184,34 @@ const AskDoubtPageMobile = (props) => {
                             <div className="flex items-center">
                                 <button 
                                     onClick={() => setActiveChat({ type: 'common', peer: { _id: null, name: 'Private Chats' } })}
-                                    className={`mr-2 p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                                    className="mr-2 p-2 rounded-lg hover:bg-white/10"
                                 >
                                     <FaChevronLeft />
                                 </button>
-                                <h3 className={`text-lg font-bold truncate ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                                <h3 className="text-lg font-bold truncate text-white">
                                     {activeChat.peer.name}
                                 </h3>
                             </div>
                         </div>
                         
                         {/* Messages container */}
-                        <div className={`flex-1 overflow-y-auto p-3 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                        <div className={`flex-1 overflow-y-auto p-3 bg-[#0a0a0a]`}>
                             {loading ? (
                                 <div className="flex justify-center items-center h-full">
                                     <div className="text-center">
-                                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500 mb-2"></div>
-                                        <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Loading messages...</p>
+                                        <div className="inline-block animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-cyan-500 mb-2"></div>
+                                        <p className="text-slate-400">Loading messages...</p>
                                     </div>
                                 </div>
                             ) : error ? (
                                 <div className="flex justify-center items-center h-full">
-                                    <div className="text-center p-3 rounded-lg bg-red-100 text-red-700">
+                                    <div className="text-center p-3 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20">
                                         <p>Error: {error}</p>
                                     </div>
                                 </div>
                             ) : filteredMessages.length === 0 ? (
                                 <div className="flex justify-center items-center h-full">
-                                    <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>
+                                    <p className="text-slate-400">
                                         No messages yet.
                                     </p>
                                 </div>
@@ -233,19 +222,15 @@ const AskDoubtPageMobile = (props) => {
                                             key={message._id} 
                                             className={`p-3 rounded-lg max-w-[85%] ${
                                                 message.user?._id === currentUser?._id
-                                                    ? theme === 'dark'
-                                                        ? 'bg-blue-600 text-white ml-auto'
-                                                        : 'bg-blue-500 text-white ml-auto'
-                                                    : theme === 'dark'
-                                                        ? 'bg-gray-800 text-white'
-                                                        : 'bg-white text-gray-800'
+                                                    ? 'bg-cyan-600 text-white ml-auto'
+                                                    : 'bg-[#1a1a1a] text-white border border-white/10'
                                             }`}
                                         >
                                             <p className="whitespace-pre-wrap text-sm">{message.text}</p>
                                             <p className={`text-xs mt-1 ${
                                                 message.user?._id === currentUser?._id
-                                                    ? theme === 'dark' ? 'text-blue-200' : 'text-blue-100'
-                                                    : theme === 'dark' ? 'text-gray-400' : 'text-gray-500'
+                                                    ? 'text-cyan-200' 
+                                                    : 'text-slate-400'
                                             }`}>
                                                 {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                             </p>
@@ -256,18 +241,14 @@ const AskDoubtPageMobile = (props) => {
                         </div>
                         
                         {/* Message input */}
-                        <div className={`p-3 border-t shrink-0 ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+                        <div className="p-3 border-t shrink-0 bg-[#1a1a1a] border-white/10">
                             <div className="flex gap-2">
                                 <input
                                     type="text"
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     placeholder="Type a message..."
-                                    className={`flex-grow p-2 rounded-lg border text-sm ${
-                                        theme === 'dark'
-                                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                                            : 'bg-white border-gray-300 text-gray-800 placeholder-gray-500'
-                                    }`}
+                                    className="flex-grow p-2 rounded-lg border border-white/10 bg-[#222222] text-white placeholder-slate-400 text-sm"
                                 />
                                 <button
                                     onClick={() => {
@@ -282,12 +263,8 @@ const AskDoubtPageMobile = (props) => {
                                     disabled={!newMessage.trim()}
                                     className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                                         newMessage.trim()
-                                            ? theme === 'dark'
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                                : 'bg-blue-500 hover:bg-blue-600 text-white'
-                                            : theme === 'dark'
-                                                ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
-                                                : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                            ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
+                                            : 'bg-slate-700 text-slate-400 cursor-not-allowed'
                                     }`}
                                 >
                                     Send
@@ -300,14 +277,14 @@ const AskDoubtPageMobile = (props) => {
                 // Show list of private chats
                 return (
                     // FIXED: Added h-full and w-full to ensure scroll works inside this container
-                    <div className={`flex-1 overflow-y-auto p-3 h-full w-full ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                        <h3 className={`text-lg font-bold mb-3 ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                    <div className="flex-1 overflow-y-auto p-3 h-full w-full bg-[#0a0a0a]">
+                        <h3 className="text-lg font-bold mb-3 text-white">
                             {currentUser?.role === 'admin' ? 'Fighters' : 'Admin'}
                         </h3>
                         
                         {currentUser?.role === 'admin' ? (
                             fighters.length === 0 ? (
-                                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>No fighters found</p>
+                                <p className="text-slate-400">No fighters found</p>
                             ) : (
                                 <div className="space-y-2 pb-16"> {/* Added padding bottom to prevent last item being hidden by bottom nav */}
                                     {fighters.map((fighter) => (
@@ -319,24 +296,18 @@ const AskDoubtPageMobile = (props) => {
                                                     peer: { _id: fighter._id, name: fighter.name } 
                                                 });
                                             }}
-                                            className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                                                theme === 'dark' 
-                                                    ? 'bg-gray-800 hover:bg-gray-700 text-white' 
-                                                    : 'bg-white hover:bg-gray-100 text-gray-800'
-                                            }`}
+                                            className="p-3 rounded-lg cursor-pointer transition-colors bg-[#1a1a1a] hover:bg-white/10 text-white border border-white/10"
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center">
-                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
-                                                        theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
-                                                    }`}>
+                                                    <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-[#222222]">
                                                         <span className="font-bold">
                                                             {fighter.name.charAt(0).toUpperCase()}
                                                         </span>
                                                     </div>
                                                     <div>
                                                         <p className="font-medium">{fighter.name}</p>
-                                                        <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                                        <p className="text-sm text-slate-400">
                                                             Fighter
                                                         </p>
                                                     </div>
@@ -361,22 +332,16 @@ const AskDoubtPageMobile = (props) => {
                                         });
                                     }
                                 }}
-                                className={`p-3 rounded-lg cursor-pointer transition-colors ${
-                                    theme === 'dark' 
-                                        ? 'bg-gray-800 hover:bg-gray-700 text-white' 
-                                        : 'bg-white hover:bg-gray-100 text-gray-800'
-                                }`}
+                                className="p-3 rounded-lg cursor-pointer transition-colors bg-[#1a1a1a] hover:bg-white/10 text-white border border-white/10"
                             >
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
-                                            theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'
-                                        }`}>
+                                        <div className="w-10 h-10 rounded-full flex items-center justify-center mr-3 bg-[#222222]">
                                             <span className="font-bold">A</span>
                                         </div>
                                         <div>
                                             <p className="font-medium">Admin</p>
-                                            <p className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                            <p className="text-sm text-slate-400">
                                                 Gym Administrator
                                             </p>
                                         </div>
@@ -397,13 +362,13 @@ const AskDoubtPageMobile = (props) => {
         // Notifications Tab
         if (activeTab === 'notifications') {
             return (
-                <div className={`flex-1 overflow-y-auto p-3 h-full w-full ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
+                <div className="flex-1 overflow-y-auto p-3 h-full w-full bg-[#0a0a0a]">
                     <div className="flex justify-between items-center mb-3">
-                        <h3 className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>Notifications</h3>
+                        <h3 className="text-lg font-bold text-white">Notifications</h3>
                         {notifications.length > 0 && (
                             <button 
                                 onClick={() => setNotifications([])}
-                                className={`text-sm ${theme === 'dark' ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
+                                className="text-sm text-cyan-400 hover:text-cyan-300"
                             >
                                 Clear All
                             </button>
@@ -411,19 +376,19 @@ const AskDoubtPageMobile = (props) => {
                     </div>
                     
                     {notifications.length === 0 ? (
-                        <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>No notifications</p>
+                        <p className="text-slate-400">No notifications</p>
                     ) : (
                         <div className="space-y-2">
                             {notifications.map((notification, index) => (
                                 <div 
                                     key={index}
-                                    className={`p-3 rounded-lg ${
-                                        theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
-                                    }`}
+                                    className="p-3 rounded-lg border border-white/10 bg-[#1a1a1a]"
                                 >
-                                    <p className="font-medium">{notification.senderName}</p>
-                                    <p className="text-sm mt-1">{notification.text}</p>
-                                    <p className={`text-xs mt-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    <p className="font-medium text-white">{notification.senderName}</p>
+                                    <p className="text-sm mt-1 text-slate-300">
+                                        {notification.text}
+                                    </p>
+                                    <p className="text-xs mt-2 text-slate-400">
                                         Just now
                                     </p>
                                 </div>
@@ -436,28 +401,28 @@ const AskDoubtPageMobile = (props) => {
         
         // Default fallback
         return (
-            <div className={`flex-grow flex items-center justify-center p-4 ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-50'}`}>
-                <p className={theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}>Select a tab to view content</p>
+            <div className="flex-grow flex items-center justify-center p-4 bg-[#0a0a0a]">
+                <p className="text-slate-400">Select a tab to view content</p>
             </div>
         );
     };
 
     return (
         // FIXED: Used h-[100dvh] for strict mobile viewport height without scrolling page
-        <div className={`flex flex-col h-[100dvh] w-full overflow-hidden ${theme === 'dark' ? 'bg-gray-900' : 'bg-gray-100'}`}>
+        <div className="flex flex-col h-[100dvh] w-full overflow-hidden bg-[#0a0a0a]">
             {/* Header - Fixed Height */}
-            <div className={`shrink-0 p-4 border-b shadow-sm ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className="shrink-0 p-4 border-b bg-[#1a1a1a] border-white/10">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center">
                         {showBackButton() && (
                             <button 
                                 onClick={handleBack}
-                                className={`mr-3 p-2 rounded-lg ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                                className="mr-3 p-2 rounded-lg hover:bg-white/10"
                             >
                                 <FaChevronLeft />
                             </button>
                         )}
-                        <h3 className={`text-xl font-bold truncate ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
+                        <h3 className="text-xl font-bold truncate text-white">
                             {activeTab === 'common' ? 'Common Chat' : 
                              activeTab === 'private' ? (activeChat?.peer?.name || 'Private Chats') : 
                              'Notifications'}
@@ -467,14 +432,11 @@ const AskDoubtPageMobile = (props) => {
                         {/* Theme toggle */}
                         <button
                             onClick={toggleTheme}
-                            className={`p-2 rounded-full transition-colors ${
-                                theme === 'dark' 
-                                    ? 'text-yellow-400 bg-gray-700 hover:bg-gray-600' 
-                                    : 'text-gray-700 bg-gray-200 hover:bg-gray-300'
-                            }`}
-                            title={theme === 'dark' ? "Switch to light mode" : "Switch to dark mode"}
+                            className="p-2 rounded-full transition-colors text-slate-400 bg-[#222222] cursor-not-allowed opacity-50"
+                            title="Theme toggle disabled for consistency"
+                            disabled
                         >
-                            {theme === 'dark' ? <FaSun className="text-lg" /> : <FaMoon className="text-lg" />}
+                            <FaMoon className="text-lg" />
                         </button>
                     </div>
                 </div>
@@ -487,13 +449,13 @@ const AskDoubtPageMobile = (props) => {
             </div>
 
             {/* Bottom Tab Navigator - Fixed Height */}
-            <div className={`shrink-0 flex justify-around items-center border-t p-2 pb-safe ${theme === 'dark' ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div className="shrink-0 flex justify-around items-center border-t p-2 pb-safe bg-[#1a1a1a] border-white/10">
                 <button 
                     onClick={() => {
                         setActiveTab('common');
                         setActiveChat({ type: 'common', peer: { _id: null, name: 'Common Group' } });
                     }} 
-                    className={`flex flex-col items-center p-2 rounded-lg w-full ${activeTab === 'common' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : (theme === 'dark' ? 'text-gray-400' : 'text-gray-500')}`}
+                    className={`flex flex-col items-center p-2 rounded-lg w-full ${activeTab === 'common' ? 'text-cyan-400 border-t-2 border-cyan-400' : 'text-slate-400 hover:text-slate-300'}`}
                 >
                     <FaUsers size={20} />
                     <span className="text-xs mt-1">Common</span>
@@ -505,14 +467,14 @@ const AskDoubtPageMobile = (props) => {
                             setActiveChat({ type: 'common', peer: { _id: null, name: 'Common Group' } });
                         }
                     }} 
-                    className={`flex flex-col items-center p-2 rounded-lg w-full ${activeTab === 'private' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : (theme === 'dark' ? 'text-gray-400' : 'text-gray-500')}`}
+                    className={`flex flex-col items-center p-2 rounded-lg w-full ${activeTab === 'private' ? 'text-cyan-400 border-t-2 border-cyan-400' : 'text-slate-400 hover:text-slate-300'}`}
                 >
                     <FaUserShield size={20} />
                     <span className="text-xs mt-1">Private</span>
                 </button>
                 <button 
                     onClick={() => setActiveTab('notifications')} 
-                    className={`flex flex-col items-center p-2 rounded-lg w-full ${activeTab === 'notifications' ? (theme === 'dark' ? 'text-blue-400' : 'text-blue-600') : (theme === 'dark' ? 'text-gray-400' : 'text-gray-500')}`}
+                    className={`flex flex-col items-center p-2 rounded-lg w-full ${activeTab === 'notifications' ? 'text-cyan-400 border-t-2 border-cyan-400' : 'text-slate-400 hover:text-slate-300'}`}
                 >
                     <div className="relative">
                         <FaBell size={20} />
