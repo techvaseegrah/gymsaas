@@ -80,7 +80,7 @@ const GymStatsPage = () => {
     if (loading) return <div className="p-8 text-center text-gray-400">Loading Stats...</div>;
 
     return (
-        <div className="min-h-screen bg-gray-900 p-4 md:p-8 text-white">
+        <div className="min-h-screen p-4 md:p-8 text-white">
             <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                 <h1 className="text-3xl font-bold flex items-center gap-3">
                     <FaDumbbell className="text-red-500" /> Gym Stats

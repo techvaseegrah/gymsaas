@@ -184,91 +184,84 @@ const LoginPage = ({ setUser }) => {
 
     // --- RENDER ---
     return (
-        <div className="relative min-h-screen w-full overflow-hidden bg-gray-900 flex items-center justify-center selection:bg-pink-500 selection:text-white font-sans">
+        <div className="relative min-h-screen w-full overflow-hidden bg-slate-950 flex items-center justify-center selection:bg-accent selection:text-white font-sans">
             
-            {/* 1. LIQUID BACKGROUND ANIMATION */}
-            <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
-                <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
-                <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-pink-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-4000"></div>
+            {/* Background elements for modern visual interest */}
+            <div className="absolute inset-0 z-0">
+                <div className="absolute top-20 left-1/4 w-[600px] h-[600px] bg-gradient-to-r from-accent/10 to-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute bottom-20 right-1/4 w-[500px] h-[500px] bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-full blur-3xl animate-pulse animation-delay-2000"></div>
             </div>
-            
-            <div className="absolute inset-0 z-0 bg-gray-900/60 backdrop-blur-sm"></div>
 
-            {/* 2. MAIN GLASS CARD */}
-            <div className="relative z-10 w-full max-w-4xl px-4 transition-all duration-500">
-                <div className="bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl overflow-hidden flex flex-col min-h-[500px]">
+            {/* Main content container */}
+            <div className="relative z-10 w-full max-w-2xl px-6 transition-all duration-500">
+                <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/80 backdrop-blur-2xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl shadow-accent/10">
                     
-                    {/* --- HEADER SECTION --- */}
-                    <div className="p-8 text-center border-b border-white/10 relative">
-                        {/* DYNAMIC LOGO: Changes to Fighter Photo when selected OR SHOWS 'GR' */}
-                        <div className="inline-block p-1 bg-gradient-to-br from-white/20 to-transparent rounded-full mb-4 backdrop-blur-md shadow-lg ring-1 ring-white/30">
-                            {selectedFighter?.profilePhoto ? (
-                                <img
-                                    src={selectedFighter.profilePhoto} 
-                                    alt="Logo"
-                                    className="w-20 h-20 rounded-full object-cover"
-                                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                                />
-                            ) : (
-                                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-2xl font-bold text-white">
-                                    GR
-                                </div>
-                            )}
-                            {/* Hidden fallback div if image fails to load */}
-                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 items-center justify-center text-2xl font-bold text-white hidden">
-                                GR
-                            </div>
+                    {/* Header section */}
+                    <div className="p-10 text-center border-b border-white/10 relative">
+                        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-blue-700 mb-6 font-bold text-white shadow-lg shadow-accent/30 relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
+                            <span className="text-2xl">GR</span>
                         </div>
                         
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight drop-shadow-lg">
+                        <h1 className="text-3xl font-bold text-white tracking-tight mb-3 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
                             {selectedFighter ? selectedFighter.name : (selectedGym ? selectedGym.name : 'GymRatz')}
                         </h1>
-                        <p className="text-blue-200 text-sm font-medium tracking-wider uppercase mt-2">
+                        <p className="text-slate-400 text-sm font-medium tracking-wider uppercase">
                             {selectedFighter ? 'Enter Password' : (loginType ? `${loginType} Portal` : 'Welcome Warrior')}
                         </p>
                     </div>
 
-                    {/* --- BODY CONTENT --- */}
-                    <div className="p-8 flex-grow flex flex-col justify-center items-center w-full">
+                    {/* Body content */}
+                    <div className="p-10 flex-grow flex flex-col justify-center items-center w-full">
                         
                         {/* VIEW 1: ROLE SELECTION */}
                         {!loginType ? (
-                            <div className="w-full max-w-md space-y-4 animate-fade-in">
+                            <div className="w-full max-w-md space-y-5 animate-fade-in">
                                 <button 
                                     onClick={() => handleRoleSelect('admin')} 
-                                    className="group w-full relative overflow-hidden rounded-2xl p-[1px] transition-all hover:scale-[1.02]"
+                                    className="w-full p-6 rounded-2xl bg-gradient-to-br from-white/5 to-white/10 border border-white/10 hover:from-white/10 hover:to-white/20 transition-all duration-300 flex items-center gap-5 group group-hover:shadow-lg group-hover:shadow-accent/10"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                                    <div className="relative flex items-center p-6 bg-gray-900/90 rounded-2xl h-full">
-                                        <div className="p-3 bg-red-500/20 rounded-full mr-4 text-red-400"><FaUserShield size={24} /></div>
-                                        <div className="text-left">
-                                            <h3 className="text-lg font-bold text-white">Admin Access</h3>
-                                            <p className="text-xs text-gray-400">Manage gym, fighters & settings</p>
-                                        </div>
+                                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-500/20 to-red-600/20 border border-red-500/30 flex items-center justify-center text-red-400 group-hover:text-white transition-colors relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        <FaUserShield size={24} />
+                                    </div>
+                                    <div className="text-left flex-1">
+                                        <h3 className="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-accent group-hover:to-purple-400 transition-all duration-300">Admin Access</h3>
+                                        <p className="text-sm text-slate-400 mt-1">Manage gym, fighters & settings</p>
+                                    </div>
+                                    <div className="text-slate-500 group-hover:text-accent transition-colors">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                                            <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                                        </svg>
                                     </div>
                                 </button>
 
                                 <button 
                                     onClick={() => handleRoleSelect('fighter')} 
-                                    className="group w-full relative overflow-hidden rounded-2xl p-[1px] transition-all hover:scale-[1.02]"
+                                    className="w-full p-6 rounded-2xl bg-gradient-to-br from-white/5 to-white/10 border border-white/10 hover:from-white/10 hover:to-white/20 transition-all duration-300 flex items-center gap-5 group group-hover:shadow-lg group-hover:shadow-accent/10"
                                 >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-                                    <div className="relative flex items-center p-6 bg-gray-900/90 rounded-2xl h-full">
-                                        <div className="p-3 bg-blue-500/20 rounded-full mr-4 text-blue-400"><FaDumbbell size={24} /></div>
-                                        <div className="text-left">
-                                            <h3 className="text-lg font-bold text-white">Fighter Access</h3>
-                                            <p className="text-xs text-gray-400">View stats, attendance & profile</p>
-                                        </div>
+                                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400 group-hover:text-white transition-colors relative overflow-hidden">
+                                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                                        <FaDumbbell size={24} />
+                                    </div>
+                                    <div className="text-left flex-1">
+                                        <h3 className="text-xl font-bold text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-accent group-hover:to-purple-400 transition-all duration-300">Fighter Access</h3>
+                                        <p className="text-sm text-slate-400 mt-1">View stats, attendance & profile</p>
+                                    </div>
+                                    <div className="text-slate-500 group-hover:text-accent transition-colors">
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
+                                            <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+                                        </svg>
                                     </div>
                                 </button>
                                 
-                                <div className="text-center mt-4">
+                                <div className="text-center mt-8 pt-8 border-t border-white/10">
                                     <button 
                                         onClick={() => navigate('/superadmin/login')} 
-                                        className="text-gray-400 hover:text-purple-400 text-sm transition-colors"
+                                        className="text-slate-400 hover:text-accent text-sm transition-colors inline-flex items-center gap-2 group"
                                     >
-                                        Super Admin Login
+                                        Super Admin Login 
+                                        <span className="group-hover:translate-x-1 transition-transform">→</span>
                                     </button>
                                 </div>
                             </div>
@@ -276,80 +269,101 @@ const LoginPage = ({ setUser }) => {
                         /* VIEW 2: GYM ID SELECTION */
                         ) : !selectedGym ? (
                             <div className="w-full max-w-md animate-fade-in">
-                                <form onSubmit={handleTenantSlugSubmit} className="space-y-6">
-                                    <div className="relative group">
-                                        <FaBuilding className="absolute left-4 top-4 text-gray-400 group-focus-within:text-white transition-colors" />
-                                        <input
-                                            type="text"
-                                            placeholder="Enter Gym ID (e.g. mutants)"
-                                            className="w-full pl-12 pr-4 py-4 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:bg-black/40 focus:border-white/30 transition-all"
-                                            value={tenantSlug}
-                                            onChange={(e) => setTenantSlug(e.target.value)}
-                                        />
+                                <form onSubmit={handleTenantSlugSubmit} className="space-y-7">
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Gym ID</label>
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400 group-focus-within:text-accent">
+                                                <FaBuilding />
+                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter Gym ID (e.g. mutants)"
+                                                className="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all group-focus-within:shadow-lg group-focus-within:shadow-accent/20"
+                                                value={tenantSlug}
+                                                onChange={(e) => setTenantSlug(e.target.value)}
+                                                required
+                                            />
+                                        </div>
                                     </div>
-                                    {tenantError && <div className="text-red-300 text-sm text-center bg-red-500/20 p-2 rounded-lg">{tenantError}</div>}
+                                    {tenantError && <div className="text-red-400 text-sm text-center bg-red-500/10 border border-red-500/20 p-3 rounded-xl">{tenantError}</div>}
                                     
-                                    <button type="submit" disabled={loading} className="w-full py-4 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl text-white font-bold transition-all">
-                                        {loading ? 'Searching...' : 'Continue'}
+                                    <button type="submit" disabled={loading} className="w-full py-4 bg-gradient-to-r from-accent to-blue-600 hover:to-blue-500 text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed btn-shine relative overflow-hidden">
+                                        {loading ? (
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                <span>Searching...</span>
+                                            </div>
+                                        ) : 'Continue'}
                                     </button>
                                     <div className="text-center">
-                                        <button type="button" onClick={resetGymSelection} className="text-gray-400 hover:text-white text-sm">Back</button>
+                                        <button type="button" onClick={resetGymSelection} className="text-slate-400 hover:text-white text-sm transition-colors inline-flex items-center gap-2 group"
+                                        >
+                                            <FaArrowLeft size={12} /> <span className="group-hover:-translate-x-0.5 transition-transform">Back to Role Selection</span>
+                                        </button>
                                     </div>
                                 </form>
                             </div>
 
                         /* VIEW 3: FIGHTER SEARCH (Grid) */
                         ) : loginType === 'fighter' && !selectedFighter ? (
-                            <div className="w-full animate-fade-in">
-                                <div className="relative mb-6 max-w-md mx-auto">
-                                    <FaSearch className="absolute left-4 top-3.5 text-gray-400 group-focus-within:text-white transition-colors" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search your name..."
-                                        className="w-full pl-12 pr-4 py-3 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:bg-black/40 focus:border-white/30 transition-all glass-card"
-                                        value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
-                                    />
+                            <div className="w-full max-w-md animate-fade-in">
+                                <div className="space-y-3 mb-7">
+                                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Search Fighter</label>
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400 group-focus-within:text-accent">
+                                            <FaSearch />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="Search your name..."
+                                            className="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all group-focus-within:shadow-lg group-focus-within:shadow-accent/20"
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                        />
+                                    </div>
                                 </div>
 
                                 {loading ? (
-                                    <div className="text-center text-white/50 py-10">Loading roster...</div>
+                                    <div className="text-center text-slate-500 py-10">
+                                        <div className="w-8 h-8 border-2 border-accent/30 border-t-accent rounded-full animate-spin mx-auto mb-4"></div>
+                                        Loading roster...
+                                    </div>
                                 ) : (
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-5 max-h-[350px] overflow-y-auto pr-2 custom-scrollbar">
                                         {filteredFighters.map(fighter => (
                                             <div 
                                                 key={fighter._id} 
                                                 onClick={() => handleFighterSelect(fighter)} 
-                                                className="glass-card group rounded-2xl p-4 flex flex-col items-center cursor-pointer transition-all duration-300 hover:scale-105 hover:bg-white/10 hover:border-white/20"
+                                                className="rounded-2xl bg-gradient-to-br from-white/5 to-white/10 border border-white/10 p-5 flex flex-col items-center cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-accent/20 group"
                                             >
-                                                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-transparent group-hover:border-red-400 mb-3 transition-all relative flex items-center justify-center" style={{ backgroundColor: fighter.profilePhoto ? 'transparent' : '#EF4444' }}>
+                                                <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-transparent group-hover:border-accent mb-4 transition-all relative flex items-center justify-center" style={{ backgroundColor: fighter.profilePhoto ? 'transparent' : '#3b82f6' }}>
                                                     {fighter.profilePhoto ? (
                                                         <img
                                                             src={fighter.profilePhoto}
                                                             alt={fighter.name}
                                                             className="w-full h-full object-cover"
                                                             onError={(e) => { e.target.src = "/logo.png"; }} 
-                                                            /* Note: Still using logo.png as last resort fallback in roster if image fails, but mainly relied on initials */
                                                         />
                                                     ) : (
-                                                        <span className="text-white text-xl font-bold">
+                                                        <span className="text-white text-base font-bold">
                                                             {getInitials(fighter.name)}
                                                         </span>
                                                     )}
                                                 </div>
-                                                <h4 className="text-white font-semibold text-sm text-center truncate w-full">{fighter.name}</h4>
-                                                <p className="text-xs text-gray-400 truncate w-full text-center">{fighter.rfid}</p>
+                                                <h4 className="text-white font-semibold text-base text-center truncate w-full">{fighter.name}</h4>
+                                                <p className="text-xs text-slate-500 truncate w-full text-center mt-1">{fighter.rfid}</p>
                                             </div>
                                         ))}
-                                        {filteredFighters.length === 0 && <p className="col-span-full text-center text-gray-500">No fighters found.</p>}
+                                        {filteredFighters.length === 0 && <p className="col-span-full text-center text-slate-500 py-6">No fighters found.</p>}
                                     </div>
                                 )}
-                                <div className="text-center mt-6">
+                                <div className="text-center mt-8 pt-8 border-t border-white/10">
                                     <button 
                                         onClick={backToGymSelection} 
-                                        className="text-gray-400 hover:text-white text-sm transition-colors duration-300 flex items-center justify-center gap-1 mx-auto"
+                                        className="text-slate-400 hover:text-white text-sm transition-colors inline-flex items-center gap-2 group"
                                     >
-                                        <FaArrowLeft size={14} /> Change Gym
+                                        <FaArrowLeft size={12} /> <span className="group-hover:-translate-x-0.5 transition-transform">Change Gym</span>
                                     </button>
                                 </div>
                             </div>
@@ -357,58 +371,68 @@ const LoginPage = ({ setUser }) => {
                         /* VIEW 4: PASSWORD LOGIN (Admin or Fighter) */
                         ) : (
                             <div className="w-full max-w-md animate-fade-in">
-                                <form onSubmit={loginType === 'admin' ? handleAdminLogin : handleFighterLogin} className="space-y-5">
+                                <form onSubmit={loginType === 'admin' ? handleAdminLogin : handleFighterLogin} className="space-y-6">
                                     
                                     {/* Admin Email Input */}
                                     {loginType === 'admin' && (
-                                        <div className="relative group">
-                                            <FaUser className="absolute left-4 top-4 text-gray-400 group-focus-within:text-white transition-colors" />
-                                            <input 
-                                                type="email" 
-                                                value={adminCredentials.email} 
-                                                onChange={(e) => setAdminCredentials({ ...adminCredentials, email: e.target.value })} 
-                                                placeholder="admin@example.com" 
-                                                className="w-full pl-12 pr-4 py-4 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:bg-black/40 focus:border-white/30 transition-all"
-                                                required 
-                                            />
+                                        <div className="space-y-3">
+                                            <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Email</label>
+                                            <div className="relative group">
+                                                <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400 group-focus-within:text-accent">
+                                                    <FaUser />
+                                                </div>
+                                                <input 
+                                                    type="email" 
+                                                    value={adminCredentials.email} 
+                                                    onChange={(e) => setAdminCredentials({ ...adminCredentials, email: e.target.value })} 
+                                                    placeholder="admin@example.com" 
+                                                    className="w-full pl-12 pr-4 py-4 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all group-focus-within:shadow-lg group-focus-within:shadow-accent/20"
+                                                    required 
+                                                />
+                                            </div>
                                         </div>
                                     )}
 
                                     {/* Password Input (Shared) */}
-                                    <div className="relative group">
-                                        <FaLock className="absolute left-4 top-4 text-gray-400 group-focus-within:text-white transition-colors" />
-                                        <input 
-                                            type={loginType === 'admin' ? (showAdminPassword ? "text" : "password") : (showFighterPassword ? "text" : "password")} 
-                                            value={loginType === 'admin' ? adminCredentials.password : fighterPassword} 
-                                            onChange={(e) => loginType === 'admin' ? setAdminCredentials({ ...adminCredentials, password: e.target.value }) : setFighterPassword(e.target.value)} 
-                                            placeholder="Password" 
-                                            className="w-full pl-12 pr-12 py-4 bg-black/20 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:bg-black/40 focus:border-white/30 transition-all"
-                                            required 
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => loginType === 'admin' ? setShowAdminPassword(!showAdminPassword) : setShowFighterPassword(!showFighterPassword)}
-                                            className="absolute right-4 top-4 text-gray-400 hover:text-white transition-colors"
-                                        >
-                                            {loginType === 'admin' 
-                                                ? (showAdminPassword ? <FaEyeSlash /> : <FaEye />)
-                                                : (showFighterPassword ? <FaEyeSlash /> : <FaEye />)
-                                            }
-                                        </button>
+                                    <div className="space-y-3">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Password</label>
+                                        <div className="relative group">
+                                            <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-slate-400 group-focus-within:text-accent">
+                                                <FaLock />
+                                            </div>
+                                            <input 
+                                                type={loginType === 'admin' ? (showAdminPassword ? "text" : "password") : (showFighterPassword ? "text" : "password")} 
+                                                value={loginType === 'admin' ? adminCredentials.password : fighterPassword} 
+                                                onChange={(e) => loginType === 'admin' ? setAdminCredentials({ ...adminCredentials, password: e.target.value }) : setFighterPassword(e.target.value)} 
+                                                placeholder="Enter your password" 
+                                                className="w-full pl-12 pr-16 py-4 bg-slate-900/50 border border-white/10 rounded-xl text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent transition-all group-focus-within:shadow-lg group-focus-within:shadow-accent/20"
+                                                required 
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => loginType === 'admin' ? setShowAdminPassword(!showAdminPassword) : setShowFighterPassword(!showFighterPassword)}
+                                                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                                            >
+                                                {loginType === 'admin' 
+                                                    ? (showAdminPassword ? <FaEyeSlash /> : <FaEye />)
+                                                    : (showFighterPassword ? <FaEyeSlash /> : <FaEye />)
+                                                }
+                                            </button>
+                                        </div>
                                     </div>
 
                                     {/* Forgot Password Link */}
                                     <div className="flex justify-end">
                                         <Link 
                                             to="/forgot-password"
-                                            className="text-sm text-blue-300 hover:text-white transition-colors"
+                                            className="text-sm text-slate-400 hover:text-accent transition-colors inline-flex items-center gap-1 group"
                                         >
-                                            Forgot Password?
+                                            Forgot Password? <span className="group-hover:translate-x-0.5 transition-transform">→</span>
                                         </Link>
                                     </div>
 
                                     {error && (
-                                        <div className="p-3 rounded-lg bg-red-500/20 border border-red-500/40 text-red-200 text-sm text-center animate-pulse">
+                                        <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
                                             {error}
                                         </div>
                                     )}
@@ -416,22 +440,23 @@ const LoginPage = ({ setUser }) => {
                                     <button 
                                         type="submit" 
                                         disabled={loading}
-                                        className={`w-full py-4 font-bold text-white rounded-xl shadow-lg transform transition-all duration-300 hover:scale-[1.02] flex justify-center items-center ${
-                                            loginType === 'admin' 
-                                            ? 'bg-gradient-to-r from-red-600 to-red-800 hover:from-red-500 hover:to-red-700' 
-                                            : 'bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700'
-                                        }`}
+                                        className="w-full py-4 bg-gradient-to-r from-accent to-blue-600 hover:to-blue-500 text-white font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed btn-shine relative overflow-hidden"
                                     >
-                                        {loading ? 'Authenticating...' : 'Sign In'}
+                                        {loading ? (
+                                            <div className="flex items-center justify-center gap-2">
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                <span>Authenticating...</span>
+                                            </div>
+                                        ) : 'Sign In'}
                                     </button>
                                 </form>
 
-                                <div className="text-center mt-6">
+                                <div className="text-center mt-8 pt-8 border-t border-white/10">
                                     <button 
                                         onClick={loginType === 'fighter' ? backToFighterList : backToGymSelection} 
-                                        className="text-gray-400 hover:text-white text-sm flex items-center justify-center gap-2 mx-auto transition-colors"
+                                        className="text-slate-400 hover:text-white text-sm transition-colors inline-flex items-center gap-2 group"
                                     >
-                                        <FaArrowLeft /> {loginType === 'fighter' ? 'Back to Fighters' : 'Back to Gym'}
+                                        <FaArrowLeft size={12} /> <span className="group-hover:-translate-x-0.5 transition-transform">{loginType === 'fighter' ? 'Back to Fighters' : 'Back to Gym'}</span>
                                     </button>
                                 </div>
                             </div>

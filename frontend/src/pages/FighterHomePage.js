@@ -50,13 +50,13 @@ const FighterHomePage = ({ user, confirmLogout }) => {
     };
 
     return (
-        <div className="min-h-screen relative bg-gray-900 pb-10 overflow-x-hidden text-gray-200 font-sans selection:bg-red-500 selection:text-white">
+        <div className="min-h-screen relative bg-gray-900 border-b-4 border-white rounded-3xl pb-10 overflow-x-hidden text-gray-200 font-sans selection:bg-red-500 selection:text-white">
             
             {/* --- ANIMATED BACKGROUND BLOBS --- */}
             <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600 rounded-full mix-blend-screen filter blur-[128px] opacity-20 animate-blob"></div>
-                 <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-600 rounded-full mix-blend-screen filter blur-[128px] opacity-20 animate-blob animation-delay-2000"></div>
-                 <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-purple-600 rounded-full mix-blend-screen filter blur-[128px] opacity-20 animate-blob animation-delay-4000"></div>
+                 <div className="absolute top-0 left-1/4 w-96 h-96 bg-red-600 rounded-3xl mix-blend-screen filter blur-[128px] opacity-20 animate-blob"></div>
+                 <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-600 rounded-3xl mix-blend-screen filter blur-[128px] opacity-20 animate-blob animation-delay-2000"></div>
+                 <div className="absolute -bottom-32 left-1/3 w-96 h-96 bg-purple-600 rounded-3xl mix-blend-screen filter blur-[128px] opacity-20 animate-blob animation-delay-4000"></div>
             </div>
 
             {/* --- GLASS HERO HEADER --- */}
@@ -70,10 +70,10 @@ const FighterHomePage = ({ user, confirmLogout }) => {
                             Train hard. Fight easy. This is your command center.
                         </p>
                         <div className="mt-4 flex flex-wrap gap-2 md:gap-3 justify-center md:justify-start">
-                            <span className="px-3 py-1 md:px-4 md:py-1.5 bg-red-500/20 border border-red-500/30 text-red-200 rounded-full text-xs md:text-sm font-medium backdrop-blur-md">
+                            <span className="px-3 py-1 md:px-4 md:py-1.5 bg-red-500/20 border border-red-500/30 text-red-200 rounded-2xl text-xs md:text-sm font-medium backdrop-blur-md">
                                 Fighter Portal
                             </span>
-                            <span className="px-3 py-1 md:px-4 md:py-1.5 bg-yellow-500/20 border border-yellow-500/30 text-yellow-200 rounded-full text-xs md:text-sm font-medium backdrop-blur-md">
+                            <span className="px-3 py-1 md:px-4 md:py-1.5 bg-yellow-500/20 border border-yellow-500/30 text-yellow-200 rounded-2xl text-xs md:text-sm font-medium backdrop-blur-md">
                                 Level {fighterData?.assessment?.specialGradeScore || 'N/A'}
                             </span>
                         </div>
@@ -83,7 +83,7 @@ const FighterHomePage = ({ user, confirmLogout }) => {
                     {fighterData && (
                         <div className="relative group mt-4 md:mt-0">
                             <div 
-                                className="w-24 h-24 md:w-36 md:h-36 rounded-full p-1 bg-gradient-to-br from-white/20 to-transparent backdrop-blur-md shadow-2xl cursor-pointer"
+                                className="w-24 h-24 md:w-36 md:h-36 rounded-3xl p-1 bg-gradient-to-br from-white/20 to-transparent backdrop-blur-md shadow-2xl cursor-pointer"
                                 onTouchStart={handleLongPressStart}
                                 onTouchEnd={handleLongPressEnd}
                                 onTouchCancel={handleLongPressEnd}
@@ -91,15 +91,15 @@ const FighterHomePage = ({ user, confirmLogout }) => {
                                 onMouseUp={handleLongPressEnd}
                                 onMouseLeave={handleLongPressEnd}
                             >
-                                <div className="w-full h-full rounded-full overflow-hidden border-4 border-black/50 relative z-10">
+                                <div className="w-full h-full rounded-3xl overflow-hidden border-4 border-black/50 relative z-10">
                                     {fighterData.profilePhoto ? (
                                         <img 
                                             src={fighterData.profilePhoto} 
                                             alt={fighterData.name} 
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110 rounded-3xl"
                                         />
                                     ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-800">
+                                        <div className="w-full h-full flex items-center justify-center text-gray-400 bg-gray-800 rounded-3xl">
                                             <span className="text-xs">No Photo</span>
                                         </div>
                                     )}
@@ -126,7 +126,7 @@ const FighterHomePage = ({ user, confirmLogout }) => {
                     <div className="bg-black/40 backdrop-blur-xl p-1.5 rounded-2xl border border-white/10 shadow-lg flex w-full max-w-md md:w-auto md:min-w-[400px]">
                         <button
                             onClick={() => setActiveTab('dashboard')}
-                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 ${
+                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-xs md:text-sm font-bold transition-all duration-300 ${
                                 activeTab === 'dashboard'
                                     ? 'bg-gradient-to-br from-red-600 to-red-800 text-white shadow-lg shadow-red-900/50 ring-1 ring-white/20'
                                     : 'text-gray-400 hover:text-white hover:bg-white/5'
@@ -136,7 +136,7 @@ const FighterHomePage = ({ user, confirmLogout }) => {
                         </button>
                         <button
                             onClick={() => setActiveTab('membership')}
-                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs md:text-sm font-bold transition-all duration-300 ${
+                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-xs md:text-sm font-bold transition-all duration-300 ${
                                 activeTab === 'membership'
                                     ? 'bg-gradient-to-br from-red-600 to-red-800 text-white shadow-lg shadow-red-900/50 ring-1 ring-white/20'
                                     : 'text-gray-400 hover:text-white hover:bg-white/5'

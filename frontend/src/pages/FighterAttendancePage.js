@@ -97,7 +97,7 @@ const FighterAttendancePage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 p-4 sm:p-6 lg:p-8">
+        <div className="min-h-screen relative  border-b-4 border-white  pb-10 overflow-x-hidden text-gray-200 font-sans selection:bg-red-500 selection:text-white">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-700 pb-4 gap-4">
                 <h1 className="text-3xl font-bold text-white">My Attendance</h1>
                 
